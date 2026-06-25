@@ -1,0 +1,30 @@
+# 로컬 개발용 인프라 (Redis 등)
+# 사용법:
+#   docker compose -f docker-compose.dev.yaml up -d
+#   docker compose -f docker-compose.dev.yaml down
+#
+# Redis 연결:
+#   REDIS_URL=redis://localhost:6379/0
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: cloosphere-dev-redis
+    ports:
+      - "6379:6379"
+    command:
+      - redis-server
+      - --maxmemory
+      - "256mb"
+      - --maxmemory-policy
+      - noeviction
+      - --appendonly
+      - "no"
+      - --save
+      - ""
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped

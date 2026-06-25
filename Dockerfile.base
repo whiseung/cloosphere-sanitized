@@ -1,0 +1,61 @@
+# syntax=docker/dockerfile:1
+# Cloosphere Base Image
+# 시스템 의존성만 포함 (변경 시에만 다시 빌드)
+# 트리거: Dockerfile.base 또는 requirements.txt 변경 시
+
+FROM python:3.11-slim-bookworm
+
+ARG UID=0
+ARG GID=0
+
+ENV HOME=/root
+
+WORKDIR /app/backend
+
+# Create user and group if not root
+RUN if [ $UID -ne 0 ]; then \
+    if [ $GID -ne 0 ]; then \
+    addgroup --gid $GID app; \
+    fi; \
+    adduser --uid $UID --gid $GID --home $HOME --disabled-password --no-create-home app; \
+    fi
+
+RUN mkdir -p $HOME/.cache/chroma
+RUN echo -n 00000000-0000-0000-0000-000000000000 > $HOME/.cache/chroma/telemetry_user_id
+
+RUN chown -R $UID:$GID /app $HOME
+
+# System packages: pandoc, build tools, ffmpeg, LibreOffice, fonts
+RUN sed -i 's/^Components: main$/Components: main contrib/' /etc/apt/sources.list.d/debian.sources && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends git build-essential pandoc gcc netcat-openbsd curl jq \
+    python3-dev ffmpeg libsm6 libxext6 libmagic1 && \
+    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
+    apt-get install -y --no-install-recommends \
+    libreoffice-writer libreoffice-calc libreoffice-impress \
+    fonts-nanum fonts-nanum-coding fonts-nanum-extra \
+    ttf-mscorefonts-installer fontconfig && \
+    fc-cache -f && \
+    rm -rf /var/lib/apt/lists/*
+
+# Microsoft ODBC Driver 18 for SQL Server
+RUN apt-get update && apt-get install -y --no-install-recommends gnupg && rm -rf /var/lib/apt/lists/* && \
+    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg && \
+    curl -fsSL https://packages.microsoft.com/config/debian/12/prod.list | tee /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y --no-install-recommends msodbcsql18 unixodbc-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Python package manager
+RUN pip3 install --no-cache-dir uv
+
+# Python dependencies
+COPY ./backend/requirements.txt ./requirements.txt
+RUN uv pip install --system -r requirements.txt --no-cache-dir && \
+    mkdir -p /app/backend/data && \
+    chown -R $UID:$GID /app/backend/data/
+
+# Playwright + Chromium & NLTK data
+RUN playwright install chromium && \
+    playwright install-deps chromium && \
+    python -c "import nltk; nltk.download('punkt_tab')"

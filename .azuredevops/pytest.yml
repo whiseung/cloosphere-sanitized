@@ -1,0 +1,97 @@
+# Backend Pytest Pipeline for Azure DevOps
+# uv로 테스트 의존성을 설치한 뒤 backend 단위·통합 테스트를 실행합니다.
+
+trigger:
+  branches:
+    include:
+      - main
+      - dev
+  paths:
+    include:
+      - backend/**
+      - pyproject.toml
+      - uv.lock
+
+pr:
+  branches:
+    include:
+      - main
+      - dev
+  paths:
+    include:
+      - backend/**
+      - pyproject.toml
+      - uv.lock
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  PYTHON_VERSION: '3.12'
+  UV_CACHE_DIR: $(Pipeline.Workspace)/.uv_cache
+
+stages:
+  - stage: Test
+    displayName: 'Backend Pytest'
+    jobs:
+      - job: Pytest
+        displayName: 'Run Pytest'
+        steps:
+          - checkout: self
+
+          - task: UsePythonVersion@0
+            displayName: 'Use Python $(PYTHON_VERSION)'
+            inputs:
+              versionSpec: '$(PYTHON_VERSION)'
+              addToPath: true
+
+          - task: Cache@2
+            displayName: 'Cache uv dependencies'
+            inputs:
+              key: 'uv | "$(Agent.OS)" | pyproject.toml | uv.lock'
+              restoreKeys: |
+                uv | "$(Agent.OS)" | pyproject.toml
+                uv | "$(Agent.OS)"
+              path: $(UV_CACHE_DIR)
+
+          # DbSphere approval-gate tests use a real Redis instance (we
+          # deliberately avoid fakeredis so multi-worker GETDEL/TTL semantics
+          # are exercised end-to-end). Ubuntu-latest agents ship Docker, so
+          # spin a disposable container exposed on the conventional port.
+          - bash: |
+              docker run -d --name redis-test -p 6379:6379 redis:7-alpine
+              # Wait for Redis to accept connections before kicking off pytest.
+              for i in {1..20}; do
+                if docker exec redis-test redis-cli ping 2>/dev/null | grep -q PONG; then
+                  echo "Redis ready"
+                  exit 0
+                fi
+                sleep 1
+              done
+              echo "Redis failed to start" >&2
+              docker logs redis-test
+              exit 1
+            displayName: 'Start Redis for tests'
+
+          - bash: |
+              curl -LsSf https://astral.sh/uv/install.sh | sh
+              echo "##vso[task.prependpath]$HOME/.local/bin"
+            displayName: 'Install uv'
+
+          - bash: |
+              uv sync --group test
+            displayName: 'Install test dependencies'
+            workingDirectory: $(Build.SourcesDirectory)
+
+          # testpaths, pythonpath, asyncio_mode, and `-m "not integration"`
+          # are configured in pyproject.toml [tool.pytest.ini_options].
+          # Integration tests (Docker/Postgres) are excluded from CI by default.
+          - bash: |
+              uv run pytest -v
+            displayName: 'Run pytest (unit only)'
+            workingDirectory: $(Build.SourcesDirectory)
+            env:
+              # DbSphere approval-gate 테스트가 set_pending/pop_pending →
+              # _redis_client() 경로를 타며, REDIS_URL 이 비어 있으면 RuntimeError
+              # 로 즉시 실패한다. 위 step 에서 띄운 redis-test 컨테이너를 가리킨다.
+              REDIS_URL: redis://localhost:6379/0

@@ -1,0 +1,96 @@
+---
+title: "이미지"
+description: "AI 이미지 생성 엔진과 연결 설정을 구성합니다."
+---
+
+**관리자 > 설정 > 이미지** 탭에서 AI 이미지 생성 기능을 구성합니다.
+
+{/* SCREENSHOT: settings-images
+     화면: 관리자 > 설정 > 이미지 탭
+     영역: 이미지 생성 활성화 + 엔진별 설정
+     상태: 활성화 + 1개 엔진 설정
+     하이라이트: 없음 */}
+<Frame caption="이미지 생성 엔진을 연결하고 에이전트에서 사용할 수 있도록 활성화합니다">
+  <img src="/images/admin/settings-images.png" alt="이미지 설정 탭" />
+</Frame>
+
+---
+
+## 이미지 생성 활성화
+
+| 설정 항목 | 설명 | 기본값 |
+|-----------|------|--------|
+| **이미지 생성 활성화** | 이미지 생성 기능 ON/OFF | 비활성화 |
+
+<Note>
+  이미지 생성은 에이전트 capability로 활성화된 경우에만 사용자에게 노출됩니다.
+</Note>
+
+---
+
+## 지원 엔진
+
+이미지 생성 연결을 추가하고 관리합니다. 여러 엔진을 동시에 구성할 수 있습니다.
+
+| 엔진 | 특징 |
+|------|------|
+| **DALL-E (OpenAI)** | OpenAI 이미지 생성 API |
+| **Azure OpenAI** | Azure gpt-image-1, quality/format/background 옵션 지원 |
+| **Gemini** | Google Gemini 이미지 생성 (API Key 인증) |
+| **Vertex AI** | Google Vertex AI 이미지 생성 (OAuth2 토큰 캐싱) |
+
+---
+
+## 엔진별 설정
+
+<Tabs>
+  <Tab title="OpenAI / DALL-E">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **API Base URL** | OpenAI API Endpoint |
+    | **API Key** | API 인증 키 |
+    | **모델** | 예: `dall-e-3` |
+    | **이미지 크기** | 기본 크기 (예: `1024x1024`) |
+  </Tab>
+  <Tab title="Azure OpenAI">
+    | 설정 항목 | 설명 | 옵션 |
+    |-----------|------|------|
+    | **API Base URL** | Azure OpenAI Endpoint | - |
+    | **API Key** | Azure 인증 키 | - |
+    | **Quality** | 이미지 품질 | `auto`, `low`, `medium`, `high` |
+    | **Output Format** | 출력 형식 | `png`, `jpeg`, `webp` |
+    | **Background** | 배경 처리 | `auto`, `transparent`, `opaque` |
+
+    기본 이미지 크기는 **1024x1024**입니다.
+  </Tab>
+  <Tab title="Gemini">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **API Key** | Google AI Studio API 키 |
+    | **모델** | Gemini 이미지 생성 모델 |
+  </Tab>
+  <Tab title="Vertex AI">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **Project ID** | Google Cloud 프로젝트 ID |
+    | **Location** | 리전 |
+    | **모델** | Gemini 이미지 생성 모델 |
+  </Tab>
+</Tabs>
+
+여러 엔진을 동시에 추가할 수 있으며, 에이전트별로 사용할 이미지 생성 연결을 선택할 수 있습니다.
+
+---
+
+## 에이전트 연동
+
+이미지 생성이 동작하려면 **3가지 조건**이 모두 충족되어야 합니다:
+
+1. 이 탭에서 이미지 생성 **활성화** + 엔진 연결
+2. 에이전트 설정에서 이미지 생성 capability를 **Default On** 또는 **Default Off**로 설정
+3. 사용자가 채팅에서 이미지 생성을 **직접 켜기** (Default Off인 경우)
+
+<Note>
+  이미지 생성은 에이전트의 **도구(Tool)**로 동작합니다. AI가 "이미지가 필요하다"고 판단하면 자동으로 이미지 생성 도구를 호출합니다.
+</Note>
+

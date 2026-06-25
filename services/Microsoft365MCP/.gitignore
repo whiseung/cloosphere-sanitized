@@ -1,0 +1,2 @@
+# 실제 비밀/키가 든 env 는 커밋 금지 (.env.example 만 커밋)
+.env

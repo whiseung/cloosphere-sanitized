@@ -1,0 +1,4 @@
+Generic single-database configuration.
+
+Create new migrations with
+cd /cloosphere/backend/open_webui && PYTHONPATH=/cloosphere/backend:$PYTHONPATH DATABASE_URL="sqlite:////cloosphere/backend/data/webui.db" alembic revision --autogenerate -m "add usage table"

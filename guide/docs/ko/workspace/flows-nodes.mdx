@@ -1,0 +1,284 @@
+---
+title: "플로우 노드 레퍼런스"
+description: "에이전트 플로우 캔버스에서 사용 가능한 10종 노드의 설정·동작·State 키 참조 가이드"
+---
+
+에이전트 플로우는 사용자가 캔버스에서 드래그·드롭으로 사용할 수 있는 **10종 노드**를 4개 카테고리로 제공합니다. 좌측 **Node Palette**에서 노드를 드래그해 캔버스에 배치하면 됩니다.
+
+| 카테고리 | 노드 |
+|---|---|
+| **General** | Start, Output |
+| **AI** | Agent, Model |
+| **Logic & Data** | Condition, Router, Merge, Transform |
+| **Workspace** | Guardrail, Glossary |
+
+## General (일반)
+
+<Columns cols={2}>
+  <Card title="Start" icon="play">
+    플로우 시작점. 사용자 입력을 `input` State 키로 받아 다음 노드로 전달합니다. 모든 플로우에 반드시 하나 필요. 플로우 변수(Variables)를 정의할 수 있습니다.
+  </Card>
+  <Card title="Output" icon="flag-checkered">
+    플로우 종료점. 이전 노드의 결과를 사용자에게 반환합니다. Action Type으로 Passthrough / Response(프롬프트 기반 최종 응답) / Error 모드 선택.
+  </Card>
+</Columns>
+
+## AI
+
+<Columns cols={2}>
+  <Card title="Agent" icon="robot">
+    등록된 에이전트를 실행합니다. KBSphere(향상된 RAG) / DBSphere(데이터베이스) 모드 에이전트도 지원.
+  </Card>
+  <Card title="Model" icon="microchip">
+    에이전트 없이 LLM 모델을 직접 호출. 간단한 텍스트 처리(요약·번역·분류)에 적합.
+  </Card>
+</Columns>
+
+## Logic & Data
+
+<Columns cols={2}>
+  <Card title="Condition" icon="code-branch">
+    조건에 따라 True / False로 분기. 6종 조건 타입 지원.
+  </Card>
+  <Card title="Router" icon="route">
+    다중 경로 라우팅. 여러 Route를 정의하고 LLM 또는 조건 기반으로 분기.
+  </Card>
+  <Card title="Merge" icon="object-group">
+    병렬 처리된 여러 출력을 하나로 결합. concat / template / json 3가지 모드.
+  </Card>
+  <Card title="Transform" icon="wand-magic-sparkles">
+    데이터를 변환. Extract Field(특정 데이터 추출) 또는 Format Text(템플릿 생성) 모드.
+  </Card>
+</Columns>
+
+## Workspace
+
+<Columns cols={2}>
+  <Card title="Guardrail" icon="shield-halved">
+    가드레일을 적용해 Pass / Block으로 분기. Block Action으로 차단 시 동작 제어.
+  </Card>
+  <Card title="Glossary" icon="book">
+    입력 텍스트에서 용어집 항목과 매칭되는 용어를 찾아 정의를 본문에 첨부. 매칭된 용어는 후속 노드에서 참조 가능.
+  </Card>
+</Columns>
+
+---
+
+## 노드 상세 설정
+
+<Accordion title="Start 노드">
+  플로우 시작점. 사용자 메시지가 `input` State 키로 전달됩니다.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **Label** | 노드 표시 이름 |
+  | **Variables** | 플로우 전체에서 사용할 변수 정의 (이름, 타입, 기본값) |
+
+  변수 타입: `String`, `Number`, `Boolean`, `Array`, `Object`
+</Accordion>
+
+<Accordion title="Output 노드">
+  플로우 종료점. 이전 노드의 결과를 사용자에게 반환합니다.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **Label** | 노드 표시 이름 |
+  | **Action Type** | `Passthrough`(결과 그대로 반환), `Response`(프롬프트 기반 최종 응답 생성), `Error`(에러 메시지 반환) |
+
+  Response 모드에서는 추가로 **Final Response Prompt**와 **Model for Response**를 설정합니다.
+  프롬프트에서 `{input}`, `{output}`, `{sources}` 및 State Key 변수를 참조할 수 있습니다.
+
+  <Note>
+    UI 라벨은 **"Output"** 으로 표시됩니다. 내부 타입명은 `flowOutput`.
+  </Note>
+</Accordion>
+
+<Accordion title="Agent 노드">
+  등록된 에이전트를 실행합니다. KBSphere / DBSphere 에이전트도 지원.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **Agent** | 실행할 에이전트 선택 |
+  | **User Prompt** | 에이전트에 전달할 사용자 프롬프트. `{input}`, `{state_key}` 등 변수 참조 가능 |
+
+  - KBSphere 에이전트 사용 시 검색된 문서 출처가 함께 반환됩니다
+  - DBSphere 에이전트 사용 시 SQL 실행 결과가 포함됩니다
+
+  <Tip>에이전트 노드는 해당 에이전트에 연결된 지식기반·도구·가드레일 설정을 모두 상속합니다.</Tip>
+</Accordion>
+
+<Accordion title="Model 노드">
+  에이전트 없이 LLM 모델을 직접 호출.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **Model** | 사용할 LLM 모델 선택 |
+  | **System Prompt** | 모델에 전달할 시스템 지시사항 |
+  | **User Prompt** | 사용자 프롬프트. `{input}`, `{state_key}` 등 변수 참조 가능 |
+  | **Output Fields** | JSON 구조화 출력 필드 정의 (필드명·타입·설명) |
+
+  Output Fields를 정의하면 응답이 JSON으로 구조화됩니다. 미정의 시 일반 텍스트 응답.
+</Accordion>
+
+<Accordion title="Condition 노드">
+  조건에 따라 플로우를 분기합니다. **True**와 **False** 두 개의 하단 출력 핸들을 가집니다.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **State Key** | 조건 평가 대상 (`input` 또는 상류 노드의 State Key) |
+  | **Condition Type** | 6종 조건 타입 중 선택 |
+  | **Value** | 비교할 값 |
+
+  **지원 조건 타입 (6종):**
+
+  | 조건 타입 | 내부 코드 | 설명 |
+  |----------|----------|------|
+  | `Contains` | `contains` | 특정 텍스트 포함 여부 |
+  | `Does not contain` | `not_contains` | 특정 텍스트 미포함 여부 |
+  | `Equals` | `equals` | 정확히 일치 여부 |
+  | `Starts with` | `starts_with` | 특정 텍스트로 시작 여부 |
+  | `Ends with` | `ends_with` | 특정 텍스트로 끝나는 여부 |
+  | `Regex match` | `regex` | 정규식 패턴 매칭 |
+
+  <Note>
+    수치 비교(Greater than / Less than)나 빈 값 검사(Is empty)는 별도 연산자가 없으므로, 필요하면 **Transform 노드**로 값을 가공한 뒤 `equals` / `regex`로 검사하세요.
+  </Note>
+</Accordion>
+
+<Accordion title="Router 노드">
+  다중 경로 라우팅. 최소 2개 Route를 정의하고 각 Route에 분기 조건을 설정합니다.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **Routing Type** | `llm`(LLM이 의도 분류로 라우트 선택) 또는 `condition`(Route별 조건 평가) |
+  | **State Key** | 조건 라우팅 시 평가 대상 |
+  | **Routes** | 각 경로의 Label, Branch Key, Condition 설정 |
+  | **Default Route** | 어떤 조건도 매칭되지 않을 때 기본 경로 |
+
+  Condition Routing 사용 시 각 Route의 조건은 Condition 노드와 동일한 6종 타입을 지원합니다.
+</Accordion>
+
+<Accordion title="Merge 노드">
+  병렬로 처리된 여러 출력을 하나로 결합합니다.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **Merge Type** | `concat`(텍스트 연결, 기본값) / `template`(Jinja2) / `json`(JSON 객체) |
+  | **Source Keys** | 결합할 State Key 목록. 비우면 자동 수집 |
+  | **Separator** | concat 모드의 구분자 (기본 `\n\n`) |
+  | **Template** | template 모드의 Jinja2 템플릿 (`{{ input }}`, `{{ variables.x }}` 등) |
+
+  **모드별 동작:**
+
+  | 모드 | 결과 형태 | 사용 예 |
+  |------|----------|---------|
+  | `concat` | `[key]\nvalue\n\n[key]\nvalue` 형태의 단일 텍스트 | 여러 에이전트 출력을 하나의 답변에 모을 때 |
+  | `template` | Jinja2 렌더링 결과 | 출력을 특정 포맷(메일/리포트)으로 가공할 때 |
+  | `json` | JSON 문자열 (key: value 매핑) | 후속 시스템에 구조화 데이터를 전달할 때 |
+
+  <Note>
+    가이드 이전 버전에 있던 "Sum / Use first only / Custom" 등의 옵션은 현재 코드에 구현되어 있지 않습니다. 위 3종이 전체 모드입니다.
+  </Note>
+</Accordion>
+
+<Accordion title="Transform 노드">
+  데이터를 변환합니다. **Extract Field**와 **Format Text** 두 모드.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **Transform Type** | `Extract Field` 또는 `Format Text` |
+  | **Output Key** | 변환 결과의 State Key 이름 (기본값: `transformed`) |
+
+  **Extract Field 모드** — 상류 노드의 State Key 중 하나를 그대로 전달.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **State Key** | 추출할 State Key 선택 (`input` 또는 상류 노드 출력) |
+
+  **Format Text 모드** — `{state_key}` 구문으로 State 값을 조합하여 새 텍스트 생성.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **Output Template** | `{state_key}` 플레이스홀더를 포함한 텍스트 템플릿 |
+
+  ```
+  분석 결과: {guardrail_type} - {guardrail_reason}
+  ```
+
+  <Note>
+    Jinja2 템플릿은 기본 모드에서 사용되지 않습니다. **Advanced Settings**에서 "Use Jinja2 Template"을 활성화하면 `{'{{ state.key }}'}` 구문으로 Jinja2 사용 가능.
+  </Note>
+</Accordion>
+
+<Accordion title="Guardrail 노드">
+  가드레일을 적용해 입력을 검증합니다. **Pass**(통과)와 **Block**(차단) 두 출력 핸들.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **Guardrail** | 적용할 가드레일 선택 |
+  | **Block Action** | `Stop`(즉시 종료) / `Message`(메시지 후 종료) / `Continue`(Block 출력으로 진행) |
+  | **Blocked Message** | Block Action이 `Message`일 때 표시할 메시지 |
+
+  **출력 핸들:**
+  - **Pass** (녹색, 하단 좌측) — 통과 시 다음 노드로 진행
+  - **Block** (빨간색, 하단 우측) — Block Action이 `Continue`일 때만 활성화
+
+  Block 출력에는 `guardrail_type`(차단 유형)과 `guardrail_reason`(차단 사유) 필드가 State에 포함됩니다.
+</Accordion>
+
+<Accordion title="Glossary 노드">
+  입력 텍스트에서 지정한 용어집의 용어·동의어와 매칭되는 항목을 찾아 정의를 본문에 첨부합니다.
+
+  | 설정 | 설명 |
+  |------|------|
+  | **Glossary** | 매칭할 용어집 선택 |
+
+  **동작:**
+  1. 입력 텍스트(`current_output` 또는 `input`)에 용어집 항목의 `term` 또는 `synonyms`가 포함되는지 검사 (대소문자 무시)
+  2. 매칭된 용어들을 모아 다음과 같이 본문 끝에 추가:
+     ```
+     [원본 텍스트]
+
+     [용어 참조]
+     • 용어1: 정의1
+     • 용어2: 정의2
+     ```
+  3. 후속 LLM 노드가 정의를 참고해 더 정확한 응답 생성
+
+  **출력 State 키:**
+  - `current_output` — 정의가 첨부된 enriched 텍스트
+  - `{node}.matched` — 매칭된 용어 객체 배열 (`term`, `matched_form`, `definition`)
+
+  <Tip>
+    사내 약어·전문 용어가 자주 등장하는 챗봇에서, **에이전트 노드 앞에 Glossary 노드**를 배치하면 LLM이 용어 의미를 정확히 인지한 채 답변을 생성합니다.
+  </Tip>
+</Accordion>
+
+---
+
+## 추가 노드 (코드 기반)
+
+다음 노드 컴포넌트는 코드베이스에 존재하지만 **현재 노드 팔레트에는 노출되지 않습니다**. 사용자가 캔버스에서 직접 추가할 수 없으며, 향후 릴리즈에서 활성화될 예정입니다:
+
+- Aggregator, Human Input, Subflow, Error Handler, Notification, Knowledge, Tool
+
+해당 노드가 필요하면 [에이전트 플로우 페이지](/ko/workspace/flows)의 **AI 빌더**(자연어로 플로우 생성)를 활용하거나, 다음 릴리즈를 기다려 주세요.
+
+---
+
+## 노드 간 데이터 흐름 (State)
+
+플로우는 공유 **State 객체**로 노드 간 데이터를 주고받습니다.
+
+| State 키 | 설명 |
+|----------|------|
+| `input` | 사용자 메시지 (Start 노드가 채움) |
+| `current_output` | 직전 노드의 출력 (체인 중 갱신) |
+| `variables.{name}` | Start 노드에서 정의한 플로우 변수 |
+| `{node_id}.{field}` | 각 노드의 출력 필드 (예: `{model_node}.response`) |
+
+각 노드는 자신의 출력을 `current_output` 및 `{node_id}.<field>` 키에 기록합니다. 후속 노드의 프롬프트·조건에서 `{state_key}` 또는 Jinja2 `{'{{ variables.x }}'}`로 참조할 수 있습니다.
+
+<Tip>
+  복잡한 플로우 디버깅 시, Start 노드 직후에 **Transform(Format Text)** 노드를 두고 모든 State 키를 출력하도록 설정하면 어떤 키가 살아있는지 한눈에 확인할 수 있습니다.
+</Tip>

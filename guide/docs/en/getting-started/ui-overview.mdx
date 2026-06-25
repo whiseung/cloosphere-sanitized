@@ -1,0 +1,323 @@
+---
+title: "UI Overview"
+description: "An overview of Cloosphere's main screen components and how to navigate them"
+---
+
+The Cloosphere screen is divided into four areas: **Sidebar**, **Header**, **Chat Area**, and **Input Area**. This page covers the role and usage of each area.
+
+---
+
+## Overall Layout
+
+<Frame caption="Overall layout">
+  <img src="/images/getting-started/ui-layout-clean.png" alt="Overall layout" />
+</Frame>
+
+The Cloosphere main screen consists of these four areas:
+
+| Area | Position | Role |
+|------|----------|------|
+| **Sidebar** | Left | Chat list, Workspace, Projects, Channels navigation |
+| **Header** | Top | Model selection, multi-model addition, default settings |
+| **Chat Area** | Center | Conversation area where AI responses and user messages appear |
+| **Input Area** | Bottom | Message input, file attachment, capability toggles |
+
+---
+
+## Sidebar
+
+The sidebar on the left is the primary navigation area in Cloosphere. Everything from chat list management to entering Workspace starts here.
+
+<Frame caption="Full sidebar">
+  <img src="/images/getting-started/ui-sidebar-full.png" alt="Full sidebar" />
+</Frame>
+
+### Top of the Sidebar
+
+| Element | Description |
+|---------|-------------|
+| **Logo** | Click to go to the main screen (`/`) |
+| **Collapse/Expand button** | Collapses or expands the sidebar. When collapsed, only icons are shown |
+| **New Chat** | Starts a new conversation. Click during an existing chat to jump to a fresh chat screen |
+
+<Tip>
+  Use the keyboard shortcut `Ctrl + Shift + S` to quickly toggle the sidebar.
+</Tip>
+
+### Workspace Link
+
+Clicking the **Workspace** button takes you to the workspace page (`/workspace`) where you manage AI building blocks like Agents, Knowledge Bases, Databases, and Flows.
+
+<Note>
+  The Workspace link is only shown to users with appropriate permissions. If you don't see it, ask your admin for access.
+</Note>
+
+### Schedules Link
+
+Takes you to the Schedules page (`/schedules`) for managing scheduled tasks. Configure and manage CRON-based automatic execution.
+
+<Note>
+  The Schedules link is only shown to admins or users with the scheduled-task permission (`scheduled_tasks`).
+</Note>
+
+### Search
+
+Type a keyword in the sidebar's search box to find matching conversations by chat title and content. Search runs automatically 1 second after typing stops.
+
+<Frame caption="Filtered search results">
+  <img src="/images/getting-started/ui-search-filter.png" alt="Filtered search results" />
+</Frame>
+
+### Chat List
+
+Most of the sidebar is occupied by the chat list, organized into the following sections in order:
+
+<Accordion title="Channels">
+  Real-time team messaging space. Shown when admins have enabled the Channels feature.
+
+  - Click a channel to jump to its message list
+  - Admins can use the **+** button to create a new channel
+</Accordion>
+
+<Accordion title="Schedules">
+  List of scheduled automatic tasks. Shows next-run time and status.
+</Accordion>
+
+<Accordion title="Projects">
+  Team-based space for grouping chats. Projects you've joined appear here.
+</Accordion>
+
+<Accordion title="My Chats">
+  Your personal conversations, sorted by time. Supports:
+
+  - **Pinned**: Pin important conversations at the top
+  - **Folders**: Organize chats into folders. Use **New Folder** to create one, then drag and drop chats
+  - **Time-range groups**: Auto-grouped into Today, Yesterday, Previous 7 days, Previous 30 days, and by month
+
+  ![My Chats section](/images/getting-started/ui-sidebar-mychats.png)
+
+  <Tip>
+    Right-click a chat to open a context menu with rename, pin, delete, share, etc.
+  </Tip>
+</Accordion>
+
+### User Profile
+
+Your **profile image** and **name** appear at the bottom of the sidebar. Click to open a dropdown menu.
+
+| Menu Item | Description |
+|-----------|-------------|
+| **Settings** | Personal settings (theme, language, default model, etc.) |
+| **Archived Chats** | List of archived conversations |
+| **What's New** | Recent changes and update log (admins only) |
+| **Admin Panel** | Admin Panel (visible to admins or anyone with permission for users, evaluations, functions, settings, or monitoring) |
+| **Contact Admin** | Send a message to the admin (regular users) |
+| **Sign Out** | Sign out |
+
+<Tip>
+  The bottom of the profile menu shows the current count of **online users**.
+</Tip>
+
+<Frame caption="Profile dropdown menu">
+  <img src="/images/getting-started/ui-profile-dropdown.png" alt="Profile dropdown menu" />
+</Frame>
+
+---
+
+## Header
+
+Located at the top of the chat screen — selects and controls the AI model used in the current conversation.
+
+### Model Selector
+
+Click the **"Select a model"** dropdown to see available models.
+
+- Type a model name to **search**
+- Click the **bookmark icon** next to a model to set it as default
+- Admins or permitted users can use the **+ button** to add multiple models simultaneously and compare responses
+
+<Frame caption="Model selector dropdown — open">
+  <img src="/images/getting-started/ui-model-selector-open.png" alt="Model selector dropdown — open" />
+</Frame>
+
+<Note>
+  If the multi-model comparison feature isn't visible to regular users, the admin has disabled the corresponding permission (`multiple_models`).
+</Note>
+
+### Notification History
+
+Click the **bell icon** at the right of the header to open the system notification history panel. It collects notifications such as file processing completion, errors, and permission changes.
+
+| Feature | Description |
+|---------|-------------|
+| **Unread badge** | Red circular number on the bell icon (shows "9+" beyond 9) |
+| **Notification types** | Distinguished by icon — success (green), error (red), warning (yellow), info (blue) |
+| **Copy** | Copies the notification message to the clipboard |
+| **Per-item / Clear all** | Remove with the per-item × button or "Clear all" |
+
+Opening the panel marks unread notifications as read and clears the badge.
+
+<Tip>
+  **Background task progress** is also integrated into the notification center — Knowledge Base file uploads/metadata extraction, DbSphere syncs, glossary DB extraction, Knowledge Graph syncs, and other long-running tasks all stream their progress here in real time. Once the task completes, the notification stays in this panel so you can review the result.
+</Tip>
+
+---
+
+## Chat Message Area
+
+The center of the screen displays the conversation between the user and the AI.
+
+<Frame caption="Chat message area">
+  <img src="/images/getting-started/ui-chat-messages.png" alt="Chat message area" />
+</Frame>
+
+### User Messages
+
+- Shows the entered text and any attached files
+- Hovering over a message reveals an **edit** icon — modify the content and resend
+
+### AI Responses
+
+- Markdown rendering supported (headings, lists, tables, code blocks, etc.)
+- Code blocks include **syntax highlighting** and a **copy button**
+- Math is rendered with LaTeX
+- Below each response: **Copy**, **Regenerate**, **Listen**, **Like/Dislike** buttons
+
+### New Chat Welcome Screen
+
+When there are no messages yet, the platform logo and a welcome message like "What can I help you with?" appear. Admin-configured suggested prompts may appear as cards.
+
+---
+
+## Input Area
+
+The message input area at the bottom of the screen offers several extras beyond plain text input.
+
+| Element | Position | Description |
+|---------|----------|-------------|
+| **+ (Attach)** | Left of input | File attachment, cloud storage (SharePoint) integration |
+| **Text input** | Center | Rich-text editor for entering questions/requests |
+| **Send button** | Right of input | Sends the message (same as `Enter`) |
+| **Microphone button** | Right of input | Voice-to-text input (STT) |
+
+### Capability Buttons (shown based on agent settings)
+
+Depending on the agent's capability settings, additional buttons may appear in the input area.
+
+| Button | Description |
+|--------|-------------|
+| **Web Search** | The AI references real-time web search results when answering |
+| **Image Generation** | Generates images from a text prompt |
+| **Code Interpreter** | Runs Python code directly and returns the result |
+
+---
+
+## Dark Mode
+
+Cloosphere supports both **light mode** and **dark mode**.
+
+<Steps>
+  <Step title="Open Settings">
+    Click your profile at the bottom of the sidebar and select **Settings**.
+  </Step>
+  <Step title="Change theme">
+    Under the **General** tab, choose a **Theme** option.
+    - **System**: Follows the OS setting
+    - **Light**: Light theme
+    - **Dark**: Dark theme
+  </Step>
+</Steps>
+
+<Frame caption="Theme setting">
+  <img src="/images/getting-started/ui-theme-setting.png" alt="Theme setting" />
+</Frame>
+
+---
+
+## Collapsing / Expanding the Sidebar
+
+The sidebar supports two states.
+
+<Tabs>
+  <Tab title="Expanded (260px)">
+    - Logo, name, and menu text are all visible
+    - Search box accepts input
+    - Chat list takes the full width
+
+    ![Sidebar — expanded](/images/getting-started/ui-sidebar-expanded.png)
+  </Tab>
+  <Tab title="Collapsed (68px)">
+    - Only icons are shown
+    - Clicking the search icon auto-expands the sidebar
+    - Hovering over the logo turns it into the expand icon
+  </Tab>
+</Tabs>
+
+**How to switch:**
+- Click the **collapse/expand toggle** at the top of the sidebar
+- Keyboard shortcut: `Ctrl + Shift + S`
+- Mobile: **swipe** from the left edge of the screen
+
+---
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Enter` | Send message |
+| `Shift + Enter` | Line break |
+| `Ctrl + Shift + O` | New chat |
+| `Ctrl + Shift + S` | Toggle sidebar |
+| `Ctrl + /` | Open keyboard shortcuts panel |
+
+---
+
+## Mobile Layout
+
+In mobile environments (≤ 768px), the UI adapts automatically.
+
+- The sidebar starts in a **hidden state** by default
+- Open sidebar: **swipe right** from the left edge or use the hamburger menu
+- Close sidebar: tap outside the sidebar to close it automatically
+- The sidebar auto-closes when you tap a menu item
+
+<Tabs>
+  <Tab title="Sidebar closed">
+    ![Mobile — sidebar closed](/images/getting-started/ui-mobile-closed.png)
+  </Tab>
+  <Tab title="Sidebar open">
+    ![Mobile — sidebar open](/images/getting-started/ui-mobile-sidebar-open.png)
+  </Tab>
+</Tabs>
+
+---
+
+## Guide Q&A Helper
+
+Click the **question mark (?) button** in the bottom-right corner to open the **guide-document-based Q&A chatbot**.
+
+Ask any question about how to use Cloosphere in natural language — the AI searches the guide and answers.
+
+| Item | Description |
+|------|-------------|
+| **Position** | Floating ? button at the bottom-right of the screen |
+| **Available to** | All signed-in users |
+| **Response source** | Cloosphere guide documents (ReAct agent based) |
+| **Model selection** | Change the AI model from the top of the chat panel |
+
+<Tip>
+  Answers questions like "How do I configure knowledge base filters?" or "How do I send email notifications via scheduled tasks?". Use it to quickly look up how a feature works.
+</Tip>
+
+---
+
+## Next Steps
+
+<Columns cols={2}>
+  <Card title="Start Your First Chat" icon="message" href="/en/getting-started/first-chat">
+    Pick an AI model and start your first conversation
+  </Card>
+  <Card title="Manage Conversations" icon="folder" href="/en/chat/conversations">
+    Organize chats with folders, pinning, and tags
+  </Card>
+</Columns>

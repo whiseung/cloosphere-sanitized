@@ -1,0 +1,189 @@
+---
+title: "Usage"
+description: "Track and analyze token usage, API requests, and cost by model/user/team"
+---
+
+The usage dashboard **visualizes AI resource consumption in real time**.
+Analyze token usage, request count, and cost across multiple dimensions (model, user, agent, group, team).
+
+Access via **Admin > Monitoring > Usage**.
+
+{/* SCREENSHOT: usage-dashboard */}
+<Frame caption="See token, request, and user status at a glance under Admin > Monitoring > Usage">
+  <img src="/images/monitoring/usage-dashboard.png" alt="Usage dashboard" />
+</Frame>
+
+---
+
+## Key Metrics
+
+Key metrics appear at the top of the dashboard as cards.
+
+| Metric | Description |
+|--------|-------------|
+| **Total Tokens** | All tokens used in the selected period |
+| **Total Requests** | API call count |
+| **Unique Users** | Active users in the period |
+| **Unique Chats** | Created chat sessions |
+| **Unique Models** | Number of model types used |
+| **Avg Tokens/Request** | Average token consumption per request |
+
+<Tip>
+  If average tokens/request is abnormally high, excessive system prompts or unnecessary context may be included. Review agent settings.
+</Tip>
+
+---
+
+## Usage Trend Chart
+
+Visualize usage over time as a line chart.
+
+<Frame caption="Usage trend chart — daily token line graph">
+  <img src="/images/monitoring/usage-trend-chart.png" alt="Usage trend chart" />
+</Frame>
+
+### Period Selection
+
+| Period | Aggregation Unit |
+|--------|------------------|
+| **Last 7 days** | Daily |
+| **Last 30 days** | Daily |
+| **Custom** | Pick date range directly |
+
+### Chart Metric
+
+The chart shows **token usage trend** as a line graph.
+
+| Metric | Description |
+|--------|-------------|
+| **Tokens** | Total token usage by date |
+
+---
+
+## Multi-dimensional Analysis
+
+<Tabs>
+  <Tab title="By Model">
+    Check how much each AI model is used.
+
+    ![Per-model usage table](/images/monitoring/usage-by-model.png)
+
+    | Column | Description |
+    |--------|-------------|
+    | **Model ID** | Used model identifier |
+    | **Total Tokens** | Token consumption for that model |
+    | **Requests** | API call count for that model |
+  </Tab>
+  <Tab title="By User">
+    Check individual user usage.
+
+    | Column | Description |
+    |--------|-------------|
+    | **User** | Name, email |
+    | **Total Tokens** | Tokens used |
+    | **Requests** | Request count |
+  </Tab>
+  <Tab title="By Agent">
+    Workspace agent usage.
+
+    | Column | Description |
+    |--------|-------------|
+    | **Agent** | Agent name |
+    | **Total Tokens** | Token consumption per agent |
+    | **Requests** | Request count per agent |
+
+    <Tip>
+      Compare agents to identify inefficient ones and optimize prompts.
+    </Tip>
+  </Tab>
+  <Tab title="By Group">
+    Aggregate usage by permission group.
+
+    | Column | Description |
+    |--------|-------------|
+    | **Group** | Group name |
+    | **Total Tokens** | Total tokens of group members |
+    | **Requests** | Total requests of group members |
+    | **User Count** | Active users in the group |
+  </Tab>
+  <Tab title="By Team">
+    Check usage per Team.
+
+    | Column | Description |
+    |--------|-------------|
+    | **Team** | Team name |
+    | **Total Tokens** | Total tokens of team members |
+    | **Requests** | Total requests of team members |
+    | **User Count** | Active users in the team |
+  </Tab>
+</Tabs>
+
+---
+
+## Usage Type Classification
+
+Classify what work tokens were used for.
+
+<Frame caption="Distribution by usage type">
+  <img src="/images/monitoring/usage-bottom.png" alt="Distribution by usage type" />
+</Frame>
+
+| Type | Description |
+|------|-------------|
+| **CHAT** | Standard chat conversation |
+| **EMBEDDING** | Document embedding processing |
+| **TITLE_GENERATION** | Chat title auto-generation |
+| **TAGS_GENERATION** | Chat tag auto-generation |
+| **QUERY_GENERATION** | RAG search query generation |
+| **TOOL_CALL** | Tool invocation |
+| **IMAGE_GENERATION** | Image generation |
+| **IMAGE_PROMPT_GENERATION** | Image prompt generation |
+
+---
+
+## Filtering
+
+Combine multiple conditions to filter data. All filters apply simultaneously.
+
+| Filter | Description |
+|--------|-------------|
+| **Period** | Start/end date range |
+| **Model** | Pick a specific model |
+| **User** | Pick a specific user |
+| **Group** | Pick a specific group |
+| **Team** | Pick a specific team |
+| **Agent** | Pick a specific agent |
+
+<Note>
+  Filter dropdowns only show items with actual usage records.
+</Note>
+
+<Note>
+  Individual conversation details are available in a separate **Monitoring > Conversation Logs** tab.
+</Note>
+
+---
+
+## Data Export
+
+Export usage data as **CSV** or **JSON**. The export button is at the top-right of the dashboard.
+
+<Tip>
+  Download monthly CSVs to compose cost reports, or analyze per-department usage in spreadsheets.
+</Tip>
+
+---
+
+## Related Pages
+
+<Columns cols={3}>
+  <Card title="General Settings" icon="gear" href="/en/admin/settings/general">
+    Configure usage limits and excess actions
+  </Card>
+  <Card title="Tracing" icon="chart-line" href="/en/monitoring/tracing">
+    Track per-request token usage
+  </Card>
+  <Card title="Auto-evaluation" icon="star" href="/en/monitoring/evaluations">
+    Review response quality evaluation results
+  </Card>
+</Columns>

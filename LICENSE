@@ -1,0 +1,134 @@
+================================================================================
+OPEN WEBUI LICENSE (BSD-3-Clause)
+================================================================================
+Copyright (c) 2023-2025 Timothy Jaeryang Baek
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+================================================================================
+CLOOSPHERE - PROPRIETARY LICENSE TERMS
+================================================================================
+Copyright (c) 2025-2026 Cloocus Co., Ltd.
+All rights reserved.
+
+Architected & Developed by Shinyoung Kim (sykim@cloocus.com)
+
+The following terms apply to all modifications, additions, and derivative works
+created by Cloocus Co., Ltd. (collectively referred to as "Cloosphere").
+
+1. GRANT OF LICENSE
+   Subject to the terms of this license and a valid commercial agreement,
+   Cloocus grants the licensee a non-exclusive, non-transferable license to
+   use Cloosphere solely within the scope defined in the commercial agreement.
+
+2. RESTRICTIONS
+   Unless expressly authorized in writing by Cloocus, the licensee shall NOT:
+
+   a) Modify, alter, or create derivative works of Cloosphere source code
+      without prior written consent from Cloocus.
+
+   b) Deploy, install, or operate Cloosphere in any environment, server,
+      or infrastructure not specified in the commercial agreement.
+
+   c) Redistribute, sublicense, sell, lease, or transfer Cloosphere or any
+      portion thereof to any third party.
+
+   d) Remove, alter, or obscure any proprietary notices, labels, or marks
+      on Cloosphere.
+
+   e) Reverse engineer, decompile, or disassemble Cloosphere, except to the
+      extent permitted by applicable law.
+
+3. OWNERSHIP
+   Cloocus retains all right, title, and interest in and to Cloosphere,
+   including all intellectual property rights therein.
+
+4. AUDIT RIGHTS
+   Cloocus reserves the right to audit the licensee's use of Cloosphere to
+   verify compliance with this license and the commercial agreement.
+
+5. TERMINATION
+   This license terminates automatically if the licensee breaches any term
+   of this license or the commercial agreement. Upon termination, the licensee
+   must immediately cease all use of Cloosphere and destroy all copies.
+
+6. REMEDIES AND ENFORCEMENT
+   a) INJUNCTIVE RELIEF: The licensee acknowledges that any breach of this
+      license may cause irreparable harm to Cloocus for which monetary damages
+      would be inadequate. Cloocus shall be entitled to seek immediate
+      injunctive relief, specific performance, or other equitable remedies
+      without the necessity of proving actual damages or posting bond.
+
+   b) DAMAGES: In addition to any other remedies available, the licensee shall
+      be liable for all actual damages suffered by Cloocus, including but not
+      limited to: lost profits, lost business opportunities, costs of
+      enforcement, and any gains obtained by the licensee through the breach.
+
+   c) LIQUIDATED DAMAGES: For unauthorized deployment or use beyond the scope
+      of the commercial agreement, the licensee agrees to pay liquidated damages
+      equal to three (3) times the applicable license fee for each unauthorized
+      instance, or actual damages, whichever is greater.
+
+   d) CRIMINAL LIABILITY: Unauthorized copying, distribution, or modification
+      of Cloosphere may constitute infringement of intellectual property rights
+      under applicable laws, including but not limited to the Copyright Act of
+      Korea and the Unfair Competition Prevention Act. Cloocus reserves the
+      right to pursue criminal prosecution to the fullest extent permitted by law.
+
+   e) LEGAL FEES: In any action to enforce this license, the prevailing party
+      shall be entitled to recover all reasonable attorneys' fees, court costs,
+      and other expenses incurred in connection with such action.
+
+7. INDEMNIFICATION
+   The licensee shall indemnify, defend, and hold harmless Cloocus and its
+   officers, directors, employees, and agents from and against any and all
+   claims, damages, losses, liabilities, costs, and expenses (including
+   reasonable attorneys' fees) arising out of or related to the licensee's
+   breach of this license or misuse of Cloosphere.
+
+8. WARRANTY DISCLAIMER
+   CLOOSPHERE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLOOCUS
+   DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+   TO WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+9. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL CLOOCUS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
+   CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO THE USE
+   OF CLOOSPHERE.
+
+10. GOVERNING LAW AND JURISDICTION
+    This license shall be governed by and construed in accordance with the
+    laws of the Republic of Korea. Any disputes arising out of or in connection
+    with this license shall be submitted to the exclusive jurisdiction of the
+    Seoul Central District Court of Korea.
+
+For licensing inquiries, please contact: contact-cloosphere@cloocus.com
+
+================================================================================
+
+

@@ -1,0 +1,249 @@
+{
+  "uid": "cloosphere-process",
+  "title": "Cloosphere Process Runtime",
+  "tags": ["cloosphere"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "instance",
+        "type": "query",
+        "hide": 0,
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(process_runtime_cpython_thread_count, service_instance_id)",
+        "refresh": 2,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "label": "Instance",
+        "sort": 1,
+        "current": {"selected": true, "text": "All", "value": "$__all"}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "CPU Utilization (%)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2},
+          "unit": "percentunit",
+          "max": 1
+        }
+      },
+      "targets": [
+        {
+          "expr": "process_cpu_utilization_ratio{service_instance_id=~\"$instance\"}",
+          "legendFormat": "{{service_instance_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "CPU Time (user + system)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2},
+          "unit": "s"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(process_runtime_cpython_cpu_time_seconds_total{type=\"user\",service_instance_id=~\"$instance\"}[5m])",
+          "legendFormat": "{{service_instance_id}} user",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(process_runtime_cpython_cpu_time_seconds_total{type=\"system\",service_instance_id=~\"$instance\"}[5m])",
+          "legendFormat": "{{service_instance_id}} system",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Process Memory (RSS / VMS)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2},
+          "unit": "bytes"
+        }
+      },
+      "targets": [
+        {
+          "expr": "process_runtime_cpython_memory_bytes{type=\"rss\",service_instance_id=~\"$instance\"}",
+          "legendFormat": "{{service_instance_id}} RSS",
+          "refId": "A"
+        },
+        {
+          "expr": "process_runtime_cpython_memory_bytes{type=\"vms\",service_instance_id=~\"$instance\"}",
+          "legendFormat": "{{service_instance_id}} VMS",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Thread Count",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {"drawStyle": "line", "fillOpacity": 10, "lineWidth": 2},
+          "unit": "short"
+        }
+      },
+      "targets": [
+        {
+          "expr": "process_runtime_cpython_thread_count{service_instance_id=~\"$instance\"}",
+          "legendFormat": "{{service_instance_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "GC Collections (rate/s)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {"drawStyle": "line", "fillOpacity": 10, "lineWidth": 2},
+          "unit": "ops"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by(service_instance_id) (rate(process_runtime_cpython_gc_count_bytes_total{service_instance_id=~\"$instance\"}[5m]))",
+          "legendFormat": "{{service_instance_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Current RSS (avg)",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 24},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 536870912},
+              {"color": "red", "value": 1073741824}
+            ]
+          }
+        }
+      },
+      "options": {"colorMode": "background", "graphMode": "area"},
+      "targets": [
+        {
+          "expr": "avg(process_runtime_cpython_memory_bytes{type=\"rss\",service_instance_id=~\"$instance\"})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Current Threads (sum)",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 24},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 50},
+              {"color": "red", "value": 100}
+            ]
+          }
+        }
+      },
+      "options": {"colorMode": "background", "graphMode": "area"},
+      "targets": [
+        {
+          "expr": "sum(process_runtime_cpython_thread_count{service_instance_id=~\"$instance\"})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "CPU % (avg)",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 24},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 0.5},
+              {"color": "red", "value": 0.8}
+            ]
+          }
+        }
+      },
+      "options": {"colorMode": "background", "graphMode": "area"},
+      "targets": [
+        {
+          "expr": "avg(process_cpu_utilization_ratio{service_instance_id=~\"$instance\"}) or vector(0)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Instances",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 24},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 4},
+              {"color": "red", "value": 8}
+            ]
+          }
+        }
+      },
+      "options": {"colorMode": "background", "graphMode": "area"},
+      "targets": [
+        {
+          "expr": "count(process_runtime_cpython_thread_count{service_instance_id=~\"$instance\"})",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}

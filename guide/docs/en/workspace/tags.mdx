@@ -1,0 +1,82 @@
+---
+title: "Tags"
+description: "Central feature for tagging and filtering workspace resources across the board"
+---
+
+Workspace agents, Knowledge Bases, flows, guardrails, tools, prompts, databases, glossaries — as resources grow, finding what you need gets harder.
+
+Tags are **labels you can attach to any workspace resource**. Create tags like "Marketing", "Customer Support", "Experimental" and classify resources, then filter by tag in each list.
+
+---
+
+## Tag Management
+
+In the **Workspace > Tags** tab, create, edit, and delete tags.
+
+{/* SCREENSHOT: tag management screen
+<Frame caption="Workspace tag management">
+  <img src="/images/workspace/tags-list.png" alt="Tag management" />
+</Frame>
+*/}
+
+### Create a Tag
+
+Type a tag name in the input at the top and click **Create**. Duplicate names aren't allowed.
+
+### Edit a Tag
+
+Click the **edit icon** in a tag row to rename it inline. Enter to save, Esc to cancel.
+
+### Delete a Tag
+
+Deleting a tag **removes it from all workspace resources** that had it.
+
+<Warning>
+  Tag deletion is irreversible. A confirmation dialog appears before deletion.
+</Warning>
+
+---
+
+## Applying Tags
+
+Add or remove tags on each workspace resource (Agents, Knowledge Bases, etc.) from its edit screen.
+
+**Supported resource types:**
+
+| Resource | Where to apply |
+|----------|----------------|
+| **Agent** | Agent edit screen |
+| **Flow** | Flow editor |
+| **Knowledge Base** | Knowledge Base edit screen |
+| **Database** | DbSphere edit screen |
+| **Guardrail** | Guardrail edit screen |
+| **Prompt** | Prompt edit screen |
+| **Tool** | Tool edit screen |
+| **Glossary** | Glossary edit screen |
+
+---
+
+## Permissions
+
+| Action | Required Permission |
+|--------|---------------------|
+| View tags | All signed-in users |
+| Create tags | All signed-in users |
+| Edit / delete tags | Tag creator or Admin |
+| Attach / detach tags on resources | All signed-in users |
+
+---
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Classify by department">
+    Create "Marketing", "Engineering", "HR", "Finance" tags to distinguish agents and Knowledge Bases used by each department.
+  </Accordion>
+  <Accordion title="Lifecycle management">
+    Manage resource lifecycle with tags like "Production", "Experimental", "Deprecating".
+  </Accordion>
+  <Accordion title="Group by project">
+    Apply a "Project-A" tag across agents, Knowledge Bases, and prompts to see related resources at a glance.
+  </Accordion>
+</AccordionGroup>

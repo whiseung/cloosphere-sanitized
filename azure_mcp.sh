@@ -1,0 +1,1 @@
+npx -y mcp-proxy --port 3000 -- npx -y @azure/mcp@latest server start  

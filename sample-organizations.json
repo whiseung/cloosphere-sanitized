@@ -1,0 +1,135 @@
+{                                                                                                                                 
+    "organization": {                                                                                                               
+      "tenant_id": "test-company-001",                                                                                              
+      "name": "테스트 주식회사",                                                                                                    
+      "display_name": "테스트 주식회사",                                                                                            
+      "domain": "testcompany.co.kr"                                                                                                 
+    },                                                                                                                              
+    "units": [                                                                                                                      
+      {                                                                                                                             
+        "id": "dept-dev",                                                                                                           
+        "name": "개발본부",                                                                                                         
+        "display_name": "개발본부",                                                                                                 
+        "type": "division",                                                                                                         
+        "children": [                                                                                                               
+          {                                                                                                                         
+            "id": "team-backend",                                                                                                   
+            "name": "백엔드팀",                                                                                                     
+            "display_name": "백엔드팀",                                                                                             
+            "type": "team",                                                                                                         
+            "meta": {                                                                                                               
+              "members": [                                                                                                          
+                {"id": "user-001", "name": "김철수", "email": "kim@testcompany.co.kr", "job_title": "팀장"},                        
+                {"id": "user-002", "name": "이영희", "email": "lee@testcompany.co.kr", "job_title": "시니어 개발자"},               
+                {"id": "user-003", "name": "박민수", "email": "park@testcompany.co.kr", "job_title": "주니어 개발자"}               
+              ]                                                                                                                     
+            }                                                                                                                       
+          },                                                                                                                        
+          {                                                                                                                         
+            "id": "team-frontend",                                                                                                  
+            "name": "프론트엔드팀",                                                                                                 
+            "display_name": "프론트엔드팀",                                                                                         
+            "type": "team",                                                                                                         
+            "meta": {                                                                                                               
+              "members": [                                                                                                          
+                {"id": "user-004", "name": "정수진", "email": "jung@testcompany.co.kr", "job_title": "팀장"},                       
+                {"id": "user-005", "name": "최동훈", "email": "choi@testcompany.co.kr", "job_title": "개발자"}                      
+              ]                                                                                                                     
+            }                                                                                                                       
+          },                                                                                                                        
+          {                                                                                                                         
+            "id": "team-devops",                                                                                                    
+            "name": "DevOps팀",                                                                                                     
+            "display_name": "DevOps팀",                                                                                             
+            "type": "team",                                                                                                         
+            "meta": {                                                                                                               
+              "members": [                                                                                                          
+                {"id": "user-006", "name": "강현우", "email": "kang@testcompany.co.kr", "job_title": "팀장"}                        
+              ]                                                                                                                     
+            }                                                                                                                       
+          }                                                                                                                         
+        ]                                                                                                                           
+      },                                                                                                                            
+      {                                                                                                                             
+        "id": "dept-business",                                                                                                      
+        "name": "사업본부",                                                                                                         
+        "display_name": "사업본부",                                                                                                 
+        "type": "division",                                                                                                         
+        "children": [                                                                                                               
+          {                                                                                                                         
+            "id": "team-sales",                                                                                                     
+            "name": "영업팀",                                                                                                       
+            "display_name": "영업팀",                                                                                               
+            "type": "team",                                                                                                         
+            "meta": {                                                                                                               
+              "members": [                                                                                                          
+                {"id": "user-007", "name": "윤서연", "email": "yoon@testcompany.co.kr", "job_title": "팀장"},                       
+                {"id": "user-008", "name": "임재혁", "email": "lim@testcompany.co.kr", "job_title": "영업 담당"}                    
+              ]                                                                                                                     
+            }                                                                                                                       
+          },                                                                                                                        
+          {                                                                                                                         
+            "id": "team-marketing",                                                                                                 
+            "name": "마케팅팀",                                                                                                     
+            "display_name": "마케팅팀",                                                                                             
+            "type": "team",                                                                                                         
+            "children": [                                                                                                           
+              {                                                                                                                     
+                "id": "unit-digital",                                                                                               
+                "name": "디지털마케팅",                                                                                             
+                "display_name": "디지털마케팅",                                                                                     
+                "type": "unit",                                                                                                     
+                "meta": {                                                                                                           
+                  "members": [                                                                                                      
+                    {"id": "user-009", "name": "한지민", "email": "han@testcompany.co.kr", "job_title": "담당자"}                   
+                  ]                                                                                                                 
+                }                                                                                                                   
+              },                                                                                                                    
+              {                                                                                                                     
+                "id": "unit-content",                                                                                               
+                "name": "콘텐츠마케팅",                                                                                             
+                "display_name": "콘텐츠마케팅",                                                                                     
+                "type": "unit",                                                                                                     
+                "meta": {                                                                                                           
+                  "members": [                                                                                                      
+                    {"id": "user-010", "name": "오승현", "email": "oh@testcompany.co.kr", "job_title": "담당자"}                    
+                  ]                                                                                                                 
+                }                                                                                                                   
+              }                                                                                                                     
+            ]                                                                                                                       
+          }                                                                                                                         
+        ]                                                                                                                           
+      },                                                                                                                            
+      {                                                                                                                             
+        "id": "dept-support",                                                                                                       
+        "name": "경영지원본부",                                                                                                     
+        "display_name": "경영지원본부",                                                                                             
+        "type": "division",                                                                                                         
+        "children": [                                                                                                               
+          {                                                                                                                         
+            "id": "team-hr",                                                                                                        
+            "name": "인사팀",                                                                                                       
+            "display_name": "인사팀",                                                                                               
+            "type": "team",                                                                                                         
+            "meta": {                                                                                                               
+              "members": [                                                                                                          
+                {"id": "user-011", "name": "신미영", "email": "shin@testcompany.co.kr", "job_title": "팀장"},                       
+                {"id": "user-012", "name": "권태호", "email": "kwon@testcompany.co.kr", "job_title": "인사 담당"}                   
+              ]                                                                                                                     
+            }                                                                                                                       
+          },                                                                                                                        
+          {                                                                                                                         
+            "id": "team-finance",                                                                                                   
+            "name": "재무팀",                                                                                                       
+            "display_name": "재무팀",                                                                                               
+            "type": "team",                                                                                                         
+            "meta": {                                                                                                               
+              "members": [                                                                                                          
+                {"id": "user-013", "name": "배수정", "email": "bae@testcompany.co.kr", "job_title": "팀장"}                         
+              ]                                                                                                                     
+            }                                                                                                                       
+          }                                                                                                                         
+        ]                                                                                                                           
+      }                                                                                                                             
+    ]                                                                                                                               
+  }  

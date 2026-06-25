@@ -1,0 +1,265 @@
+---
+title: "Troubleshooting"
+description: "Common symptoms and solutions — AI models, chat, file upload, permissions, guardrails, email/webhooks, and more"
+---
+
+This page is a reference for **symptoms and fixes you'll commonly encounter in production**. It collects user-impacting cases from recent Cloosphere bug fixes.
+
+<Tip>
+  Even if your symptom doesn't match a category exactly, check adjacent items. The same root cause (e.g., multi-worker environment, encoding) often manifests across multiple areas.
+</Tip>
+
+---
+
+## AI Model Response Issues
+
+<AccordionGroup>
+  <Accordion title="Gemini / Vertex AI responses are cut off mid-stream" icon="scissors">
+    **Symptom**: When generating a long response with Gemini, only part of the response is shown. Or in multipart content (text+image), some blocks are missing.
+
+    **Cause**: The Gemini API response structure differs from OpenAI/Claude — it returns a `parts` array, and the text from each part must be concatenated in order to form a complete response. An older bug only processed the first part.
+
+    **Fix**: Auto-handled in the latest version. If truncation persists:
+    - Set `max_output_tokens` in the model parameters large enough (e.g., 8192)
+    - Verify the model parameters in the Chat Controls panel
+  </Accordion>
+
+  <Accordion title="I selected an Ollama model but Vertex AI settings are used" icon="circle-question">
+    **Symptom**: You chat with a local Ollama model but the response looks like a Vertex AI result, or Ollama settings are ignored.
+
+    **Cause**: A bug during model ID resolve where the same key existed across multiple providers caused routing to the wrong provider.
+
+    **Fix**: Fixed in the latest version. If unresolved, prefix the model ID with the provider (`ollama/llama3:8b`), or check for ID collisions under **Admin > Settings > Models**.
+  </Accordion>
+
+  <Accordion title="Tool calls don't work for OSS models (Ollama, etc.)" icon="wrench">
+    **Symptom**: When the OSS model should call a tool, it instead replies with natural-language description and no tool actually runs.
+
+    **Cause**: OSS models often have weak or absent OpenAI-compatible function-calling, so the model only describes the call in text.
+
+    **Fix**: The latest version added a **submit_result enforcement middleware** that auto-invokes the submit_result tool when a text response is detected. Ollama agents are also routed through UnifiedAgent — no extra setup needed.
+  </Accordion>
+
+  <Accordion title="`stream=false` API requests are routed as plain models" icon="bolt">
+    **Symptom**: External API calls with `stream=false` aren't routed to agents (KBSphere/DBSphere) and are processed as simple LLM calls only.
+
+    **Cause**: Older routing conditions were limited to stream=true.
+
+    **Fix**: In the latest version, stream=false requests also route through UnifiedAgent.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Chat / File Upload
+
+<AccordionGroup>
+  <Accordion title="Uploading multiple files at once leaves only the last one" icon="files">
+    **Symptom**: When uploading multiple files to a Knowledge Base, some files disappear and only the last is processed.
+
+    **Cause**: Upload concurrency control bug.
+
+    **Fix**: Fixed in the latest version. Upload progress is integrated into the notification center (top-right bell), so you can monitor progress.
+  </Accordion>
+
+  <Accordion title="After attaching a file in chat, responses are very slow" icon="hourglass">
+    **Symptom**: Attaching a file slows responses, or the AI starts answering before some files finish processing.
+
+    **Cause**: In older versions, file uploads were async — the AI could start responding before file processing completed.
+
+    **Fix**: In the latest version, chat file uploads are processed **synchronously** — the AI response only starts after file indexing completes. Large files take longer to process; for files over 5MB, upload to a Knowledge Base in advance and reference it.
+  </Accordion>
+
+  <Accordion title="The AI doesn't recognize an attached image" icon="image">
+    **Symptom**: You attach an image, but the AI replies "I didn't receive an image".
+
+    **Cause**: A bug where the image upload's context parameter was missing, so it wasn't passed to LLM Vision processing.
+
+    **Fix**: Fixed in the latest version. Verify the model supports Vision — non-Vision models can't recognize images.
+  </Accordion>
+
+  <Accordion title="Chat file upload error messages are vague" icon="triangle-exclamation">
+    **Symptom**: File upload failures display inconsistent error messages.
+
+    **Fix**: Standardized to ERROR_MESSAGES in the latest version. Meaning of common messages:
+    - "Unsupported file type" — Unsupported format (check the [supported formats](/en/workspace/knowledge#supported-file-formats) list)
+    - "File too large" — Exceeds the admin's max file size setting
+    - "Storage quota exceeded" — User/organization storage quota exceeded
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Korean / Encoding
+
+<AccordionGroup>
+  <Accordion title="Korean characters are duplicated in the input box" icon="keyboard">
+    **Symptom**: When typing with a Korean IME, consonants are entered twice or characters are garbled.
+
+    **Cause**: Timing collision between Svelte's input event and the IME's compositionend.
+
+    **Fix**: Fixed in the latest version. If it persists:
+    - Clear browser cache
+    - Reproduce in another browser (Chrome/Edge)
+    - Try changing the IME (2-Set vs 3-Set, Hancom vs MS)
+  </Accordion>
+
+  <Accordion title="Korean characters get garbled when importing users via CSV" icon="file-csv">
+    **Symptom**: Korean names appear as `?` or mojibake when bulk-importing users via CSV.
+
+    **Cause**: The CSV file is encoded as CP949/EUC-KR instead of UTF-8.
+
+    **Fix**:
+    - Save CSV files as **UTF-8 (with BOM)**
+    - In Excel, choose "CSV UTF-8 (.csv)" when saving
+    - You can re-encode in Notepad/VS Code
+  </Accordion>
+
+  <Accordion title="Only part of the title is extracted in the glossary" icon="book">
+    **Symptom**: When extracting from the title column in glossary DB extraction, only the first character is extracted or the title is truncated.
+
+    **Cause**: Early-return bug in the title-only extraction mode.
+
+    **Fix**: Fixed in the latest version. If it occurs, configure the extraction source as `Title` + `First N chars of body` to verify the full text is processed.
+  </Accordion>
+
+  <Accordion title="Guardrail PII detection doesn't work on Korean data" icon="shield">
+    **Symptom**: PII patterns like email and ID numbers aren't detected in text containing Korean characters.
+
+    **Cause**: Regex word boundary (`\b`) behaves differently in Korean environments.
+
+    **Fix**: Updated for Korean environments in the latest version. If detection is still missing, add patterns directly in guardrail settings or switch to LLM-based detection.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Permissions / Access
+
+<AccordionGroup>
+  <Accordion title='I set permission to "None" but access is still possible' icon="lock-open">
+    **Symptom**: The group permission is set to `none`, but users can still access the feature.
+
+    **Cause**: A bug where the permission level `"none"` was evaluated as truthy in JavaScript, bypassing permission checks.
+
+    **Fix**: Fixed in the latest version. If it occurs:
+    - Sign the user out and back in (refresh JWT)
+    - Check group memberships — the permission may be granted by another group
+  </Accordion>
+
+  <Accordion title="A guardrail assigned to an OU isn't shown in the permission view modal" icon="users-gear">
+    **Symptom**: You assigned a guardrail to an Organizational Unit (OU) in organization management, but it doesn't appear in the user's "permission view".
+
+    **Fix**: The latest version adds a guardrails category to the permission view API, so it's displayed. If it's still missing, verify OU membership sync has completed — IdP sync takes about 5 minutes for cache refresh.
+  </Accordion>
+
+  <Accordion title="The agent's tools don't use the KB selected via # in chat" icon="hashtag">
+    **Symptom**: You explicitly select a Knowledge Base with `#` in chat, but the agent searches a different KB or ignores the KB info.
+
+    **Fix**: Fixed in the latest version. KBs selected with `#` are passed as priority context to the agent's tools for that turn. If it doesn't work:
+    - Verify the agent has access permission to that KB
+    - Verify the agent's Tool Description isn't empty (a warning banner appears in the editor)
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Embeddings / Vector Search
+
+<AccordionGroup>
+  <Accordion title="A dimension error occurs after configuring the embedding URL" icon="vector-square">
+    **Symptom**: After changing the embedding model, search returns a "vector dimension mismatch" error.
+
+    **Cause**: The new embedding model's dimension differs from the existing index, and the dimension info isn't auto-updated.
+
+    **Fix**:
+    - Enter the embedding URL without trailing slash (e.g., `http://embeddings.local:8080`)
+    - Enter the dimension correctly per model (text-embedding-3-small=1536, text-embedding-3-large=3072, etc.)
+    - **Reindex** affected Knowledge Bases after changing the model
+  </Accordion>
+
+  <Accordion title="Intermittent errors with Azure Search Vector DB" icon="cloud-arrow-up">
+    **Symptom**: Intermittent index errors or search failures when using Azure AI Search as the vector DB.
+
+    **Fix**: Error handling improved in the latest version (retries, clearer error messages). If it persists:
+    - Check the Azure Search service tier (Free tier has concurrent request limits)
+    - Verify index schema and embedding dimensions match
+    - Check exact response codes for failed requests in **Monitoring > Tracing**
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Email / Notifications
+
+<AccordionGroup>
+  <Accordion title='SMTP send fails with "Invalid domain name"' icon="envelope-circle-check">
+    **Symptom**: Sending mail via the SMTP channel fails with "EHLO: Invalid domain name".
+
+    **Cause**: The SMTP server validates the domain used in the EHLO command, but the container's hostname isn't a FQDN.
+
+    **Fix**: The latest version sets the EHLO hostname to a valid value automatically. If unresolved, relax SMTP server EHLO validation or change the container hostname to a FQDN.
+  </Accordion>
+
+  <Accordion title="The guardrail blocked something but no reason is shown to the user" icon="ban">
+    **Symptom**: A guardrail blocks the request but users only see a generic error and can't tell which pattern was the issue.
+
+    **Fix**: In the latest version, when blocked, the response metadata includes the **violation type (`guardrail_type`)** and **reason (`guardrail_reason`)**. Customize the user-visible message via the Block Action in guardrail settings.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Operations / Deployment
+
+<AccordionGroup>
+  <Accordion title="Setting changes only apply to some workers in a multi-worker setup" icon="server">
+    **Symptom**: Admin setting changes apply only to some users, or responses differ across workers.
+
+    **Cause**: PersistentConfig uses per-worker memory cache; without Redis, workers don't sync.
+
+    **Fix**:
+    - **Redis is required for production** — set the `REDIS_URL` environment variable
+    - The latest version improves `partial-stale` invalidation and bulk import handling
+    - See [Deployment Checklist](/en/admin/deployment-checklist) for details
+  </Accordion>
+
+  <Accordion title="Alembic migrations create tables in the wrong schema" icon="database">
+    **Symptom**: You set the `DATABASE_SCHEMA` environment variable, but tables are created in the `public` schema.
+
+    **Fix**: Fixed in the latest version. If it occurs:
+    - Manually clean up tables wrongly created in the public schema
+    - Re-run migrations after explicitly setting `DATABASE_SCHEMA=cloosphere`
+    - Concurrent migration conflicts in multi-process setups are also fixed — only the first worker runs the migration
+  </Accordion>
+
+  <Accordion title="PoolError occurs during Knowledge Graph sync" icon="diagram-project">
+    **Symptom**: KG sync or fan-out extraction fails due to PostgreSQL connection pool exhaustion.
+
+    **Fix**: Increase the AGE graph DB-specific pool size with the `AGE_POOL_MAX` environment variable.
+    - Small: `AGE_POOL_MAX=16`
+    - Medium: `AGE_POOL_MAX=32` (default)
+    - Large (>100M nodes): `AGE_POOL_MAX=64`
+
+    See [KG performance tuning in the deployment checklist](/en/admin/deployment-checklist#knowledge-graph-age).
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Need More Help?
+
+<Columns>
+  <Card title="Audit Log" icon="clipboard-list" href="/en/monitoring/audit-logs">
+    See what was changed and when, in chronological order
+  </Card>
+  <Card title="Tracing" icon="route" href="/en/monitoring/tracing">
+    Per-request LLM call, agent flow, and failure analysis
+  </Card>
+  <Card title="Deployment Checklist" icon="list-check" href="/en/admin/deployment-checklist">
+    Required environment variables and multi-worker configuration
+  </Card>
+  <Card title="Contact Admin" icon="envelope" href="/en/admin/users#inquiry-management">
+    Report problems to the admin
+  </Card>
+</Columns>

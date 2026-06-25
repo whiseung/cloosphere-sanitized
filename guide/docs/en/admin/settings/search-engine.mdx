@@ -1,0 +1,103 @@
+---
+title: "Search Engine"
+description: "Configure the vector database and search settings used by Knowledge Bases, Glossaries, and DbSphere."
+---
+
+In **Admin > Settings > Search Engine**, set the vector database type and search parameters. These settings are shared across Knowledge Bases (KbSphere), Glossaries, and DbSphere.
+
+<Frame caption="Search Engine settings tab">
+  <img src="/images/admin/settings-search-engine.png" alt="Search Engine settings tab" />
+</Frame>
+
+---
+
+## Search Engine Selection
+
+| Engine | Strengths |
+|--------|-----------|
+| **Azure AI Search** | Azure managed service, hybrid search supported by default |
+| **PostgreSQL pgvector** | PostgreSQL extension, memory-efficient halfvec support |
+| **Milvus** | Large-scale distributed processing, high-performance vector search |
+| **Elasticsearch** | Hybrid search (BM25 + vector), reuse existing ELK stack |
+| **Google Vertex AI Search** | Google Cloud managed search service |
+
+<Tabs>
+  <Tab title="Azure AI Search">
+    | Setting | Description |
+    |---------|-------------|
+    | **Endpoint** | Azure Search service URL |
+    | **API Key** | Admin API Key |
+    | **API Version** | API version (e.g., `2024-07-01`) |
+  </Tab>
+  <Tab title="pgvector">
+    | Setting | Description |
+    |---------|-------------|
+    | **Host** | PostgreSQL server address |
+    | **Port** | Port number |
+    | **Database** | Database name |
+    | **User** | Connection username |
+    | **Password** | Connection password |
+
+    <Note>
+      The `pgvector` extension must be installed in PostgreSQL.
+    </Note>
+  </Tab>
+  <Tab title="Milvus">
+    | Setting | Description |
+    |---------|-------------|
+    | **URI** | Milvus server address |
+    | **Token** | Auth token (optional) |
+    | **User** | Auth username (optional) |
+    | **Password** | Auth password (optional) |
+  </Tab>
+  <Tab title="Elasticsearch">
+    | Setting | Description |
+    |---------|-------------|
+    | **URL** | Elasticsearch server URL |
+    | **Username** | Auth username (optional) |
+    | **Password** | Auth password (optional) |
+    | **Index Prefix** | Index name prefix (optional) |
+  </Tab>
+  <Tab title="Vertex AI Search">
+    | Setting | Description |
+    |---------|-------------|
+    | **Project ID** | Google Cloud project ID |
+    | **Location** | Region |
+    | **Collection** | Data store collection |
+    | **Use Global Google Cloud Key** | When enabled, uses the global Google Cloud key. When disabled, enter Service Account Key JSON directly below. |
+    | **Service Account Key JSON** | JSON input field shown when `Use Global Google Cloud Key` is disabled. Paste the full service account key JSON. |
+  </Tab>
+</Tabs>
+
+<Note>
+  Embedding engines and models are configured in the **Settings > Documents** tab. Vector dimensions must match between search engine and embedding settings.
+</Note>
+
+---
+
+## Search Settings
+
+Configure search result count and reranker.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Top K** | Vector search result count | `10` |
+| **Reranker Top K** | Result count after reranker | `3` |
+| **Reranker threshold** | Minimum relevance score after reranking (0–1). Results below threshold are filtered | `0.0` |
+
+---
+
+## Reranker Settings (Vertex AI Ranking API)
+
+Configure Vertex AI Ranking API-based reranker to improve search quality.
+
+| Setting | Description |
+|---------|-------------|
+| **Project ID** | Google Cloud project ID (optional — uses Vertex AI Search's Project ID when unset) |
+| **Location** | Vertex AI Ranking API region |
+| **Reranker Model** | Reranking model to use |
+| **Authentication** | Auth method (Use Global Google Cloud Key toggle or Service Account Key JSON entry) |
+
+<Warning>
+  Changing the search engine type makes previously indexed data inaccessible. Always plan data migration before changing.
+</Warning>

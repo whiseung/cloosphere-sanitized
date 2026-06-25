@@ -1,0 +1,1037 @@
+@reference "./tailwind.css";
+
+/* Pretendard — used across DbSphere SQL surfaces (editor panel + memory
+ * modal code blocks) so Korean and English SQL keywords render at the
+ * same visual size. Loaded from CDN so we don't have to vendor the file. */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
+
+@font-face {
+	font-family: 'Inter';
+	src: url('/assets/fonts/Inter-Variable.ttf');
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Archivo';
+	src: url('/assets/fonts/Archivo-Variable.ttf');
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Mona Sans';
+	src: url('/assets/fonts/Mona-Sans.woff2');
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'InstrumentSerif';
+	src: url('/assets/fonts/InstrumentSerif-Regular.ttf');
+	font-display: swap;
+}
+
+:root {
+	/* Figma major color tokens: https://www.figma.com/design/0NsOnsh3RTShm9pweqg7ZW/ClooSphere?node-id=167-1032&m=dev */
+	--token-background-default: #f3f4f6;
+	--token-background-surface: #ffffff;
+	--token-background-neutral-hovered: #e3e4e9;
+	--token-background-disabled: #e5e7eb;
+	/* Page canvas — slightly off-white area that surrounds white cards
+	 * (Figma 1305:12305 workspace inner). Distinct from `surface` (#fff cards)
+	 * and `default` (#f3f4f6 sidebar). */
+	--token-background-canvas: #fafafb;
+
+	--token-brand-primary: #000000;
+	--token-brand-accent: #8200db;
+	--token-status-info: #155dfc;
+	--token-status-success: #008236;
+	--token-status-warning: #a65f00;
+	--token-status-danger: #c10007;
+
+	--token-text-default: #030712;
+	--token-text-primary: #000000;
+	--token-text-on-dark: #ffffff;
+
+	--token-border-default: #9ca3af;
+	--token-border-primary: #4338ca;
+
+	/* Figma border & spacing tokens:
+	   - https://www.figma.com/design/0NsOnsh3RTShm9pweqg7ZW/ClooSphere?node-id=589-10849&m=dev
+	   - https://www.figma.com/design/0NsOnsh3RTShm9pweqg7ZW/ClooSphere?node-id=589-10963&m=dev */
+	--token-border-width-default: 1px;
+	--token-border-radius-none: 0px;
+	--token-border-radius-sm: 2px;
+	--token-border-radius-default: 4px;
+	--token-border-radius-md: 6px;
+	--token-border-radius-lg: 8px;
+	--token-border-radius-xl: 12px;
+	--token-border-radius-2xl: 16px;
+	--token-border-radius-3xl: 24px;
+	--token-border-radius-full: 9999px;
+
+	--token-gap-sm: 0px;
+	--token-spacing-0-5: 2px;
+	--token-spacing-1: 4px;
+	--token-spacing-2: 8px;
+	--token-spacing-3: 12px;
+	--token-space-2: 8px;
+	--token-space-6: 24px;
+	--token-space-16: 64px;
+	--token-space-24: 96px;
+
+	/* Figma naming aliases */
+	--border-width-default: var(--token-border-width-default);
+	--border-radius-default: var(--token-border-radius-default);
+	--rounded-none: var(--token-border-radius-none);
+	--rounded: var(--token-border-radius-default);
+	--gap-sm: var(--token-gap-sm);
+	--spacing-0-5: var(--token-spacing-0-5);
+	--spacing-1: var(--token-spacing-1);
+	--spacing-2: var(--token-spacing-2);
+	--spacing-3: var(--token-spacing-3);
+	--space-2: var(--token-space-2);
+	--space-6: var(--token-space-6);
+	--space-16: var(--token-space-16);
+	--space-24: var(--token-space-24);
+
+	/* Figma color classification tokens: https://www.figma.com/design/0NsOnsh3RTShm9pweqg7ZW/ClooSphere?node-id=166-2486&m=dev */
+	--token-scale-neutral-50: #f9f9fa;
+	--token-scale-neutral-100: #f3f4f6;
+	--token-scale-neutral-200: #e3e4e9;
+	--token-scale-neutral-300: #d5d5da;
+	--token-scale-neutral-400: #9d9ea9;
+	--token-scale-neutral-500: #6f707c;
+	--token-scale-neutral-600: #52525c;
+	--token-scale-neutral-700: #3f3f46;
+	--token-scale-neutral-800: #27272a;
+	--token-scale-neutral-900: #18181b;
+	--token-scale-neutral-950: #000000;
+
+	/* Interaction action set, not a numeric tone scale. */
+	--token-action-primary-default: var(--token-brand-primary);
+	--token-action-primary-hover: var(--token-scale-neutral-900);
+	--token-action-primary-active: var(--token-scale-neutral-800);
+	--token-action-primary-contrast: var(--token-text-on-dark);
+
+	/* Accent classification reuses the Figma purple scale. */
+	--token-scale-accent-50: #faf5ff;
+	--token-scale-accent-100: #f3e8ff;
+	--token-scale-accent-200: #e9d4ff;
+	--token-scale-accent-300: #dab2ff;
+	--token-scale-accent-400: #c27aff;
+	--token-scale-accent-500: #ad46ff;
+	--token-scale-accent-600: #9810fa;
+	--token-scale-accent-700: #8311d5;
+	--token-scale-accent-800: #6e11b0;
+	--token-scale-accent-900: #59168b;
+	--token-scale-accent-950: #3c0366;
+
+	--token-scale-info-50: #eff6ff;
+	--token-scale-info-100: #dbeafe;
+	--token-scale-info-200: #bfdbfe;
+	--token-scale-info-300: #93c5fd;
+	--token-scale-info-400: #60a5fa;
+	--token-scale-info-500: #3b82f6;
+	--token-scale-info-600: #2563eb;
+	--token-scale-info-700: #1d4ed8;
+	--token-scale-info-800: #1e40af;
+	--token-scale-info-900: #1e3a8a;
+	--token-scale-info-950: #172554;
+
+	--token-scale-success-50: #f0fdf4;
+	--token-scale-success-100: #dcfce7;
+	--token-scale-success-200: #bbf7d0;
+	--token-scale-success-300: #86efac;
+	--token-scale-success-400: #4ade80;
+	--token-scale-success-500: #22c55e;
+	--token-scale-success-600: #16a34a;
+	--token-scale-success-700: #15803d;
+	--token-scale-success-800: #166534;
+	--token-scale-success-900: #14532d;
+	--token-scale-success-950: #052e16;
+
+	--token-scale-warning-50: #fefce8;
+	--token-scale-warning-100: #fef9c3;
+	--token-scale-warning-200: #fef08a;
+	--token-scale-warning-300: #fde047;
+	--token-scale-warning-400: #facc15;
+	--token-scale-warning-500: #eab308;
+	--token-scale-warning-600: #ca8a04;
+	--token-scale-warning-700: #a16207;
+	--token-scale-warning-800: #854d0e;
+	--token-scale-warning-900: #713f12;
+	--token-scale-warning-950: #422006;
+
+	--token-scale-danger-50: #fef2f2;
+	--token-scale-danger-100: #fee2e2;
+	--token-scale-danger-200: #fecaca;
+	--token-scale-danger-300: #fca5a5;
+	--token-scale-danger-400: #f87171;
+	--token-scale-danger-500: #ef4444;
+	--token-scale-danger-600: #dc2626;
+	--token-scale-danger-700: #b91c1c;
+	--token-scale-danger-800: #991b1b;
+	--token-scale-danger-900: #7f1d1d;
+	--token-scale-danger-950: #450a0a;
+
+	--cloo-radius-default: var(--token-border-radius-default);
+	--cloo-border-width-default: var(--token-border-width-default);
+
+	--cloo-space-1: var(--token-spacing-1);
+	--cloo-space-1-5: calc((var(--token-spacing-1) + var(--token-spacing-2)) / 2);
+	--cloo-space-2: var(--token-spacing-2);
+	--cloo-space-2-5: calc((var(--token-spacing-2) + var(--token-spacing-3)) / 2);
+	--cloo-space-3: var(--token-spacing-3);
+	--cloo-space-4: calc(var(--token-spacing-2) * 2);
+
+	--cloo-bg-default: var(--token-background-default);
+	--cloo-bg-surface: var(--token-background-surface);
+	--cloo-bg-neutral-hovered: var(--token-background-neutral-hovered);
+	--cloo-bg-disabled: var(--token-background-disabled);
+	--cloo-bg-canvas: var(--token-background-canvas);
+
+	--cloo-text-default: var(--token-text-default);
+	--cloo-text-primary: var(--token-text-primary);
+	--cloo-text-muted: var(--token-scale-neutral-600);
+	--cloo-text-inverse: var(--token-text-on-dark);
+
+	--cloo-border-default: var(--token-border-default);
+	/* Divider/separator color — lighter than border-default. Used for inline
+	 * vertical/horizontal dividers between adjacent controls (Figma
+	 * `--color/border/divider` = #d5d5da, neutral-300). */
+	--cloo-border-divider: var(--token-scale-neutral-300);
+	--cloo-border-subtle: var(--token-scale-neutral-200);
+	--cloo-control-border: var(--token-scale-neutral-500);
+	--cloo-focus-ring: var(--token-border-primary);
+	--cloo-surface-border: var(--token-scale-neutral-300);
+	--cloo-surface-hover: var(--token-scale-neutral-100);
+	--cloo-surface-active: var(--token-scale-neutral-200);
+
+	--cloo-color-primary: var(--token-action-primary-default);
+	--cloo-color-primary-hover: var(--token-action-primary-hover);
+	--cloo-color-primary-active: var(--token-action-primary-active);
+	--cloo-color-on-primary: var(--token-action-primary-contrast);
+
+	--cloo-color-accent: var(--token-scale-accent-600);
+	--cloo-color-accent-hover: var(--token-scale-accent-700);
+	--cloo-color-accent-soft: var(--token-scale-accent-100);
+	--cloo-color-accent-contrast: var(--token-text-on-dark);
+
+	--cloo-color-info: var(--token-status-info);
+	--cloo-color-success: var(--token-status-success);
+	--cloo-color-warning: var(--token-status-warning);
+
+	--cloo-danger-solid: var(--token-scale-danger-700);
+	--cloo-danger-solid-hover: var(--token-scale-danger-800);
+	--cloo-danger-solid-active: var(--token-scale-danger-900);
+	--cloo-danger-solid-contrast: var(--token-text-on-dark);
+	--cloo-color-danger: var(--token-scale-danger-700);
+	--cloo-color-danger-hover: var(--token-scale-danger-800);
+	--cloo-color-danger-active: var(--token-scale-danger-900);
+	--cloo-color-danger-border: var(--token-scale-danger-300);
+	--cloo-color-danger-soft: var(--token-scale-danger-50);
+	--cloo-color-danger-softer: var(--token-scale-danger-100);
+}
+
+html.dark {
+	--token-background-default: var(--color-gray-950, #0d0d0d);
+	--token-background-surface: var(--color-gray-900, #171717);
+	--token-background-neutral-hovered: var(--color-gray-800, #333333);
+	--token-background-disabled: var(--color-gray-800, #333333);
+	--token-background-canvas: var(--color-gray-925, #0f0f0f);
+
+	--token-text-default: #ffffff;
+	--token-text-primary: #ffffff;
+	--token-text-on-dark: #ffffff;
+
+	--token-border-default: var(--color-gray-700, #4e4e4e);
+	--token-border-primary: #818cf8;
+
+	--token-action-primary-default: var(--token-scale-neutral-50);
+	--token-action-primary-hover: var(--token-scale-neutral-100);
+	--token-action-primary-active: var(--token-scale-neutral-200);
+	--token-action-primary-contrast: var(--token-scale-neutral-950);
+
+	--cloo-text-muted: var(--token-scale-neutral-500);
+	--cloo-border-subtle: var(--token-scale-neutral-800);
+	--cloo-border-divider: var(--token-scale-neutral-700);
+	--cloo-control-border: var(--token-scale-neutral-500);
+	--cloo-surface-border: var(--token-scale-neutral-700);
+	--cloo-surface-hover: var(--token-scale-neutral-800);
+	--cloo-surface-active: var(--token-scale-neutral-700);
+	--cloo-color-accent: var(--token-scale-accent-500);
+	--cloo-color-accent-hover: var(--token-scale-accent-600);
+	--cloo-color-accent-soft: var(--token-scale-accent-950);
+	--cloo-danger-solid: var(--token-scale-danger-600);
+	--cloo-danger-solid-hover: var(--token-scale-danger-700);
+	--cloo-danger-solid-active: var(--token-scale-danger-800);
+	--cloo-color-danger: var(--token-scale-danger-300);
+	--cloo-color-danger-hover: var(--token-scale-danger-200);
+	--cloo-color-danger-active: var(--token-scale-danger-100);
+	--cloo-color-danger-border: var(--token-scale-danger-700);
+	--cloo-color-danger-soft: var(--token-scale-danger-950);
+	--cloo-color-danger-softer: var(--token-scale-danger-900);
+}
+
+html {
+	word-break: break-word;
+	/* Font chain mirrored in src/tailwind.css @layer base — keep in sync. */
+	font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, 'Inter', ui-sans-serif,
+		system-ui, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif, 'Helvetica Neue',
+		Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+code {
+	/* white-space-collapse: preserve !important; */
+	overflow-x: auto;
+	width: auto;
+}
+
+.font-secondary {
+	font-family: 'InstrumentSerif', sans-serif;
+}
+
+math {
+	margin-top: 1rem;
+}
+
+.hljs {
+	@apply rounded-lg;
+}
+
+input::placeholder {
+	direction: auto;
+}
+
+textarea::placeholder {
+	direction: auto;
+}
+
+.input-prose {
+	@apply prose dark:prose-invert prose-headings:font-semibold prose-hr:my-4 prose-hr:border-gray-100 prose-hr:dark:border-gray-800 prose-p:my-0 prose-img:my-1 prose-headings:my-1 prose-pre:my-0 prose-table:my-0 prose-blockquote:my-0 prose-ul:-my-0 prose-ol:-my-0 prose-li:-my-0 whitespace-pre-line;
+}
+
+.input-prose-sm {
+	@apply prose dark:prose-invert prose-headings:font-semibold prose-hr:my-4 prose-hr:border-gray-100 prose-hr:dark:border-gray-800 prose-p:my-0 prose-img:my-1 prose-headings:my-1 prose-pre:my-0 prose-table:my-0 prose-blockquote:my-0 prose-ul:-my-0 prose-ol:-my-0 prose-li:-my-0 whitespace-pre-line text-sm;
+}
+
+.markdown-prose {
+	@apply prose dark:prose-invert prose-blockquote:border-s-gray-100 prose-blockquote:dark:border-gray-800 prose-blockquote:border-s-2 prose-blockquote:not-italic prose-blockquote:font-normal  prose-headings:font-semibold prose-hr:my-7 prose-hr:border-gray-100 prose-hr:dark:border-gray-800 prose-p:my-3.5 prose-img:my-1 prose-headings:mt-7 prose-headings:mb-3 prose-pre:my-4 prose-table:my-4 prose-blockquote:my-4 prose-ul:my-3 prose-ol:my-3 prose-li:my-0.5 whitespace-pre-line;
+}
+
+/* 유저 질의 말풍선은 컴팩트 유지 — 넓은 리듬은 답변(chat-assistant)에만 적용 */
+.chat-user.markdown-prose :where(p, ul, ol, li, h1, h2, h3, h4, hr, blockquote) {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.markdown-prose-xs {
+	@apply text-xs prose dark:prose-invert prose-blockquote:border-s-gray-100 prose-blockquote:dark:border-gray-800 prose-blockquote:border-s-2 prose-blockquote:not-italic prose-blockquote:font-normal  prose-headings:font-semibold prose-hr:my-0  prose-hr:border-gray-100 prose-hr:dark:border-gray-800 prose-p:my-0 prose-img:my-1 prose-headings:my-1 prose-pre:my-0 prose-table:my-0 prose-blockquote:my-0 prose-ul:-my-0 prose-ol:-my-0 prose-li:-my-0 whitespace-pre-line;
+}
+
+.markdown a {
+	@apply underline;
+}
+
+.font-primary {
+	font-family: 'Archivo', 'Pretendard Variable', sans-serif;
+}
+
+.drag-region {
+	-webkit-app-region: drag;
+}
+
+.drag-region a,
+.drag-region button {
+	-webkit-app-region: no-drag;
+}
+
+.no-drag-region {
+	-webkit-app-region: no-drag;
+}
+
+li p {
+	display: inline;
+}
+
+::-webkit-scrollbar-thumb {
+	--tw-border-opacity: 1;
+	background-color: rgba(236, 236, 236, 0.8);
+	border-color: rgba(255, 255, 255, var(--tw-border-opacity));
+	border-radius: 9999px;
+	border-width: 1px;
+}
+
+/* Dark theme scrollbar styles */
+.dark ::-webkit-scrollbar-thumb {
+	background-color: rgba(42, 42, 42, 0.8); /* Darker color for dark theme */
+	border-color: rgba(0, 0, 0, var(--tw-border-opacity));
+}
+
+::-webkit-scrollbar {
+	height: 0.8rem;
+	width: 0.4rem;
+}
+
+::-webkit-scrollbar-track {
+	background-color: transparent;
+	border-radius: 9999px;
+}
+
+select {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+	background-position: right 0rem center;
+	background-repeat: no-repeat;
+	background-size: 1.5em 1.5em;
+	-webkit-print-color-adjust: exact;
+	print-color-adjust: exact;
+	/* padding-right: 2.5rem; */
+	/* for Firefox */
+	-moz-appearance: none;
+	/* for Chrome */
+	-webkit-appearance: none;
+}
+
+@keyframes shimmer {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+.shimmer {
+	background: linear-gradient(90deg, #9a9b9e 25%, #2a2929 50%, #9a9b9e 75%);
+	background-size: 200% 100%;
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: shimmer 4s linear infinite;
+	color: #818286; /* Fallback color */
+}
+
+:global(.dark) .shimmer {
+	background: linear-gradient(90deg, #818286 25%, #eae5e5 50%, #818286 75%);
+	background-size: 200% 100%;
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: shimmer 4s linear infinite;
+	color: #a1a3a7; /* Darker fallback color for dark mode */
+}
+
+@keyframes smoothFadeIn {
+	0% {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.status-description {
+	animation: smoothFadeIn 0.2s forwards;
+}
+
+.katex-mathml {
+	display: none;
+}
+
+.scrollbar-hidden:active::-webkit-scrollbar-thumb,
+.scrollbar-hidden:focus::-webkit-scrollbar-thumb,
+.scrollbar-hidden:hover::-webkit-scrollbar-thumb {
+	visibility: visible;
+}
+.scrollbar-hidden::-webkit-scrollbar-thumb {
+	visibility: hidden;
+}
+
+.scrollbar-hidden::-webkit-scrollbar-corner {
+	display: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+	display: none; /* for Chrome, Safari and Opera */
+}
+
+.scrollbar-none::-webkit-scrollbar-corner {
+	display: none;
+}
+
+.scrollbar-none {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	/* display: none; <- Crashes Chrome on hover */
+	-webkit-appearance: none;
+	margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type='number'] {
+	-moz-appearance: textfield; /* Firefox */
+}
+
+.katex-display {
+	@apply overflow-y-hidden overflow-x-auto max-w-full;
+}
+
+.katex-display::-webkit-scrollbar {
+	height: 0.4rem;
+	width: 0.4rem;
+}
+
+.katex-display:active::-webkit-scrollbar-thumb,
+.katex-display:focus::-webkit-scrollbar-thumb,
+.katex-display:hover::-webkit-scrollbar-thumb {
+	visibility: visible;
+}
+.katex-display::-webkit-scrollbar-thumb {
+	visibility: hidden;
+}
+
+.katex-display::-webkit-scrollbar-corner {
+	display: none;
+}
+
+.cm-editor {
+	height: 100%;
+	width: 100%;
+}
+
+.cm-scroller:active::-webkit-scrollbar-thumb,
+.cm-scroller:focus::-webkit-scrollbar-thumb,
+.cm-scroller:hover::-webkit-scrollbar-thumb {
+	visibility: visible;
+}
+
+.cm-scroller::-webkit-scrollbar-thumb {
+	visibility: hidden;
+}
+
+.cm-scroller::-webkit-scrollbar-corner {
+	display: none;
+}
+
+.cm-editor.cm-focused {
+	outline: none;
+}
+
+.tippy-box[data-theme~='dark'] {
+	@apply rounded-lg bg-gray-950 text-xs border border-gray-900 shadow-xl;
+}
+
+.password {
+	-webkit-text-security: disc;
+}
+
+.codespan {
+	color: #eb5757;
+	border-width: 0px;
+	padding: 3px 8px;
+	font-size: 0.8em;
+	font-weight: 600;
+	@apply rounded-md dark:bg-gray-800 bg-gray-100 mx-0.5;
+}
+
+.svelte-flow {
+	background-color: transparent !important;
+}
+
+.svelte-flow__edge > path {
+	stroke-width: 0.5;
+}
+
+.svelte-flow__edge.animated > path {
+	stroke-width: 2;
+	@apply stroke-gray-600 dark:stroke-gray-500;
+}
+
+.bg-gray-950-90 {
+	background-color: rgba(var(--color-gray-950, #0d0d0d), 0.9);
+}
+
+.ProseMirror {
+	@apply h-full min-h-fit max-h-full whitespace-pre-wrap;
+}
+
+.ProseMirror:focus {
+	outline: none;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+	content: attr(data-placeholder);
+	float: left;
+	color: #adb5bd;
+	pointer-events: none;
+
+	@apply line-clamp-1 absolute;
+}
+
+.ai-autocompletion::after {
+	color: #a0a0a0;
+
+	content: attr(data-suggestion);
+	pointer-events: none;
+}
+
+.tiptap > pre > code {
+	border-radius: 0.4rem;
+	font-size: 0.85rem;
+	padding: 0.25em 0.3em;
+
+	@apply dark:bg-gray-800 bg-gray-100;
+}
+
+.tiptap > pre {
+	border-radius: 0.5rem;
+	font-family: 'JetBrainsMono', monospace;
+	margin: 1.5rem 0;
+	padding: 0.75rem 1rem;
+
+	@apply dark:bg-gray-800 bg-gray-100;
+}
+
+.tiptap p code {
+	color: #eb5757;
+	border-width: 0px;
+	padding: 3px 8px;
+	font-size: 0.8em;
+	font-weight: 600;
+	@apply rounded-md dark:bg-gray-800 bg-gray-100 mx-0.5;
+}
+
+/* Code styling */
+.hljs-comment,
+.hljs-quote {
+	color: #616161;
+}
+
+.hljs-variable,
+.hljs-template-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.hljs-link,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class {
+	color: #f98181;
+}
+
+.hljs-number,
+.hljs-meta,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params {
+	color: #fbbc88;
+}
+
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet {
+	color: #b9f18d;
+}
+
+.hljs-title,
+.hljs-section {
+	color: #faf594;
+}
+
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #70cff8;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: 700;
+}
+
+/* Workspace/Schedules shared layout */
+.workspace-page-shell {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100dvh;
+	max-height: 100dvh;
+	background: var(--cloo-bg-canvas);
+}
+
+.workspace-page-header {
+	display: flex;
+	align-items: center;
+	gap: var(--cloo-space-2);
+	padding: 20px 32px 8px;
+}
+
+.workspace-page-divider {
+	border-top: 1px solid var(--cloo-border-subtle);
+}
+
+.workspace-page-content {
+	flex: 1;
+	max-height: 100%;
+	overflow-y: auto;
+	padding: 8px 32px 4px;
+}
+
+.workspace-section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--cloo-space-3);
+	margin: 8px 0 16px;
+}
+
+.workspace-section-title-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.workspace-section-title {
+	font-size: 1.125rem;
+	font-weight: 500;
+	color: var(--cloo-text-primary);
+}
+
+.workspace-section-count {
+	font-size: 1.125rem;
+	font-weight: 500;
+	color: var(--token-scale-neutral-400);
+}
+
+.workspace-section-actions {
+	display: flex;
+	align-items: center;
+	gap: var(--cloo-space-2);
+}
+
+.workspace-section-search {
+	width: min(340px, 52vw);
+}
+
+.workspace-cards-grid {
+	display: grid;
+	gap: var(--token-space-6);
+	grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+	.workspace-cards-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1024px) {
+	.workspace-cards-grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 767px) {
+	.workspace-page-header {
+		padding: 16px 18px 8px;
+	}
+
+	.workspace-page-content {
+		padding: 8px 18px 4px;
+	}
+
+	.workspace-section-header {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.workspace-section-actions {
+		width: 100%;
+	}
+
+	.workspace-section-search {
+		width: 100%;
+	}
+}
+
+/* WorkspaceCard */
+.workspace-card {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	padding: var(--token-space-6, 24px) var(--token-space-6, 24px) 20px;
+	background-color: var(--cloo-bg-surface);
+	border: var(--cloo-border-width-default) solid var(--cloo-border-subtle);
+	border-radius: var(--token-border-radius-xl);
+	cursor: pointer;
+	transition:
+		border-color 150ms ease,
+		box-shadow 150ms ease;
+}
+
+.workspace-card:hover {
+	border-color: var(--cloo-surface-border);
+	box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+}
+
+.workspace-card:focus-visible {
+	outline: none;
+	box-shadow:
+		0 0 0 2px var(--cloo-bg-surface),
+		0 0 0 4px var(--cloo-focus-ring);
+}
+
+/* Schedule cards */
+.schedule-card-meta-grid {
+	display: grid;
+	gap: var(--cloo-space-1-5);
+	grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.35fr) minmax(0, 0.9fr);
+	font-size: 0.75rem;
+	line-height: 1rem;
+	color: var(--cloo-text-muted);
+}
+
+.schedule-card-meta-pill {
+	display: inline-flex;
+	align-items: center;
+	min-width: 0;
+	padding: 2px 8px;
+	border-radius: var(--token-border-radius-md);
+	border: 1px solid var(--cloo-border-subtle);
+	background: var(--cloo-bg-default);
+}
+
+.schedule-card-meta-pill-mono {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+		'Courier New', monospace;
+}
+
+.schedule-list-info {
+	font-size: 0.75rem;
+	line-height: 1rem;
+	color: var(--cloo-text-muted);
+	margin: 4px 0 8px;
+}
+
+.schedule-page-content {
+	padding: 12px 36px 8px;
+}
+
+.schedule-list-shell {
+	padding: 4px 0 12px;
+}
+
+.schedule-section-header {
+	margin: 10px 0 20px;
+	gap: var(--cloo-space-4);
+}
+
+.schedule-section-actions {
+	display: grid;
+	grid-template-columns: minmax(260px, 420px) auto;
+	align-items: center;
+	gap: var(--cloo-space-3);
+}
+
+.schedule-section-search {
+	width: 100%;
+}
+
+.schedule-section-create {
+	justify-self: end;
+}
+
+.schedule-cards-grid {
+	gap: 28px;
+}
+
+.schedule-detail-page {
+	max-width: min(1180px, 100%);
+	margin: 0 auto;
+	padding: 6px 0 20px;
+}
+
+.schedule-detail-back-row {
+	margin-bottom: 14px;
+}
+
+.schedule-detail-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--cloo-space-4);
+	margin-bottom: 18px;
+}
+
+.schedule-detail-title-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--cloo-space-2);
+	min-width: 0;
+}
+
+.schedule-detail-title {
+	min-width: 0;
+	max-width: 100%;
+	line-height: 1.25;
+}
+
+.schedule-detail-copied-from {
+	line-height: 1.25;
+}
+
+.schedule-detail-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: var(--cloo-space-2);
+}
+
+.schedule-detail-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 2px;
+	border-bottom: 1px solid var(--cloo-border-subtle);
+	margin-bottom: 18px;
+}
+
+.schedule-detail-tab-button {
+	white-space: nowrap;
+}
+
+.schedule-detail-content {
+	min-width: 0;
+	border: 1px solid var(--cloo-border-subtle);
+	border-radius: var(--token-border-radius-xl);
+	background: var(--cloo-bg-surface);
+	padding: 22px;
+}
+
+.schedule-detail-panel {
+	min-width: 0;
+	margin-bottom: 24px;
+}
+
+.schedule-form {
+	width: 100%;
+}
+
+.schedule-form-fields {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.schedule-form-field {
+	width: 100%;
+}
+
+.schedule-form-edit .schedule-form-fields {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px 18px;
+	align-items: start;
+}
+
+.schedule-form-edit .schedule-form-field-description,
+.schedule-form-edit .schedule-form-field-prompt,
+.schedule-form-edit .schedule-form-field-schedule,
+.schedule-form-edit .schedule-form-field-delivery {
+	grid-column: 1 / -1;
+}
+
+@media (min-width: 1280px) {
+	.schedule-form-edit .schedule-form-field-schedule {
+		grid-column: 1 / 2;
+	}
+
+	.schedule-form-edit .schedule-form-field-delivery {
+		grid-column: 2 / 3;
+	}
+}
+
+@media (max-width: 1279px) {
+	.schedule-section-actions {
+		grid-template-columns: minmax(220px, 1fr) auto;
+	}
+}
+
+@media (max-width: 767px) {
+	.schedule-page-content {
+		padding: 8px 18px 6px;
+	}
+
+	.schedule-list-shell {
+		padding: 2px 0 10px;
+	}
+
+	.schedule-section-header {
+		margin: 8px 0 14px;
+	}
+
+	.schedule-section-actions {
+		grid-template-columns: 1fr;
+	}
+
+	.schedule-section-create {
+		justify-self: start;
+	}
+
+	.schedule-cards-grid {
+		gap: 20px;
+	}
+
+	.schedule-detail-page {
+		padding: 4px 0 12px;
+	}
+
+	.schedule-detail-header {
+		flex-direction: column;
+		align-items: stretch;
+		gap: var(--cloo-space-2);
+		margin-bottom: 14px;
+	}
+
+	.schedule-detail-actions {
+		justify-content: flex-start;
+	}
+
+	.schedule-detail-tabs {
+		margin-bottom: 14px;
+	}
+
+	.schedule-detail-content {
+		padding: 16px;
+	}
+
+	.schedule-detail-panel {
+		margin-bottom: 16px;
+	}
+
+	.schedule-form-edit .schedule-form-fields {
+		grid-template-columns: 1fr;
+		gap: 14px;
+	}
+
+	.schedule-form-edit .schedule-form-field-target,
+	.schedule-form-edit .schedule-form-field-description,
+	.schedule-form-edit .schedule-form-field-prompt,
+	.schedule-form-edit .schedule-form-field-schedule,
+	.schedule-form-edit .schedule-form-field-delivery {
+		grid-column: 1 / -1;
+	}
+
+	.schedule-card-meta-grid {
+		grid-template-columns: 1fr;
+	}
+}

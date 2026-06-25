@@ -1,0 +1,196 @@
+---
+title: "Sign In"
+description: "How to sign in with SSO (Microsoft Entra ID) or email/password, plus troubleshooting"
+---
+
+Cloosphere supports both SSO (Single Sign-On) and email/password sign-in. In enterprise environments, SSO based on Microsoft Entra ID (Azure AD) is recommended.
+
+---
+
+## Authentication Methods
+
+| Method | Description | Status |
+|--------|-------------|--------|
+| **Microsoft Entra ID** | Enterprise SSO based on Azure AD | Supported |
+| **Email/Password** | Default sign-in form | Supported |
+| **LDAP** | LDAP directory service integration | Supported |
+| **Google Workspace** | Google enterprise account | Available when configured by admin |
+| **GitHub** | GitHub account integration | Available when configured by admin |
+| **OIDC/OAuth 2.0** | Other IdP integrations | Available when configured by admin |
+
+<Note>
+  The available sign-in methods depend on admin configuration. If a method isn't shown on the sign-in screen, contact your IT admin.
+</Note>
+
+<Note>
+  OAuth sign-in options (Microsoft, Google, GitHub, etc.) only appear on the sign-in screen if the admin has configured the corresponding provider via environment variables.
+</Note>
+
+---
+
+## How to Sign In
+
+<Tabs>
+  <Tab title="SSO (Microsoft)">
+    The recommended sign-in method for enterprise environments using Microsoft Entra ID (Azure AD). Sign in with your corporate account — no separate account creation needed.
+
+    <Steps>
+      <Step title="Open Cloosphere">
+        Enter the Cloosphere URL provided by your admin in the browser address bar.
+      </Step>
+      <Step title="Click the SSO button">
+        Click the **"Continue with Microsoft"** button at the bottom of the sign-in screen.
+      </Step>
+      <Step title="Authenticate with Microsoft">
+        You'll be redirected to the Microsoft sign-in page. Enter your corporate email and password, or pick an account that's already signed in to the browser.
+
+        <Tip>
+          If you're already signed in to Microsoft 365, you'll be authenticated automatically by selecting your account.
+        </Tip>
+      </Step>
+      <Step title="Land on the main screen">
+        Once authenticated, you'll be redirected to the Cloosphere main chat screen.
+
+        ![Main screen after successful sign-in](/images/getting-started/login-success.png)
+      </Step>
+    </Steps>
+
+    **Benefits of SSO:**
+    - No separate account creation needed
+    - Corporate password policies apply automatically
+    - MFA and other corporate security policies carry over
+    - Organization information syncs automatically
+  </Tab>
+
+  <Tab title="Email / Password">
+    Sign in with email and password when SSO isn't used.
+
+    <Steps>
+      <Step title="Open Cloosphere">
+        Enter the Cloosphere URL provided by your admin in the browser.
+      </Step>
+      <Step title="Enter email">
+        Enter your registered email address in the **Email** field.
+      </Step>
+      <Step title="Enter password">
+        Enter your password in the **Password** field.
+      </Step>
+      <Step title="Click sign in">
+        Click **"Sign in"** or press `Enter`.
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="LDAP">
+    Use this method when an LDAP directory service has been configured.
+
+    <Steps>
+      <Step title="Open Cloosphere">
+        Enter the Cloosphere URL provided by your admin in the browser.
+      </Step>
+      <Step title="Confirm LDAP mode">
+        The sign-in screen displays in LDAP mode, with a **Username** field.
+
+        If you see the email sign-in form instead, click **"Continue with LDAP"** at the bottom to switch. To go back from LDAP to email sign-in, click **"Continue with Email"**.
+      </Step>
+      <Step title="Enter credentials">
+        Enter your LDAP username and password, then click **"Authenticate"**.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+---
+
+## Creating a New Account
+
+<Note>
+  You can create your own account only if the admin has enabled new sign-ups. If it's disabled, contact your IT admin to request an account.
+</Note>
+
+When sign-up is allowed, click the **"Sign up"** link at the bottom of the sign-in screen to create an account.
+
+<Steps>
+  <Step title="Go to the sign-up page">
+    Click the **"Don't have an account? Sign up"** link at the bottom of the sign-in screen.
+  </Step>
+  <Step title="Enter your information">
+    Fill in:
+    - **Name**: Display name (real name recommended)
+    - **Email**: Email address used for sign-in
+    - **Password**: Password
+
+    ![Sign up form](/images/getting-started/login-signup-form.png)
+  </Step>
+  <Step title="Check password requirements">
+    The password must meet **all** of the following:
+    - Minimum 8 characters
+    - At least 1 uppercase letter
+    - At least 1 lowercase letter
+    - At least 1 number
+
+    A password strength indicator shows compliance in real time as you type.
+  </Step>
+  <Step title="Complete account creation">
+    Once all conditions are met, the **"Create Account"** button activates. Click it to create the account.
+
+    <Warning>
+      Depending on admin settings, your account may go into a `pending` state after creation. In that case, an admin must approve the account before you can sign in.
+    </Warning>
+  </Step>
+</Steps>
+
+---
+
+## Sign Out
+
+<Steps>
+  <Step title="Open the user menu">
+    Click your **profile image** in the bottom-left corner.
+  </Step>
+  <Step title="Click Sign Out">
+    Click **"Sign Out"** in the dropdown menu. You'll be redirected to the sign-in screen (`/auth`).
+
+    ![User menu dropdown](/images/getting-started/ui-profile-dropdown.png)
+  </Step>
+</Steps>
+
+---
+
+## Troubleshooting
+
+<Accordion title="The SSO button doesn't appear">
+  SSO appears on the sign-in screen only when an admin has configured an OAuth provider. If "Continue with Microsoft" is missing, ask your IT admin to set up OAuth (configured via environment variables).
+</Accordion>
+
+<Accordion title="I get an 'Invalid credentials' error">
+  Your email or password is wrong. Check:
+  - Email typos (case-insensitive)
+  - Caps Lock state
+  - If you forgot your password, ask the admin to reset it
+</Accordion>
+
+<Accordion title='I see "You do not have permission to access this resource"'>
+  This appears when the admin requires approval after sign-up and your account is in `pending` state. Contact the IT admin to activate your account.
+</Accordion>
+
+<Accordion title="Permission error after Microsoft sign-in">
+  Occurs when Cloosphere hasn't been granted access in Microsoft Entra ID. Ask your IT admin to verify:
+  - Cloosphere is registered as an app in Azure AD
+  - Your user or group has app access permission
+  - Required API permissions (User.Read, etc.) are consented
+</Accordion>
+
+<Accordion title="Blank screen after sign-in">
+  This may be a browser cache issue:
+  1. Clear browser cache (`Ctrl + Shift + Delete`)
+  2. Hard refresh (`Ctrl + Shift + R`)
+  3. Try in private/incognito mode
+  4. If the issue persists, contact the IT admin
+</Accordion>
+
+---
+
+## Next Steps
+
+After signing in, explore the [UI layout](/en/getting-started/ui-overview) and start your [first AI conversation](/en/getting-started/first-chat).

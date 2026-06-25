@@ -1,0 +1,421 @@
+---
+title: "Chat Widget Embed"
+description: "Embed Cloosphere AI chat into external websites for customer support, internal system automation, and more."
+---
+
+A feature for **embedding Cloosphere chat into external websites** like internal portals, customer support pages, and groupware. With a single script tag, provide AI chat on any web page.
+
+{/* TODO: screenshot needed — Admin > Settings > Embed Widgets list screen */}
+
+---
+
+## Why You Need It
+
+| Existing Approach | Embed Widget |
+|-------------------|--------------|
+| Users must directly access Cloosphere | AI chat directly inside the work system |
+| Separate sign-in needed | Token forwarding or in-widget self sign-in |
+| No external system integration | Supports **UI bridge** where AI reads and fills host page forms |
+
+**Use scenarios:**
+- Place an AI assistant in internal groupware to compose leave requests by chat
+- Embed a FAQ chatbot on customer support pages
+- Mount an operations support AI on the management console
+
+---
+
+## Creating Widgets
+
+Manage widgets in **Admin > Settings > Embed Widgets**.
+
+<Steps>
+  <Step title="Add widget">
+    Click the **+ button** to create a new widget.
+  </Step>
+  <Step title="Enter basic info">
+    | Field | Description |
+    |-------|-------------|
+    | **Name** | Widget identifier (also used as default header title) |
+    | **Description** | Admin-side memo (not externally exposed) |
+    | **Model/Agent** | Pick **Agent**, **Flow**, or **Model** for the widget |
+    | **System Prompt** | Widget-specific system prompt (optional) |
+  </Step>
+  <Step title="Edit design">
+    Click the **Design** button to customize appearance (details below).
+  </Step>
+  <Step title="Activate">
+    Set the toggle to **Active** in the widget list. Inactive widgets aren't loaded externally.
+  </Step>
+</Steps>
+
+---
+
+## Display Modes
+
+How the widget appears on the host page — 6 modes supported.
+
+| Mode | Behavior | Default Size | Host Layout Impact |
+|------|----------|--------------|---------------------|
+| **Bubble** | Bottom-right (or bottom-left) floating button → chat panel popup on click | 400×600px | None (overlay) |
+| **Side Right** | Fixed panel on the right of the screen | 380px width | Auto-applies `margin-right` to body |
+| **Side Left** | Fixed panel on the left of the screen | 380px width | Auto-applies `margin-left` to body |
+| **Side Bottom** | Fixed full-width panel at the bottom of the screen | 320px height | Reduces `html height` by panel size → content reflows upward naturally |
+| **Inline** | Inserted inside a specified HTML element | 100%×500px | None (within specified container) |
+| **Fullscreen** | Full screen overlay | 100vw×100vh | Host page is hidden |
+
+<Tip>
+  **Bubble mode** is the most common choice. Used only when the user clicks, with auto-responsive sizing on mobile (≤480px).
+
+  **Side modes** auto-shift host page content without separate CSS/JS. To opt-out of this, add the `data-cloosphere-no-shift` attribute to the host page's root element.
+</Tip>
+
+<Note>
+  Bubble mode's **Bubble Open Style** also supports 4 options: `popup` / `side-right` / `side-left` / `side-bottom`. Start as Bubble and specify how to expand on click.
+</Note>
+
+### Resizable Panel
+
+Toggle on **Resizable Panel** in widget settings to let users adjust panel size.
+
+| Mode | Grip Position | Adjustable |
+|------|---------------|------------|
+| **Popup (Bubble)** | Diagonal grip on top corner of panel (opposite to bubble) | width / height both directions |
+| **Side Right / Left** | Vertical edge inside panel | width only (height stays 100vh) |
+| **Side Bottom** | Horizontal edge on top of panel | height only (width stays 100vw) |
+
+Adjusted size is **saved in localStorage** per `widgetId`, so previous size is restored when the user revisits the same site.
+
+<Accordion title="Detect panel size changes from the host page" icon="code">
+  When panel size changes in Side modes, the following occurs:
+
+  - CSS variable updates: `--cloosphere-side-panel-width`, `--cloosphere-side-panel-height`
+  - Event published to host page: `cloosphere:side-resize` (payload includes `width`/`height`)
+
+  Subscribe to this event if you need to sync host page positions like sidebars or fixed headers with the panel.
+</Accordion>
+
+---
+
+## Design Customization
+
+Fine-tune widget appearance in the Design editor. See changes immediately with real-time preview.
+
+### Layout
+
+| Setting | Description |
+|---------|-------------|
+| **Mode** | Display mode (pick from 5) |
+| **Position** | Bubble mode button position (bottom-right / bottom-left) |
+| **Width / Height** | Widget size (CSS values, e.g., `400px`, `100%`) |
+| **Bubble Size** | Bubble button size (default 56px) |
+| **Bubble Draggable** | Allow bubble button to be dragged |
+| **Bubble Open Style** | Behavior on bubble click (`popup` / `side-right` / `side-left`) |
+| **Show Header Close Button** | Show header close (X) button |
+
+### Icons
+
+| Setting | Description |
+|---------|-------------|
+| **Bubble Icon** | Floating button icon (7 presets + custom upload) |
+| **Send Button Icon** | Send button icon (7 presets + custom upload) |
+
+Presets: Chat, Sparkles, Message, Robot, Support (Headset), Help (Question), Bolt
+
+### Header
+
+| Setting | Description |
+|---------|-------------|
+| **Show Header** | Show header |
+| **Header Text** | Header title (uses widget name if empty) |
+| **Show Avatar** | Show AI avatar |
+| **Avatar URL** | Custom AI avatar image |
+| **Bot Name** | AI name (shown above messages) |
+
+### Colors
+
+| Setting | Applies To |
+|---------|------------|
+| **Primary Color** | Bubble button background |
+| **Bubble Icon Color** | Bubble button icon |
+| **Header Color** | Header background |
+| **Header Text Color** | Header text |
+| **Background Color** | Chat area background |
+| **Message Text Color** | Message text |
+| **Send Button Color** | Send button background |
+| **Send Button Icon Color** | Send button icon |
+
+### Theme Presets
+
+12 theme presets to apply all colors at once.
+
+Light, Dark, Slate, Midnight, Ocean, Aurora, Sunset, Forest, Rose, Cyberpunk, Ember, Mono
+
+After picking a preset, individual colors can be further customized.
+
+### Chat Settings
+
+| Setting | Description | Default |
+|---------|-------------|:-------:|
+| **Theme** | Theme (auto / light / dark). auto follows OS setting | auto |
+| **Welcome Message** | Welcome message AI auto-sends at chat start | — |
+| **Max Messages Per Session** | Max messages per session. 0 = unlimited | 0 |
+
+### Feature Toggles
+
+| Setting | Description | Default |
+|---------|-------------|:-------:|
+| **File Upload** | Allow file attachment | off |
+| **Markdown** | Markdown rendering | on |
+| **Code Highlight** | Code block highlighting | on |
+| **Web Search** | Web search feature | off |
+
+---
+
+## Embed Code
+
+Once a widget is created, a **script tag** to embed in the host page is provided.
+
+```html
+<script
+  src="https://your-cloosphere.com/static/embed/embed.js"
+  data-widget-id="WIDGET_ID">
+</script>
+```
+
+This single line auto-loads the widget. Override settings with additional `data-*` attributes:
+
+| Attribute | Description |
+|-----------|-------------|
+| `data-widget-id` | Widget ID (required) |
+| `data-token` | Pre-authenticated user token (optional — skips sign-in if present) |
+| `data-mode` | Override display mode |
+| `data-theme` | Override theme (`light` / `dark` / `auto`) |
+| `data-position` | Override button position (`bottom-right` / `bottom-left`) |
+| `data-primary-color` | Override Bubble button color |
+| `data-target` | Target CSS selector for Inline mode |
+| `data-width` / `data-height` | Override size |
+
+<AccordionGroup>
+  <Accordion title="Inline mode example">
+    ```html
+    <div id="my-chat-container" style="height: 600px;"></div>
+    <script
+      src="https://your-cloosphere.com/static/embed/embed.js"
+      data-widget-id="WIDGET_ID"
+      data-mode="inline"
+      data-target="#my-chat-container">
+    </script>
+    ```
+  </Accordion>
+  <Accordion title="Pre-authentication (SSO integration) example">
+    ```html
+    <!-- Inject user token from host page -->
+    <script
+      src="https://your-cloosphere.com/static/embed/embed.js"
+      data-widget-id="WIDGET_ID"
+      data-token="eyJhbGciOiJIUzI1NiIs...">
+    </script>
+    ```
+    <Warning>
+      Don't hardcode tokens directly in HTML. Render server-side dynamically or inject via JavaScript.
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+### JavaScript API
+
+Control the widget via JavaScript in Bubble mode:
+
+```javascript
+// Open chat panel
+window.CloosphereEmbed.open();
+
+// Close chat panel
+window.CloosphereEmbed.close();
+
+// Replace token at runtime
+window.CloosphereEmbed.updateToken("new-jwt-token");
+```
+
+<Note>
+  `open()` / `close()` only work in **Bubble mode**. They're ignored in Side, Inline, and Fullscreen modes since the widget is always visible.
+</Note>
+
+---
+
+## Authentication Methods
+
+The widget authenticates users via one of three modes. Pick the mode in the **Auth** tab of widget settings.
+
+### Login Mode (default)
+
+Sign in directly with a Cloosphere account.
+
+| Priority | Method | Description |
+|:--------:|--------|-------------|
+| 1 | **Token forwarding** | JWT injection via `data-token` attribute or `updateToken()` API |
+| 2 | **Session restoration** | Auto-uses tokens from previous widget sign-in saved in sessionStorage |
+| 3 | **In-widget sign-in** | Sign-in screen shown when neither above is present |
+
+The sign-in screen auto-shows OAuth provider buttons (Google, Microsoft, etc.) configured in Cloosphere.
+
+### SSO Mode
+
+**Exchange the host site's existing SSO token for a Cloosphere JWT**. Use the existing auth system without a separate sign-in screen.
+
+**Supported Providers:**
+
+| Provider | Token Validation |
+|:---------|:-----------------|
+| **Microsoft Entra ID** | OIDC JWKS + id_token signature verification |
+| **Google** | OIDC JWKS |
+| **GitHub** | access_token → GitHub API verification |
+| **Generic OIDC** | Discovery URL → JWKS auto-discovery |
+
+**SSO Settings:**
+
+| Setting | Description | Default |
+|:--------|:------------|:-------:|
+| **Providers** | List of allowed Providers | — |
+| **Auto Signup** | Auto-create unregistered users | off |
+| **Default Role** | Role for auto sign-up | pending |
+
+<Accordion title="Per-Provider additional settings">
+  | Provider | Setting | Description |
+  |:---------|:--------|:------------|
+  | Microsoft | Tenant ID | Single-tenant lock (empty = multi-tenant) |
+  | Microsoft | Trusted Audiences | Allowed client_id list |
+  | Google | Trusted Audiences | Allowed client_id list |
+  | Generic OIDC | Trusted Issuers | Allowed issuer URL list |
+  | Generic OIDC | Trusted Audiences | Allowed audience list |
+</Accordion>
+
+**Host site integration example:**
+
+```javascript
+// Get Cloosphere JWT from host site using existing SSO token
+const response = await fetch(
+  'https://your-cloosphere.com/api/v1/embed-widgets/id/WIDGET_ID/auth/sso-exchange',
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      provider: 'microsoft',
+      id_token: 'eyJhbG...',    // Existing SSO id_token
+      access_token: 'eyJhbG...' // (optional) for additional profile info
+    })
+  }
+);
+const { token } = await response.json();
+// Pass the obtained token to the widget via data-token
+```
+
+### Guest Mode
+
+**Non-signed-in users** can use the widget with simple info entry (or auto). Suitable for unrestricted-audience scenarios like customer support chatbots.
+
+**Guest Settings:**
+
+| Setting | Description | Default |
+|:--------|:------------|:-------:|
+| **Collect Info** | Show name/email entry form | on |
+| **Required Fields** | Required input fields | name |
+| **Optional Fields** | Optional input fields | email |
+| **Auto Proceed** | Skip info collection and start session immediately | off |
+| **JWT Expires In** | Guest JWT expiration | 24h |
+
+<Tip>
+  Enabling `Auto Proceed` starts **chat immediately** without info collection. Suitable for anonymous FAQ chatbots.
+</Tip>
+
+<Warning>
+  Login / SSO / Guest are **mutually exclusive**. Only one can be activated.
+</Warning>
+
+---
+
+## Domain Allowlist
+
+For security, restrict **which domains can load the widget**.
+
+Register allowed domain patterns in widget settings' `allowed_domains`:
+
+| Pattern | Matches |
+|---------|---------|
+| `example.com` | Exactly example.com |
+| `*.example.com` | sub.example.com, portal.example.com, etc. |
+| *(empty)* | **All domains allowed** |
+
+<Warning>
+  In production, always set the allowlist explicitly. Empty list is for testing only.
+</Warning>
+
+---
+
+## UI Manipulation Bridge
+
+The most powerful feature of the embed widget — **the AI directly manipulates the host page DOM**.
+
+For example, when a user says "submit a leave request for today", the AI can auto-fill the host page's leave request form.
+
+### Available Tools
+
+UI manipulation tools auto-attach to the agent, enabling:
+
+| Tool | Function |
+|------|----------|
+| **fill_form** | Fill multiple fields in a form at once |
+| **fill_form_field** | Set value on individual input field |
+| **read_form** | Read the form's current values as JSON |
+| **click_element** | Click a button or link |
+| **highlight_element** | Highlight an element with blue border + scroll (auto-clears after 2.5s) |
+| **get_page_info** | Get current page URL, title, form list |
+| **navigate_to** | Navigate the host page |
+
+### Security: Selector Allowlist
+
+Restrict the HTML elements the AI can manipulate using `allowed_selectors` in widget settings.
+
+| Setting | Behavior |
+|---------|----------|
+| `["*"]` (default) | All elements manipulable |
+| `["form#leave-form *"]` | Only elements within a specific form |
+| `["#name", "#date", ".btn-submit"]` | Only specified selectors |
+
+<Danger>
+  In production, **explicitly restrict `allowed_selectors`**. The default `["*"]` lets the AI manipulate any page element, which can cause unintended behavior.
+</Danger>
+
+<Accordion title="Cautions when using navigate_to">
+  After `navigate_to` is called, host page navigation **reloads the iframe and loses conversation context**. Include guidance like "Don't use additional tools after navigate_to" in the AI prompt.
+
+  Within the same origin, **soft navigation** is attempted first. In SPAs (Single Page Applications), handling the `cloosphere:navigate` event enables routing without page transition.
+</Accordion>
+
+---
+
+## Limitations
+
+| Item | Detail |
+|------|--------|
+| **Session persistence** | Closing and reopening the widget starts a new session (previous conversation isn't restored) |
+| **Chat title** | Auto-title/tag generation is off, so chat appears as `Embed: {widget-name}` in Cloosphere chat list |
+| **UI bridge timeout** | Tool fails when host page response isn't received within 15 seconds |
+| **Mobile responsive** | Only Bubble mode is auto-responsive. Other modes need manual width/height adjustment |
+| **sessionStorage** | Token storage may be blocked in Private/Incognito mode |
+
+---
+
+## Related Pages
+
+<Columns>
+  <Card title="Agents" icon="robot" href="/en/workspace/agents">
+    Create and configure AI agents to connect to widgets
+  </Card>
+  <Card title="Flows" icon="diagram-project" href="/en/workspace/flows">
+    Connect flows for complex multi-step tasks
+  </Card>
+  <Card title="Guardrails" icon="shield-halved" href="/en/workspace/guardrails">
+    Safety rules applied to widget responses
+  </Card>
+</Columns>

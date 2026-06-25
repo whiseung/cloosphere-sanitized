@@ -1,0 +1,125 @@
+---
+title: "General Settings"
+description: "Manage authentication, usage limits, feature toggles, and other system-wide defaults."
+---
+
+In **Admin > Settings > General**, manage system-wide defaults — authentication policy, usage limits, feature toggles, etc.
+
+{/* SCREENSHOT: settings-general */}
+<Frame caption="Manage authentication, usage, and feature toggles in Admin > Settings > General">
+  <img src="/images/admin/settings-general-full.png" alt="General settings tab" />
+</Frame>
+
+---
+
+## Authentication Settings
+
+Set policies for user signup and sessions.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Default user role** | Default role assigned to new users (`pending`, `user`, `admin`, or a specific group) | `pending` |
+| **Enable new sign-ups** | Whether new users can self-register | Enabled |
+| **Enable onboarding** | Whether to show the onboarding landing page (service intro) to non-signed-in visitors. Disabling sends them straight to the sign-in screen | Enabled |
+| **Show admin info** | Show admin contact for users in pending state | Disabled |
+| **Enable API keys** | Allow authentication via API keys | Disabled |
+| **Restrict API key endpoints** | Restrict the endpoints accessible via API keys (shown when API keys enabled) | Disabled |
+| **Allowed endpoints** | List of paths accessible via API keys (comma-separated) | - |
+| **JWT expiration** | Session token validity duration | `-1` |
+
+<Note>
+  JWT expiration format: `30m` (minutes), `1h` (hours), `10d` (days), `1w` (weeks), `-1` (no expiration).
+  In enterprise environments, `8h` to `1d` is recommended.
+</Note>
+
+### Email De-identification
+
+When the `ENABLE_EMAIL_DEIDENTIFY=true` environment variable is set, **the @ domain part is removed** from user email addresses, storing only the ID portion.
+
+| Item | Disabled (default) | Enabled |
+|------|---------------------|---------|
+| **Sign-in/up label** | "Email" | "Account ID" |
+| **Input field** | `type="email"` | `type="text"` |
+| **Email validation** | @ required | No format restriction (allows employee IDs, etc.) |
+| **Stored value** | `sykim@cloocus.com` | `sykim` |
+
+<Note>
+  Use this when **privacy protection requirements** dictate not storing full email addresses in DB in SSO/LDAP environments. Same applies to OAuth sign-in users.
+</Note>
+
+---
+
+## LDAP Settings
+
+Integrate with corporate LDAP / Active Directory servers for unified authentication.
+
+| Setting | Description | Example |
+|---------|-------------|---------|
+| **Label** | LDAP server identifier name | `Corporate AD` |
+| **Host** | LDAP server address | `ldap.example.com` |
+| **Port** | Connection port (default 636 with TLS) | `389` |
+| **Application DN** | Bind account DN | `cn=admin,dc=example,dc=com` |
+| **Application DN Password** | Bind account password | - |
+| **Attribute for Mail** | LDAP attribute mapped to email | `mail` |
+| **Attribute for Username** | LDAP attribute mapped to username | `uid`, `sAMAccountName` |
+| **Search Base** | User search base | `ou=users,dc=example,dc=com` |
+| **Search Filters** | LDAP search filter (optional) | `(&(objectClass=inetOrgPerson)(uid=%s))` |
+| **TLS** | Use TLS encryption | Disabled |
+
+<Warning>
+  LDAP settings apply immediately. Misconfiguration can block user sign-ins, so verify with a test account first.
+</Warning>
+
+---
+
+## Usage Limits
+
+Set daily token usage caps to manage AI usage cost.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable usage limits** | Token usage limit feature ON/OFF | Disabled |
+| **Default daily token limit** | Default applied to users without individual limits (0 = unlimited) | `0` |
+| **Excess action** | Behavior when limit is exceeded | `Warn` |
+
+**Excess action options:**
+
+| Action | Description |
+|--------|-------------|
+| **Warn** | Show warning message but allow usage (monitoring purpose) |
+| **Block** | Block additional requests (returns HTTP 429) |
+
+<Note>
+  Admin role users are excluded from usage limit checks.
+  Usage limits can be set at 4 levels — global, user, group, organization — and the **most permissive (highest)** value applies.
+</Note>
+
+---
+
+## Feature Toggles
+
+Control whether specific features are enabled system-wide.
+
+| Feature | Description | Default |
+|---------|-------------|---------|
+| **Community Sharing** | OpenWebUI community sharing feature | Disabled |
+| **Message Rating** | User AI response rating (like/dislike) | Enabled |
+| **Channels (Beta)** | Team chat channel feature | Disabled |
+| **User Webhooks** | Per-user external webhook integration | Enabled |
+
+Additionally, configure **WebUI URL** and **Webhook URL**.
+
+| Setting | Description |
+|---------|-------------|
+| **WebUI URL** | Public URL used to generate notification links |
+| **Webhook URL** | External webhook URL invoked on events |
+
+<AccordionGroup>
+  <Accordion title="Can I use LDAP and local accounts simultaneously?" icon="circle-question">
+    Yes. Even with LDAP enabled, you can sign in with existing local accounts (email/password). When an LDAP user signs in for the first time, an account is auto-created. The default role is the **Default user role** under "Authentication Settings".
+  </Accordion>
+
+  <Accordion title="What happens when usage limits are set in multiple places?" icon="circle-question">
+    Limits can be set at 4 levels — global, user, group, organization — and the **most permissive (highest)** value applies. For example, if global is 1,000 tokens and group is 5,000 tokens, users in that group can use up to 5,000 tokens.
+  </Accordion>
+</AccordionGroup>

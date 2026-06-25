@@ -1,0 +1,421 @@
+---
+title: "채팅 위젯 임베드"
+description: "외부 웹사이트에 Cloosphere AI 채팅을 삽입하여 고객 지원, 사내 시스템 자동화 등에 활용합니다."
+---
+
+사내 포털, 고객 지원 페이지, 그룹웨어 등 **외부 웹사이트에 Cloosphere 채팅을 삽입**하는 기능입니다. 한 줄의 스크립트 태그만으로 어떤 웹페이지에서든 AI 채팅을 제공할 수 있습니다.
+
+{/* TODO: 스크린샷 필요 — 관리자 > 설정 > Embed Widgets 목록 화면 */}
+
+---
+
+## 왜 필요한가
+
+| 기존 방식 | 임베드 위젯 |
+|-----------|-----------|
+| 사용자가 Cloosphere에 직접 접속해야 함 | 업무 시스템 안에서 바로 AI 채팅 |
+| 별도 로그인 필요 | 토큰 전달 또는 위젯 내 자체 로그인 |
+| 외부 시스템 연동 불가 | AI가 호스트 페이지의 폼을 읽고 채우는 **UI 브리지** 지원 |
+
+**활용 시나리오:**
+- 사내 그룹웨어에 AI 비서를 배치하여 휴가 신청서를 대화로 작성
+- 고객 지원 페이지에 FAQ 챗봇 삽입
+- 관리 콘솔에 운영 지원 AI 탑재
+
+---
+
+## 위젯 생성
+
+**관리자 > 설정 > Embed Widgets** 탭에서 위젯을 관리합니다.
+
+<Steps>
+  <Step title="위젯 추가">
+    **"+" 버튼**을 클릭하여 새 위젯을 생성합니다.
+  </Step>
+  <Step title="기본 정보 입력">
+    | 필드 | 설명 |
+    |------|------|
+    | **이름** | 위젯 식별 이름 (헤더 기본 타이틀로도 사용) |
+    | **설명** | 관리자용 메모 (외부에 노출되지 않음) |
+    | **모델/에이전트** | 위젯에서 사용할 **에이전트**, **플로우**, 또는 **모델** 선택 |
+    | **시스템 프롬프트** | 위젯 전용 시스템 프롬프트 (선택) |
+  </Step>
+  <Step title="디자인 편집">
+    **"Design" 버튼**을 클릭하여 외형을 커스터마이징합니다 (아래 상세 설명).
+  </Step>
+  <Step title="활성화">
+    위젯 목록에서 토글을 **Active**로 설정합니다. 비활성화된 위젯은 외부에서 로드되지 않습니다.
+  </Step>
+</Steps>
+
+---
+
+## 표시 모드
+
+위젯이 호스트 페이지에서 어떻게 보이는지 6가지 모드를 지원합니다.
+
+| 모드 | 동작 | 기본 크기 | 호스트 레이아웃 영향 |
+|------|------|----------|--------------------|
+| **Bubble** | 우하단(또는 좌하단) 플로팅 버튼 → 클릭 시 채팅 패널 팝업 | 400×600px | 없음 (오버레이) |
+| **Side Right** | 화면 우측에 고정 패널 | 380px 너비 | 본문 `margin-right` 자동 적용 |
+| **Side Left** | 화면 좌측에 고정 패널 | 380px 너비 | 본문 `margin-left` 자동 적용 |
+| **Side Bottom** | 화면 하단에 풀너비 고정 패널 | 320px 높이 | `html height`를 패널만큼 축소 → 콘텐츠 위쪽으로 자연 reflow |
+| **Inline** | 지정한 HTML 요소 내부에 삽입 | 100%×500px | 없음 (지정 컨테이너 내부) |
+| **Fullscreen** | 전체 화면 오버레이 | 100vw×100vh | 호스트 페이지 가려짐 |
+
+<Tip>
+  **Bubble 모드**가 가장 일반적인 선택입니다. 사용자가 필요할 때만 클릭하여 사용하며, 모바일(480px 이하)에서 자동으로 반응형 크기 조절됩니다.
+
+  **Side 계열 모드**는 호스트 페이지가 별도 CSS/JS 없이도 자동으로 콘텐츠가 밀리도록 처리됩니다. 이 동작이 싫으면 호스트 페이지의 루트 요소에 `data-cloosphere-no-shift` 속성을 추가해 opt-out하세요.
+</Tip>
+
+<Note>
+  Bubble 모드의 **Bubble Open Style**도 `popup` / `side-right` / `side-left` / `side-bottom` 4가지를 지원합니다. 즉 Bubble로 시작해서 클릭 시 어떤 형태로 펼칠지 별도로 지정할 수 있습니다.
+</Note>
+
+### Resizable Panel (사용자 리사이즈)
+
+위젯 설정의 **Resizable Panel** 토글을 켜면 사용자가 패널 크기를 직접 조정할 수 있습니다.
+
+| 모드 | 그립 위치 | 조정 가능 |
+|------|----------|----------|
+| **Popup (Bubble)** | 패널 상단 모서리(버블 반대쪽) 대각선 그립 | width / height 양방향 |
+| **Side Right / Left** | 패널 안쪽 세로 edge | width만 (height는 100vh 유지) |
+| **Side Bottom** | 패널 상단 가로 edge | height만 (width는 100vw 유지) |
+
+조정한 크기는 `widgetId`별로 **localStorage에 저장**되어, 사용자가 같은 사이트에 재방문해도 이전 크기가 복원됩니다.
+
+<Accordion title="호스트 페이지에서 패널 크기 변경 감지하기" icon="code">
+  Side 계열 모드에서 패널 크기가 변경되면 다음이 발생합니다:
+
+  - CSS 변수 업데이트: `--cloosphere-side-panel-width`, `--cloosphere-side-panel-height`
+  - 호스트 페이지에 이벤트 발행: `cloosphere:side-resize` (payload에 `width`/`height` 포함)
+
+  호스트 페이지에서 사이드바·고정 헤더 등의 위치를 패널과 동기화해야 한다면 이 이벤트를 구독하세요.
+</Accordion>
+
+---
+
+## 디자인 커스터마이징
+
+Design 에디터에서 위젯의 외형을 세밀하게 조정할 수 있습니다. 실시간 미리보기로 변경 사항을 즉시 확인 가능합니다.
+
+### 레이아웃
+
+| 설정 | 설명 |
+|------|------|
+| **Mode** | 표시 모드 (5가지 중 선택) |
+| **Position** | Bubble 모드의 버튼 위치 (우하단 / 좌하단) |
+| **Width / Height** | 위젯 크기 (CSS 값, 예: `400px`, `100%`) |
+| **Bubble Size** | 버블 버튼 크기 (기본 56px) |
+| **Bubble Draggable** | 버블 버튼을 드래그로 이동 가능하게 설정 |
+| **Bubble Open Style** | 버블 클릭 시 동작 (`popup` / `side-right` / `side-left`) |
+| **Show Header Close Button** | 헤더 닫기(X) 버튼 표시 여부 |
+
+### 아이콘
+
+| 설정 | 설명 |
+|------|------|
+| **Bubble Icon** | 플로팅 버튼 아이콘 (7종 프리셋 + 커스텀 업로드) |
+| **Send Button Icon** | 전송 버튼 아이콘 (7종 프리셋 + 커스텀 업로드) |
+
+프리셋: Chat, Sparkles, Message, Robot, Support(Headset), Help(Question), Bolt
+
+### 헤더
+
+| 설정 | 설명 |
+|------|------|
+| **Show Header** | 헤더 표시 여부 |
+| **Header Text** | 헤더 타이틀 (비우면 위젯 이름 사용) |
+| **Show Avatar** | AI 아바타 표시 여부 |
+| **Avatar URL** | 커스텀 AI 아바타 이미지 |
+| **Bot Name** | AI 이름 (메시지 상단에 표시) |
+
+### 색상
+
+| 설정 | 적용 대상 |
+|------|----------|
+| **Primary Color** | Bubble 버튼 배경 |
+| **Bubble Icon Color** | Bubble 버튼 아이콘 |
+| **Header Color** | 헤더 배경 |
+| **Header Text Color** | 헤더 텍스트 |
+| **Background Color** | 채팅 영역 배경 |
+| **Message Text Color** | 메시지 텍스트 |
+| **Send Button Color** | 전송 버튼 배경 |
+| **Send Button Icon Color** | 전송 버튼 아이콘 |
+
+### 테마 프리셋
+
+12종의 테마 프리셋으로 전체 색상을 한 번에 적용할 수 있습니다.
+
+Light, Dark, Slate, Midnight, Ocean, Aurora, Sunset, Forest, Rose, Cyberpunk, Ember, Mono
+
+프리셋 선택 후 개별 색상을 추가로 커스터마이징할 수 있습니다.
+
+### 채팅 설정
+
+| 설정 | 설명 | 기본값 |
+|------|------|:------:|
+| **Theme** | 테마 (auto / light / dark). auto는 OS 설정을 따름 | auto |
+| **Welcome Message** | 채팅 시작 시 AI가 자동으로 보내는 환영 메시지 | — |
+| **Max Messages Per Session** | 세션당 최대 메시지 수. 0 = 무제한 | 0 |
+
+### 기능 토글
+
+| 설정 | 설명 | 기본값 |
+|------|------|:------:|
+| **File Upload** | 파일 첨부 허용 | off |
+| **Markdown** | 마크다운 렌더링 | on |
+| **Code Highlight** | 코드 블록 하이라이팅 | on |
+| **Web Search** | 웹 검색 기능 | off |
+
+---
+
+## 임베드 코드
+
+위젯을 생성하면 호스트 페이지에 삽입할 **스크립트 태그**가 제공됩니다.
+
+```html
+<script
+  src="https://your-cloosphere.com/static/embed/embed.js"
+  data-widget-id="WIDGET_ID">
+</script>
+```
+
+이 한 줄로 위젯이 자동으로 로드됩니다. 추가 `data-*` 속성으로 설정을 오버라이드할 수 있습니다:
+
+| 속성 | 설명 |
+|------|------|
+| `data-widget-id` | 위젯 ID (필수) |
+| `data-token` | 사전 인증된 사용자 토큰 (선택 — 있으면 로그인 건너뜀) |
+| `data-mode` | 표시 모드 오버라이드 |
+| `data-theme` | 테마 오버라이드 (`light` / `dark` / `auto`) |
+| `data-position` | 버튼 위치 오버라이드 (`bottom-right` / `bottom-left`) |
+| `data-primary-color` | Bubble 버튼 색상 오버라이드 |
+| `data-target` | Inline 모드의 대상 CSS 셀렉터 |
+| `data-width` / `data-height` | 크기 오버라이드 |
+
+<AccordionGroup>
+  <Accordion title="Inline 모드 예시">
+    ```html
+    <div id="my-chat-container" style="height: 600px;"></div>
+    <script
+      src="https://your-cloosphere.com/static/embed/embed.js"
+      data-widget-id="WIDGET_ID"
+      data-mode="inline"
+      data-target="#my-chat-container">
+    </script>
+    ```
+  </Accordion>
+  <Accordion title="사전 인증 (SSO 연동) 예시">
+    ```html
+    <!-- 호스트 페이지에서 사용자 토큰을 주입 -->
+    <script
+      src="https://your-cloosphere.com/static/embed/embed.js"
+      data-widget-id="WIDGET_ID"
+      data-token="eyJhbGciOiJIUzI1NiIs...">
+    </script>
+    ```
+    <Warning>
+      토큰을 HTML에 직접 하드코딩하지 마세요. 서버 사이드에서 동적으로 렌더링하거나 JavaScript로 주입하는 것을 권장합니다.
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+### JavaScript API
+
+Bubble 모드에서는 JavaScript로 위젯을 제어할 수 있습니다:
+
+```javascript
+// 채팅 패널 열기
+window.CloosphereEmbed.open();
+
+// 채팅 패널 닫기
+window.CloosphereEmbed.close();
+
+// 런타임에 토큰 교체
+window.CloosphereEmbed.updateToken("new-jwt-token");
+```
+
+<Note>
+  `open()` / `close()`는 **Bubble 모드에서만** 동작합니다. Side, Inline, Fullscreen 모드에서는 항상 표시되어 있으므로 호출해도 무시됩니다.
+</Note>
+
+---
+
+## 인증 방식
+
+위젯은 3가지 인증 모드 중 하나를 선택하여 사용자를 인증합니다. 위젯 설정의 **"Auth"** 탭에서 모드를 선택합니다.
+
+### Login 모드 (기본)
+
+Cloosphere 계정으로 직접 로그인합니다.
+
+| 우선순위 | 방식 | 설명 |
+|:--------:|------|------|
+| 1 | **토큰 전달** | `data-token` 속성 또는 `updateToken()` API로 JWT 주입 |
+| 2 | **세션 복원** | 이전에 위젯에서 로그인한 토큰이 sessionStorage에 남아 있으면 자동 사용 |
+| 3 | **위젯 내 로그인** | 위 둘 다 없으면 로그인 화면 표시 |
+
+로그인 화면에는 Cloosphere에 설정된 OAuth 공급자(Google, Microsoft 등) 버튼이 자동으로 표시됩니다.
+
+### SSO 모드
+
+호스트 사이트가 이미 보유한 SSO 토큰을 **Cloosphere JWT로 교환**합니다. 별도 로그인 화면 없이 기존 인증 체계를 활용할 수 있습니다.
+
+**지원 Provider:**
+
+| Provider | 토큰 검증 방식 |
+|:---------|:-------------|
+| **Microsoft Entra ID** | OIDC JWKS + id_token 서명 검증 |
+| **Google** | OIDC JWKS |
+| **GitHub** | access_token → GitHub API 검증 |
+| **Generic OIDC** | Discovery URL → JWKS 자동 탐색 |
+
+**SSO 설정:**
+
+| 설정 | 설명 | 기본값 |
+|:-----|:-----|:------:|
+| **Providers** | 허용할 Provider 목록 | — |
+| **Auto Signup** | 미가입 사용자 자동 생성 | off |
+| **Default Role** | 자동 가입 시 역할 | pending |
+
+<Accordion title="Provider별 추가 설정">
+  | Provider | 설정 | 설명 |
+  |:---------|:-----|:-----|
+  | Microsoft | Tenant ID | 단일 테넌트 고정 (비우면 multi-tenant) |
+  | Microsoft | Trusted Audiences | 허용할 client_id 목록 |
+  | Google | Trusted Audiences | 허용할 client_id 목록 |
+  | Generic OIDC | Trusted Issuers | 허용할 issuer URL 목록 |
+  | Generic OIDC | Trusted Audiences | 허용할 audience 목록 |
+</Accordion>
+
+**호스트 사이트 연동 예시:**
+
+```javascript
+// 호스트 사이트에서 기존 SSO 토큰으로 Cloosphere JWT 획득
+const response = await fetch(
+  'https://your-cloosphere.com/api/v1/embed-widgets/id/WIDGET_ID/auth/sso-exchange',
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      provider: 'microsoft',
+      id_token: 'eyJhbG...',    // 기존 SSO id_token
+      access_token: 'eyJhbG...' // (선택) 추가 프로필 정보 획득용
+    })
+  }
+);
+const { token } = await response.json();
+// 획득한 token을 data-token으로 위젯에 전달
+```
+
+### Guest 모드
+
+**비로그인 사용자**가 간단한 정보 입력(또는 자동)으로 위젯을 사용할 수 있습니다. 고객 지원 챗봇 등 불특정 다수 대상 시나리오에 적합합니다.
+
+**Guest 설정:**
+
+| 설정 | 설명 | 기본값 |
+|:-----|:-----|:------:|
+| **Collect Info** | 이름/이메일 입력 폼 표시 | on |
+| **Required Fields** | 필수 입력 필드 | name |
+| **Optional Fields** | 선택 입력 필드 | email |
+| **Auto Proceed** | 정보 수집 없이 즉시 세션 시작 | off |
+| **JWT Expires In** | 게스트 JWT 만료 시간 | 24h |
+
+<Tip>
+  `Auto Proceed`를 켜면 정보 수집 폼 없이 **즉시 채팅**이 시작됩니다. 익명 FAQ 챗봇에 적합합니다.
+</Tip>
+
+<Warning>
+  Login / SSO / Guest는 **상호 배타적**입니다. 하나만 활성화할 수 있습니다.
+</Warning>
+
+---
+
+## 도메인 허용 목록
+
+보안을 위해 **위젯이 로드될 수 있는 도메인**을 제한할 수 있습니다.
+
+위젯 설정의 `allowed_domains`에 허용할 도메인 패턴을 등록합니다:
+
+| 패턴 | 매칭 대상 |
+|------|----------|
+| `example.com` | 정확히 example.com만 |
+| `*.example.com` | sub.example.com, portal.example.com 등 |
+| *(비워두면)* | **모든 도메인 허용** |
+
+<Warning>
+  운영 환경에서는 반드시 허용 도메인을 명시적으로 설정하세요. 빈 목록은 테스트용으로만 사용하시기 바랍니다.
+</Warning>
+
+---
+
+## UI 조작 브리지
+
+임베드 위젯의 가장 강력한 기능 — **AI가 호스트 페이지의 DOM을 직접 조작**할 수 있습니다.
+
+예를 들어 사용자가 "오늘 날짜로 휴가 신청해줘"라고 말하면, AI가 호스트 페이지의 휴가 신청 폼에 값을 자동으로 채울 수 있습니다.
+
+### 사용 가능한 도구
+
+에이전트에 UI 조작 도구가 자동으로 연결되며, 다음 작업이 가능합니다:
+
+| 도구 | 기능 |
+|------|------|
+| **fill_form** | 폼 내 복수 필드를 한 번에 입력 |
+| **fill_form_field** | 개별 입력 필드에 값 설정 |
+| **read_form** | 폼의 현재 값을 JSON으로 읽기 |
+| **click_element** | 버튼이나 링크 클릭 |
+| **highlight_element** | 요소를 파란 테두리로 강조 + 스크롤 (2.5초 후 해제) |
+| **get_page_info** | 현재 페이지 URL, 제목, 폼 목록 조회 |
+| **navigate_to** | 호스트 페이지 이동 |
+
+### 보안: 셀렉터 허용 목록
+
+위젯 설정의 `allowed_selectors`로 AI가 조작할 수 있는 HTML 요소 범위를 제한합니다.
+
+| 설정 | 동작 |
+|------|------|
+| `["*"]` (기본값) | 모든 요소 조작 가능 |
+| `["form#leave-form *"]` | 특정 폼 내 요소만 허용 |
+| `["#name", "#date", ".btn-submit"]` | 지정한 셀렉터만 허용 |
+
+<Danger>
+  운영 환경에서는 **`allowed_selectors`를 명시적으로 제한**하세요. 기본값 `["*"]`는 AI가 페이지의 모든 요소를 조작할 수 있어 의도치 않은 동작이 발생할 수 있습니다.
+</Danger>
+
+<Accordion title="navigate_to 사용 시 주의사항">
+  `navigate_to` 호출 후 호스트 페이지가 이동하면 **iframe이 리로드되어 대화 맥락이 소실**됩니다. AI 프롬프트에서 "navigate_to 호출 후 추가 도구를 사용하지 마세요"와 같은 지침을 포함하는 것이 좋습니다.
+
+  동일 origin 내에서는 **소프트 네비게이션**을 먼저 시도합니다. SPA(Single Page Application)에서 `cloosphere:navigate` 이벤트를 처리하면 페이지 전환 없이 라우팅이 가능합니다.
+</Accordion>
+
+---
+
+## 제한사항
+
+| 항목 | 내용 |
+|------|------|
+| **세션 지속성** | 위젯을 닫았다 열면 새 세션으로 시작 (이전 대화 복원 안 됨) |
+| **채팅 제목** | 자동 제목/태그 생성이 꺼져 있어, Cloosphere 내 채팅 목록에 `Embed: {위젯명}`으로 표시 |
+| **UI 브리지 타임아웃** | 호스트 페이지 응답이 15초 내에 없으면 도구 실패 |
+| **모바일 반응형** | Bubble 모드만 자동 반응형. 나머지 모드는 width/height 수동 조정 필요 |
+| **sessionStorage** | Private/Incognito 모드에서 토큰 저장이 차단될 수 있음 |
+
+---
+
+## 관련 페이지
+
+<Columns>
+  <Card title="에이전트" icon="robot" href="/ko/workspace/agents">
+    위젯에 연결할 AI 에이전트 생성 및 설정
+  </Card>
+  <Card title="플로우" icon="diagram-project" href="/ko/workspace/flows">
+    복잡한 멀티스텝 작업용 플로우 연결
+  </Card>
+  <Card title="가드레일" icon="shield-halved" href="/ko/workspace/guardrails">
+    위젯 응답에 적용되는 안전 규칙
+  </Card>
+</Columns>

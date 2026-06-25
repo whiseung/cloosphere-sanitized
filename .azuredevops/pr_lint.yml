@@ -1,0 +1,133 @@
+# PR Title Lint Pipeline for Azure DevOps
+# PR 타이틀이 Conventional Commits 형식을 따르는지 검증합니다.
+# 형식: <type>(<scope>): <description>
+# 예시: feat(backend): Add new API endpoint
+
+trigger: none
+
+pr:
+  branches:
+    include:
+      - main
+      - dev
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Conventional Commit Types
+  VALID_TYPES: 'feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|release'
+  # Project-specific Scopes (optional)
+  VALID_SCOPES: 'backend|frontend|api|ui|docs|tests|ci|deps|config|db|auth|chat|models|routers|utils'
+  # PR이 있는 실제 리포지토리 이름 (Build.Repository.Name과 다를 수 있음)
+  TARGET_REPO_NAME: 'AIS-Cloosphere'
+
+stages:
+  - stage: Validate
+    displayName: 'PR Title Validation'
+    jobs:
+      - job: LintPRTitle
+        displayName: 'Validate PR Title'
+        steps:
+          - checkout: none
+
+          - bash: |
+              echo "=========================================="
+              echo "PR Title Validation"
+              echo "=========================================="
+
+              # PR 빌드인지 확인
+              if [ -z "$PR_ID" ] || [ "$PR_ID" == "" ]; then
+                echo "##[warning]This is not a PR build. Skipping PR title validation."
+                exit 0
+              fi
+
+              echo "PR ID: $PR_ID"
+              echo "Repository ID: $REPO_ID"
+              echo "Repository Name (pipeline): $REPO_NAME"
+              echo "Target Repository Name: $TARGET_REPO_NAME"
+              echo "Collection URI: $COLLECTION_URI"
+              echo "Project: $PROJECT"
+              echo "Fetching PR title from Azure DevOps API..."
+
+              # Azure DevOps REST API를 통해 PR 정보 조회
+              # TARGET_REPO_NAME 사용 (Build.Repository.Name과 다를 수 있음)
+              # 참고: https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-requests/get-pull-request
+              API_URL="${COLLECTION_URI}${PROJECT}/_apis/git/repositories/${TARGET_REPO_NAME}/pullrequests/${PR_ID}?api-version=7.0"
+              
+              echo "API URL: $API_URL"
+
+              # Bearer 토큰 인증 사용 (Azure DevOps 권장 방식)
+              HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+                -H "Authorization: Bearer ${SYSTEM_ACCESSTOKEN}" \
+                -H "Content-Type: application/json" \
+                "$API_URL")
+              
+              HTTP_BODY=$(echo "$HTTP_RESPONSE" | sed -e 's/HTTPSTATUS\:.*//g')
+              HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+
+              if [ "$HTTP_STATUS" -ne 200 ]; then
+                echo "##[error]Failed to fetch PR information from API. HTTP Status: $HTTP_STATUS"
+                echo "Response: $HTTP_BODY"
+                echo ""
+                echo "##[warning]Possible causes:"
+                echo "  - Check 'Protect access to repositories in YAML pipelines' setting"
+                echo "  - Ensure pipeline has 'Read' access to the repository"
+                echo "  - Verify System.AccessToken permissions in pipeline settings"
+                exit 1
+              fi
+
+              PR_TITLE=$(echo "$HTTP_BODY" | jq -r '.title // empty')
+
+              if [ -z "$PR_TITLE" ]; then
+                echo "##[error]Failed to extract PR title from API response."
+                echo "API Response: $HTTP_BODY"
+                exit 1
+              fi
+
+              echo "PR Title: $PR_TITLE"
+              echo ""
+
+              # Conventional Commits 정규식 패턴
+              # 형식: type(scope): description 또는 type: description
+              VALID_TYPES_PATTERN="${VALID_TYPES}"
+              VALID_SCOPES_PATTERN="${VALID_SCOPES}"
+              PATTERN="^(${VALID_TYPES_PATTERN})(\((${VALID_SCOPES_PATTERN})\))?!?: .+$"
+
+              echo "Validating against pattern..."
+              echo ""
+
+              if echo "$PR_TITLE" | grep -Eq "$PATTERN"; then
+                echo "##[section]PR title is valid!"
+                echo ""
+                echo "Title follows Conventional Commits format."
+              else
+                echo "##[error]PR title is invalid!"
+                echo ""
+                echo "PR title must follow Conventional Commits format:"
+                echo "  <type>(<scope>): <description>"
+                echo "  <type>: <description>"
+                echo ""
+                echo "Valid types: $VALID_TYPES_PATTERN"
+                echo ""
+                echo "Valid scopes (optional): $VALID_SCOPES_PATTERN"
+                echo ""
+                echo "Examples:"
+                echo "  feat(backend): Add user authentication"
+                echo "  fix(frontend): Resolve chat scroll issue"
+                echo "  docs: Update README"
+                echo "  chore(deps): Bump dependencies"
+                echo ""
+                exit 1
+              fi
+            displayName: 'Validate PR Title Format'
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              PR_ID: $(System.PullRequest.PullRequestId)
+              COLLECTION_URI: $(System.CollectionUri)
+              PROJECT: $(System.TeamProject)
+              REPO_ID: $(Build.Repository.ID)
+              REPO_NAME: $(Build.Repository.Name)
+              TARGET_REPO_NAME: $(TARGET_REPO_NAME)
+              VALID_TYPES: $(VALID_TYPES)
+              VALID_SCOPES: $(VALID_SCOPES)

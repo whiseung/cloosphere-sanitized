@@ -1,0 +1,5 @@
+# 실제 비밀/키가 든 env 는 커밋 금지 (.env.example 만 커밋)
+.env
+
+# Presenton 런타임 데이터(생성물·DB·업로드·mem0). 커밋 금지.
+app_data/

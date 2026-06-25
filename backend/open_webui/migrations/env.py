@@ -1,0 +1,105 @@
+from logging.config import fileConfig
+
+from alembic import context
+from open_webui.env import DATABASE_SCHEMA, DATABASE_URL
+from open_webui.internal.db import Base
+from open_webui.models.organization import (  # noqa
+    Organization,
+    OrganizationalUnit,
+)
+from sqlalchemy import engine_from_config, event, pool
+
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+config = context.config
+
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
+
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+target_metadata = Base.metadata
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+
+DB_URL = DATABASE_URL
+
+if DB_URL:
+    config.set_main_option("sqlalchemy.url", DB_URL.replace("%", "%%"))
+
+
+def run_migrations_offline() -> None:
+    """Run migrations in 'offline' mode.
+
+    This configures the context with just a URL
+    and not an Engine, though an Engine is acceptable
+    here as well.  By skipping the Engine creation
+    we don't even need a DBAPI to be available.
+
+    Calls to context.execute() here emit the given string to the
+    script output.
+
+    """
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+        version_table_schema=DATABASE_SCHEMA,
+        include_schemas=bool(DATABASE_SCHEMA),
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode.
+
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+
+    """
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    # 비-default 스키마 사용 시 alembic 커넥션에도 search_path 주입.
+    # 이게 없으면 op.create_table(...)이 public 에 테이블을 만들어
+    # 런타임 엔진(cloosphere) 과 분리됨.
+    if DATABASE_SCHEMA and "postgres" in str(connectable.url):
+
+        @event.listens_for(connectable, "connect")
+        def _set_alembic_search_path(dbapi_conn, _rec):
+            cur = dbapi_conn.cursor()
+            try:
+                cur.execute(f'SET search_path TO "{DATABASE_SCHEMA}", ag_catalog')
+            finally:
+                cur.close()
+
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            version_table_schema=DATABASE_SCHEMA,
+            include_schemas=bool(DATABASE_SCHEMA),
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()

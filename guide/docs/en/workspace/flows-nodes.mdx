@@ -1,0 +1,284 @@
+---
+title: "Flow Node Reference"
+description: "Reference for the 10 nodes available in the Agent Flow canvas — settings, behavior, and State key conventions"
+---
+
+Agent Flow provides **10 nodes** organized into 4 categories that you can drag and drop on the canvas. Drag from the **Node Palette** on the left and place on the canvas.
+
+| Category | Nodes |
+|----------|-------|
+| **General** | Start, Output |
+| **AI** | Agent, Model |
+| **Logic & Data** | Condition, Router, Merge, Transform |
+| **Workspace** | Guardrail, Glossary |
+
+## General
+
+<Columns cols={2}>
+  <Card title="Start" icon="play">
+    Flow entry point. Receives user input as the `input` State key and passes it to the next node. Required in every flow. You can define flow Variables.
+  </Card>
+  <Card title="Output" icon="flag-checkered">
+    Flow exit point. Returns the previous node's result to the user. Choose Action Type: Passthrough / Response (prompt-based final answer) / Error.
+  </Card>
+</Columns>
+
+## AI
+
+<Columns cols={2}>
+  <Card title="Agent" icon="robot">
+    Runs a registered agent. KBSphere (enhanced RAG) and DBSphere (database) mode agents are supported.
+  </Card>
+  <Card title="Model" icon="microchip">
+    Calls an LLM directly without an agent. Suited for simple text processing (summarize, translate, classify).
+  </Card>
+</Columns>
+
+## Logic & Data
+
+<Columns cols={2}>
+  <Card title="Condition" icon="code-branch">
+    Branch True / False based on a condition. 6 condition types supported.
+  </Card>
+  <Card title="Router" icon="route">
+    Multi-path routing. Define multiple Routes and branch by LLM intent or by condition.
+  </Card>
+  <Card title="Merge" icon="object-group">
+    Combine multiple parallel outputs into one. 3 modes: concat / template / json.
+  </Card>
+  <Card title="Transform" icon="wand-magic-sparkles">
+    Transform data. Modes: Extract Field (pull a specific value) or Format Text (template-based generation).
+  </Card>
+</Columns>
+
+## Workspace
+
+<Columns cols={2}>
+  <Card title="Guardrail" icon="shield-halved">
+    Apply a guardrail and branch Pass / Block. Use Block Action to control behavior on block.
+  </Card>
+  <Card title="Glossary" icon="book">
+    Find glossary terms in the input text and append definitions to the body. Matched terms are referenceable by downstream nodes.
+  </Card>
+</Columns>
+
+---
+
+## Node Settings — Details
+
+<Accordion title="Start node">
+  Flow entry point. The user message arrives as the `input` State key.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **Label** | Node display name |
+  | **Variables** | Define variables used across the flow (name, type, default) |
+
+  Variable types: `String`, `Number`, `Boolean`, `Array`, `Object`
+</Accordion>
+
+<Accordion title="Output node">
+  Flow exit point. Returns the previous node's result to the user.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **Label** | Node display name |
+  | **Action Type** | `Passthrough` (return result as-is), `Response` (generate prompt-based final answer), `Error` (return error message) |
+
+  In Response mode, additionally configure **Final Response Prompt** and **Model for Response**.
+  The prompt can reference `{input}`, `{output}`, `{sources}`, and State Key variables.
+
+  <Note>
+    The UI label is shown as **"Output"**. The internal type name is `flowOutput`.
+  </Note>
+</Accordion>
+
+<Accordion title="Agent node">
+  Runs a registered agent. KBSphere / DBSphere agents supported.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **Agent** | Agent to run |
+  | **User Prompt** | User prompt passed to the agent. Can reference `{input}`, `{state_key}`, etc. |
+
+  - With KBSphere agents, retrieved document sources are returned alongside
+  - With DBSphere agents, SQL execution results are included
+
+  <Tip>The Agent node inherits all Knowledge Base, Tool, and Guardrail settings of the connected agent.</Tip>
+</Accordion>
+
+<Accordion title="Model node">
+  Calls an LLM directly without an agent.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **Model** | LLM model to use |
+  | **System Prompt** | System instructions to the model |
+  | **User Prompt** | User prompt. Can reference `{input}`, `{state_key}`, etc. |
+  | **Output Fields** | Define JSON-structured output fields (name, type, description) |
+
+  Defining Output Fields produces a JSON-structured response. Without them, plain text is returned.
+</Accordion>
+
+<Accordion title="Condition node">
+  Branches the flow on a condition. Has two output handles at the bottom: **True** and **False**.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **State Key** | Target for evaluation (`input` or upstream State Key) |
+  | **Condition Type** | Pick one of 6 condition types |
+  | **Value** | Comparison value |
+
+  **Supported condition types (6):**
+
+  | Condition | Internal Code | Description |
+  |-----------|---------------|-------------|
+  | `Contains` | `contains` | Whether the text is contained |
+  | `Does not contain` | `not_contains` | Whether the text is absent |
+  | `Equals` | `equals` | Exact match |
+  | `Starts with` | `starts_with` | Whether it starts with the text |
+  | `Ends with` | `ends_with` | Whether it ends with the text |
+  | `Regex match` | `regex` | Regex pattern match |
+
+  <Note>
+    Numeric comparisons (Greater than / Less than) and empty checks (Is empty) have no dedicated operators. If needed, transform with a **Transform node** and check via `equals` / `regex`.
+  </Note>
+</Accordion>
+
+<Accordion title="Router node">
+  Multi-path routing. Define at least 2 Routes and set a branching condition for each.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **Routing Type** | `llm` (LLM picks the route via intent classification) or `condition` (per-route condition evaluation) |
+  | **State Key** | Evaluation target for condition routing |
+  | **Routes** | Set Label, Branch Key, Condition for each route |
+  | **Default Route** | Fallback when no condition matches |
+
+  When using Condition Routing, each route's condition supports the same 6 types as the Condition node.
+</Accordion>
+
+<Accordion title="Merge node">
+  Combines multiple parallel outputs into one.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **Merge Type** | `concat` (text concatenation, default) / `template` (Jinja2) / `json` (JSON object) |
+  | **Source Keys** | List of State Keys to merge. If empty, auto-collected |
+  | **Separator** | Separator for concat mode (default `\n\n`) |
+  | **Template** | Jinja2 template for template mode (`{{ input }}`, `{{ variables.x }}`, etc.) |
+
+  **Per-mode behavior:**
+
+  | Mode | Result | Use Case |
+  |------|--------|----------|
+  | `concat` | Single text in `[key]\nvalue\n\n[key]\nvalue` form | Merge multiple agent outputs into one answer |
+  | `template` | Jinja2 rendering result | Format outputs into a specific format (email/report) |
+  | `json` | JSON string (key: value mapping) | Pass structured data to a downstream system |
+
+  <Note>
+    Options like "Sum / Use first only / Custom" mentioned in older docs are not currently implemented. The 3 modes above are all that exist.
+  </Note>
+</Accordion>
+
+<Accordion title="Transform node">
+  Transforms data. Two modes: **Extract Field** and **Format Text**.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **Transform Type** | `Extract Field` or `Format Text` |
+  | **Output Key** | State Key name for the transform result (default: `transformed`) |
+
+  **Extract Field mode** — Pass through one of the upstream State Keys as-is.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **State Key** | State Key to extract (`input` or upstream output) |
+
+  **Format Text mode** — Compose new text using `{state_key}` syntax.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **Output Template** | Text template containing `{state_key}` placeholders |
+
+  ```
+  Analysis result: {guardrail_type} - {guardrail_reason}
+  ```
+
+  <Note>
+    Jinja2 templates are not used in default mode. Enable "Use Jinja2 Template" in **Advanced Settings** to use Jinja2 with `{'{{ state.key }}'}` syntax.
+  </Note>
+</Accordion>
+
+<Accordion title="Guardrail node">
+  Applies a guardrail to validate input. Two output handles: **Pass** and **Block**.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **Guardrail** | Guardrail to apply |
+  | **Block Action** | `Stop` (immediate exit) / `Message` (show message and exit) / `Continue` (proceed via Block output) |
+  | **Blocked Message** | Message shown when Block Action is `Message` |
+
+  **Output handles:**
+  - **Pass** (green, bottom left) — proceed to next node when passed
+  - **Block** (red, bottom right) — only active when Block Action is `Continue`
+
+  The Block output includes `guardrail_type` (block category) and `guardrail_reason` (block reason) fields in the State.
+</Accordion>
+
+<Accordion title="Glossary node">
+  Finds matches between the input text and the specified glossary's terms/synonyms, and appends the definitions to the body.
+
+  | Setting | Description |
+  |---------|-------------|
+  | **Glossary** | Glossary to match |
+
+  **Behavior:**
+  1. Check whether the input text (`current_output` or `input`) contains a glossary entry's `term` or `synonyms` (case-insensitive)
+  2. Collect matched terms and append to the end of the body like:
+     ```
+     [Original text]
+
+     [Term reference]
+     • Term1: Definition1
+     • Term2: Definition2
+     ```
+  3. The downstream LLM node generates a more accurate response using the definitions
+
+  **Output State keys:**
+  - `current_output` — enriched text with appended definitions
+  - `{node}.matched` — array of matched term objects (`term`, `matched_form`, `definition`)
+
+  <Tip>
+    For chatbots that frequently use internal abbreviations and specialized terminology, placing a **Glossary node before an Agent node** ensures the LLM understands term meanings before generating an answer.
+  </Tip>
+</Accordion>
+
+---
+
+## Additional Nodes (code-only)
+
+The following node components exist in the codebase but are **not exposed in the current Node Palette**. Users can't add them directly on the canvas — they may be enabled in future releases:
+
+- Aggregator, Human Input, Subflow, Error Handler, Notification, Knowledge, Tool
+
+If you need these nodes, use the **AI Builder** (natural-language flow generation) on the [Agent Flow page](/en/workspace/flows), or wait for the next release.
+
+---
+
+## Inter-node Data Flow (State)
+
+A flow uses a shared **State object** to pass data between nodes.
+
+| State Key | Description |
+|-----------|-------------|
+| `input` | User message (filled by Start node) |
+| `current_output` | Output of the previous node (updated through the chain) |
+| `variables.{name}` | Flow variables defined in the Start node |
+| `{node_id}.{field}` | Each node's output fields (e.g., `{model_node}.response`) |
+
+Each node writes its output to `current_output` and `{node_id}.<field>` keys. Downstream nodes' prompts/conditions can reference them with `{state_key}` or Jinja2 `{'{{ variables.x }}'}`.
+
+<Tip>
+  When debugging complex flows, place a **Transform (Format Text)** node right after Start to print all State keys — useful for seeing what's currently alive in State.
+</Tip>

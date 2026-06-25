@@ -1,0 +1,136 @@
+---
+title: Cloosphere User Guide
+description: Cloosphere User Guide — Enterprise AI chat platform
+mode: custom
+---
+
+<div className="landing-hero">
+  <h1>Cloosphere User Guide</h1>
+  <p>Enterprise AI chat platform — manage agents, knowledge bases, and workflows in one platform.</p>
+</div>
+
+<div className="landing-cta">
+  <Columns cols={3}>
+    <Card title="Quick Start Guide" icon="rocket" href="/en/getting-started/overview">
+      From login to your first conversation
+    </Card>
+    <Card title="Workspace Setup" icon="briefcase" href="/en/workspace/overview">
+      Configure agents, knowledge bases, databases
+    </Card>
+    <Card title="Admin Settings" icon="gear" href="/en/admin/overview">
+      Users, model connections, system settings
+    </Card>
+  </Columns>
+</div>
+
+<div className="landing-divider"><hr /></div>
+
+<div className="landing-section">
+  <h2>Key Features</h2>
+  <p>Explore Cloosphere's core capabilities by area. Click each tab to see detailed features for that area.</p>
+
+  <Tabs>
+    <Tab title="Chat">
+      Talk to AI models, attach files, and leverage web search results.
+
+      <Columns cols={3}>
+        <Card title="Conversations" icon="comment" href="/en/chat/conversations">
+          Start new chats, search history, manage folders
+        </Card>
+        <Card title="Model Selection" icon="microchip" href="/en/chat/models">
+          Multi-model integration including Azure OpenAI, Ollama
+        </Card>
+        <Card title="Advanced Features" icon="wand-magic-sparkles" href="/en/chat/capabilities">
+          Web search, image generation, code interpreter
+        </Card>
+        <Card title="Files & RAG" icon="file-lines" href="/en/chat/files-and-rag">
+          File attachment and document-grounded answers
+        </Card>
+        <Card title="Conversation Sharing" icon="share-nodes" href="/en/chat/sharing">
+          Share conversations with teammates and collaborate
+        </Card>
+        <Card title="Playground" icon="flask" href="/en/chat/playground">
+          LLM testing and model comparison experiments
+        </Card>
+      </Columns>
+    </Tab>
+
+    <Tab title="Workspace">
+      Configure your AI work environment — agents, knowledge bases, databases.
+
+      <Columns cols={4}>
+        <Card title="Agents" icon="robot" href="/en/workspace/agents">
+          Custom AI combining knowledge bases, tools, and guardrails
+        </Card>
+        <Card title="Knowledge Base" icon="book" href="/en/workspace/knowledge">
+          Document upload, vector search, evidence-grounded answers
+        </Card>
+        <Card title="Database" icon="database" href="/en/workspace/database">
+          Query databases in natural language (NL-to-SQL)
+        </Card>
+        <Card title="Agent Flows" icon="diagram-project" href="/en/workspace/flows">
+          Visual builder for multi-agent workflows
+        </Card>
+        <Card title="Guardrails" icon="shield-halved" href="/en/workspace/guardrails">
+          PII detection, content filtering, I/O validation
+        </Card>
+        <Card title="Tools" icon="wrench" href="/en/workspace/tools">
+          OpenAPI / MCP server integration
+        </Card>
+        <Card title="Prompts" icon="message" href="/en/workspace/prompts">
+          Templates invoked quickly via `/` commands
+        </Card>
+        <Card title="Glossary" icon="spell-check" href="/en/workspace/glossary">
+          Domain-specific terminology for higher answer accuracy
+        </Card>
+      </Columns>
+    </Tab>
+
+    <Tab title="Collaboration & Automation">
+      Use AI together with your team and automate repetitive work.
+
+      <Columns cols={4}>
+        <Card title="Projects" icon="folder-open" href="/en/collaboration/projects">
+          Group chats and resources at a team level
+        </Card>
+        <Card title="Channels" icon="hashtag" href="/en/collaboration/channels">
+          Team messaging, threads, AI mentions
+        </Card>
+        <Card title="Sharing & Permissions" icon="lock" href="/en/collaboration/sharing-permissions">
+          Group/organization-based access control
+        </Card>
+        <Card title="Schedules" icon="clock" href="/en/automation/schedules">
+          CRON-based automatic agent execution
+        </Card>
+      </Columns>
+    </Tab>
+  </Tabs>
+</div>
+
+<div className="landing-divider"><hr /></div>
+
+<div className="landing-section">
+  <h2>Admin & Monitoring</h2>
+  <p>Get a complete view of system settings, user management, and AI operations.</p>
+
+  <Columns cols={3}>
+    <Card title="User Management" icon="users" href="/en/admin/users">
+      User registration, role assignment, permission management
+    </Card>
+    <Card title="System Settings" icon="sliders" href="/en/admin/settings/general">
+      14 settings: model connections, document processing, interface, and more
+    </Card>
+    <Card title="Branding" icon="palette" href="/en/admin/settings/branding">
+      Customize logo, colors, and welcome messages
+    </Card>
+    <Card title="Usage" icon="chart-pie" href="/en/monitoring/usage">
+      Token consumption, costs, per-user statistics
+    </Card>
+    <Card title="Audit Log" icon="clipboard-list" href="/en/monitoring/audit-logs">
+      System activity records and audit trail
+    </Card>
+    <Card title="Tracing" icon="route" href="/en/monitoring/tracing">
+      LLM call chain tracking and performance analysis
+    </Card>
+  </Columns>
+</div>

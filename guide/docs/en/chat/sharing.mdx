@@ -1,0 +1,191 @@
+---
+title: "Sharing & Organization"
+description: "Manage conversations with chat share links, tags, archives, and folders"
+---
+
+In Cloosphere, share conversations with colleagues and organize them with tags and folders.
+
+## Sharing Chats
+
+### Create a Share Link
+
+Generate a share link so other users can view the conversation.
+
+<Frame caption="Share Chat modal">
+  <img src="/images/chat/sharing-modal.png" alt="Share Chat modal" />
+</Frame>
+
+<Steps>
+  <Step title="Open the share menu">
+    Click **Share** in the chat item's more menu, or click the more menu (⋮) > **Share** at the top of the chat screen.
+  </Step>
+  <Step title="Generate share link">
+    Click **Copy Link** — a share link is generated and copied to the clipboard.
+    Share URL format: `https://{domain}/s/{share_id}`
+  </Step>
+  <Step title="Send the link">
+    Send the copied link to a colleague. Through the link, they can view the conversation read-only.
+  </Step>
+</Steps>
+
+<Tip>
+  In the shared chat screen, click **Clone Chat** to copy the conversation into your own chat and continue.
+</Tip>
+
+### Managing Share Links
+
+<Accordion title="Already-shared chats">
+  Re-opening the Share modal for a previously shared chat shows:
+
+  - **View existing link**: "You have shared this chat before" with the existing link
+  - **Delete link**: Click "delete this link" to cancel the existing share and create a new link
+  - **Update and copy**: Click **Update and Copy Link** to reflect the latest content
+</Accordion>
+
+<Note>
+  Messages added **after** generating the share link are not included in the share.
+  To reflect the latest content, click **Update and Copy Link** again.
+</Note>
+
+<Warning>
+  Only users signed in to the same Cloosphere can view shared content via the link. Users not signed in cannot access.
+  Review content before sharing if it contains sensitive information.
+</Warning>
+
+## Tag Management
+
+Use tags to classify conversations by category.
+
+<Frame caption="Tag area">
+  <img src="/images/chat/sharing-tags.png" alt="Tag area" />
+</Frame>
+
+### Add Tags
+
+<Steps>
+  <Step title="Open the tag area">
+    The tag input area is at the bottom of the chat item's more menu.
+  </Step>
+  <Step title="Enter a tag">
+    Type a tag name and press Enter. You can also pick from existing tag list.
+  </Step>
+</Steps>
+
+### Remove Tags
+
+Click the **X** button next to a tag to remove it individually.
+
+### Tag-based Filtering
+
+Click a tag in the sidebar to filter and display only conversations with that tag.
+
+<Accordion title="Example tag usage">
+  Classifying tags by work type makes conversation management efficient.
+
+  | Tag | Use |
+  |-----|-----|
+  | `data-analysis` | Data analysis conversations |
+  | `report` | Report writing conversations |
+  | `coding` | Programming conversations |
+  | `email` | Email writing conversations |
+  | `research` | Research/investigation conversations |
+  | `meeting` | Meeting prep/notes conversations |
+</Accordion>
+
+## Pinning
+
+Pin important conversations to the top of the sidebar for quick access.
+
+<Steps>
+  <Step title="Pin">
+    Click **Pin** in the chat item's more menu.
+  </Step>
+  <Step title="Unpin">
+    Click **Unpin** in the pinned chat's menu.
+  </Step>
+</Steps>
+
+Pinned conversations appear in a dedicated section at the top of the sidebar, always accessible regardless of the time-ordered list.
+
+## Archiving
+
+Archive conversations no longer in active use but worth keeping.
+
+### Archive Individually
+
+<Steps>
+  <Step title="Archive">
+    Click **Archive** in the chat item's more menu.
+    The conversation disappears from the sidebar list but is not deleted.
+  </Step>
+  <Step title="View archive list">
+    See all archived conversations in Settings > Chats > **Archived Chats**.
+    Quick access via **Archived Chats** in the user menu at the bottom of the sidebar.
+  </Step>
+  <Step title="Restore">
+    Click the **Unarchive Chat** button (up-arrow icon) in the archive list to restore — it reappears in the sidebar.
+  </Step>
+</Steps>
+
+### Archive All
+
+Click Settings > Chats > **Archive All Chats** to archive all conversations at once.
+
+<Warning>
+  Inline confirmation is displayed when running Archive All.
+  After running, you can still restore individually from Archived Chats.
+</Warning>
+
+## Cloning Chats
+
+Copy an existing conversation to start a new direction with the same context.
+
+<Steps>
+  <Step title="Pick clone menu">
+    Click **Clone** in the chat item's more menu.
+  </Step>
+  <Step title="Create new chat">
+    A new chat with the entire history of the original is created.
+  </Step>
+</Steps>
+
+<Tip>
+  Cloning doesn't affect the original conversation.
+  Useful when you want to take a conversation in a different direction from a specific point.
+</Tip>
+
+## Folder-based Organization
+
+Use folders to hierarchically organize conversations. See [Conversations > Folder Management](/en/chat/conversations#folder-management) for details.
+
+### Drag and Drop
+
+Easily move chat items by dragging into folders.
+
+| Action | Description |
+|--------|-------------|
+| **Chat → Folder** | Move a chat into a folder |
+| **Folder → Folder** | Move a folder into another folder |
+| **Chat → Root** | Move a chat out of a folder |
+
+## Organization Strategy
+
+<Accordion title="Recommended organization">
+  As conversations grow, combine these strategies:
+
+  1. **Pin**: Currently active major conversations (3–5)
+  2. **Folders**: Classify by project/work unit
+  3. **Tags**: Mark conversation type (coding, analysis, report, etc.)
+  4. **Archive**: Store completed work conversations
+  5. **Periodic cleanup**: Delete or archive unnecessary conversations monthly
+
+  ```mermaid
+  graph TD
+      A[New conversation] --> B{Actively used?}
+      B -->|Yes| C[Pin]
+      B -->|No| D{Need to keep?}
+      D -->|Yes| E[Archive]
+      D -->|No| F[Delete]
+      C --> G[Classify with folders + tags]
+  ```
+</Accordion>

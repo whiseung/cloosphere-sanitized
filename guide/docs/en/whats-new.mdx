@@ -1,0 +1,116 @@
+---
+title: "What's New"
+description: "Recent feature additions and notable changes in Cloosphere, in reverse chronological order"
+---
+
+A consolidated view of what's been added, improved, and changed. Each entry links directly to the relevant guide.
+
+<Update label="2026-04 · 1.0.1 release" tags={["release", "Teams Bot", "Knowledge Graph"]}>
+
+### Microsoft Teams Bot
+A two-way Teams integration where users converse with the bot in 1:1 and group chats and pick agents. Includes AAD Object ID ↔ `User.oauth_oid` matching, RSC permissions, and Redis-backed multi-worker session state.
+[Learn more →](/en/admin/teams-bot)
+
+### Knowledge Graph — `Doc Attr` Nodes
+A lightweight path that promotes KB filter values into graph nodes **without LLM calls**. Glossary `Term` nodes are reused automatically to prevent fragmentation. A great starting point before turning on the costlier chunk-level entity extraction (`Doc Entity`).
+[Learn more →](/en/workspace/knowledge-graph#promoting-kb-filters-to-kg-nodes)
+
+### Embed Widget Enhancements
+- **side-bottom** panel mode added (alongside popup / side-right / side-left — 4 placements total)
+- Users can resize the panel width directly; host layout auto-shifts
+- **Guest mode**: non-logged users can use the embed widget
+- **SSO token exchange** to pass through the host site's existing login session
+[Learn more →](/en/admin/settings/embed-widgets)
+
+### Group ↔ Organizational Unit Mapping
+Map a group to OUs in the **Organizations** tab of the group edit modal — when IdP sync adds a new employee to a mapped OU, group permissions apply immediately. OUs are 1:1 exclusive (an OU can be assigned to at most one group).
+[Learn more →](/en/admin/users#group-↔-organizational-unit-mapping)
+
+### Multi-Worker Stability
+- `PersistentConfig` changes propagate to all workers instantly (Redis pub/sub)
+- OAuth callback state shared across workers
+- Teams Bot per-user agent selection persisted in Redis
+[Learn more →](/en/admin/deployment-checklist#multi-worker-checklist)
+
+### Other
+- User **role change audit logging** (`ROLE_CHANGE`) [→](/en/monitoring/audit-logs)
+- Google Workspace Admin Directory API for org/group sync
+- Follow-Up Generation — default OFF, enable with cost in mind [→](/en/admin/settings/interface)
+- Fixed alembic migrations ignoring `DATABASE_SCHEMA` and creating tables in `public` [→](/en/troubleshooting)
+
+</Update>
+
+<Update label="Early 2026-04 · Knowledge Graph GA" tags={["Knowledge Graph", "Glossary", "Embed Widget"]}>
+
+### Knowledge Graph (KG) — Generally Available
+A new workspace resource that unifies glossaries, DbSphere databases, and knowledge bases into a single graph. Built on Apache AGE.
+- Knowledge Links (attach KB·DB·glossary to a KG)
+- Graph-RAG: hybrid vector + graph retrieval
+- Edge catalog with LLM-suggested edge types
+- Full-screen graph view with node/edge detail panels
+- KG export/import (backup/migration)
+- KG tool tester (admin)
+- Background-worker sync with progress indicator
+[Learn more →](/en/workspace/knowledge-graph)
+
+### Glossary Improvements
+- Tag-style category input UI
+- Auto-generation from DB values
+- Per-entry custom instructions for DB extraction
+- Configurable extraction source (title / body / first N chars / last N chars)
+- DB extraction moved to background with inline review UX
+- Pagination + single-entry CRUD + index regeneration
+[Learn more →](/en/workspace/glossary)
+
+### Knowledge Base (KB) Operability
+- Bulk upload + directory upload + failure-first sort
+- Server-side pagination for file lists
+- Per-KB toggle for document summary / sample queries
+- New filter type: **Glossary** (metadata filter aligned with a glossary)
+[Learn more →](/en/workspace/knowledge)
+
+### Database (DbSphere)
+- BigQuery connector
+[Learn more →](/en/workspace/database)
+
+### Embed Widget SSO / Guest (early)
+Beta introduction of guest mode and SSO token exchange before the official 1.0.1 polish. Promoted to GA in 1.0.1 alongside the design options.
+
+### Workspace List UX
+- Unified **share tags + filter tabs** across guardrails, tools, prompts, knowledge dictionary, and databases lists
+
+</Update>
+
+<Update label="2026-03 · Admin, OAuth, Onboarding" tags={["Admin", "OAuth"]}>
+
+### Google OAuth SSO + Org/Group Sync
+Auto-sync OUs and groups via the Google Workspace Admin Directory API. Same permission model as Entra OIDC.
+[Learn more →](/en/admin/organizations)
+
+### Admin Onboarding Toggle
+Toggle the **onboarding guide** visibility under admin settings. Activates step-by-step guidance for first-time workspace setup.
+[Learn more →](/en/admin/settings/general)
+
+### OU Permission View
+Quickly inspect guardrails and permission sets on each OU row. OAuth sync now **shows grandchild OUs** in the org tree.
+
+</Update>
+
+<Update label="Earlier updates" tags={["AI Foundry", "Embed Widget", "Permissions"]}>
+
+Highlights from earlier releases (2026-02 ~ early 2026-03):
+- **AI Foundry** model connection — leverage the Azure-backed model catalog
+- **SQL result rendering** — DbSphere query results render naturally in chat
+- **Embed widget design options** — colors, logo, CTA message customization
+- **Fine-grained permission control** — 4-level model (None / Access / Read / Write)
+- **Agent guardrails** — input/output PII masking, blocking, LLM Judge
+
+</Update>
+
+---
+
+## Where to Go Next
+
+This page is a changelog showing **what's new at a glance**. For step-by-step usage of each feature, browse the relevant sidebar category (Workspace / Admin / Monitoring).
+
+Operational changes worth noting (env variables, migrations, Redis dependencies) are consolidated on the [Deployment Checklist](/en/admin/deployment-checklist).

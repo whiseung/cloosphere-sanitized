@@ -1,0 +1,88 @@
+---
+title: "Web Search"
+description: "Configure search engines and web loaders so the AI can search real-time web information."
+---
+
+In **Admin > Settings > Web Search**, configure the AI's web search functionality. With web search enabled, agents can reference real-time internet information when answering.
+
+<Frame caption="Web Search settings tab">
+  <img src="/images/admin/settings-web-search.png" alt="Web Search settings tab" />
+</Frame>
+
+---
+
+## Enabling Web Search
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Web Search enabled** | Web search feature ON/OFF | Disabled |
+
+---
+
+## Search Engine Selection
+
+Supported web search engines. Pick the engine and enter its API key.
+
+| Engine | API Key Required | Notes |
+|--------|:---------------:|-------|
+| **SearXNG** | Not required (self-hosted) | Privacy-focused metasearch engine. Requires Query URL |
+| **Google PSE** | Required | Google Programmable Search Engine. Requires API Key + Engine ID |
+| **Brave Search** | Required | Brave Search API |
+| **Kagi** | Required | Premium search engine |
+| **Mojeek** | Required | Independent crawler-based search engine |
+| **Bocha** | Required | AI search API |
+| **Serpstack** | Required | Google search results API |
+| **Serper** | Required | Google search results API |
+| **Serply** | Required | Search results API |
+| **SearchAPI** | Required | Multi-engine search API. Engine selectable |
+| **SerpAPI** | Required | Google search results scraping. Engine selectable |
+| **DuckDuckGo** | Not required | Free, privacy-focused |
+| **Tavily** | Required | AI-optimized search API |
+| **Jina** | Required | AI search API |
+| **Bing** | Required | Microsoft Bing Search V7. Requires Endpoint + Subscription Key |
+| **Exa** | Required | Semantic search API |
+| **Perplexity** | Required | AI-based search |
+| **Sougou** | Required | Chinese search engine. Requires API sID + SK |
+
+---
+
+## Search Configuration
+
+<Note>
+  The detail settings below are only visible when **Web Search enabled** is on.
+</Note>
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Number of results** | Number of search results to fetch | `5` |
+| **Concurrent requests** | Number of parallel search requests | `1` |
+| **Domain filter** | Allow/block domain list (comma-separated) | - |
+
+---
+
+## Web Loader
+
+The engine that fetches web page content from search result URLs.
+
+| Engine | Strengths |
+|--------|-----------|
+| **Default** | Simple HTTP request to extract text. Toggle **Verify SSL Certificate** to set SSL certificate verification |
+| **Playwright** | Supports JavaScript rendering for SPA pages. Set WebSocket URL and Timeout |
+| **Firecrawl** | Advanced web crawling and content refinement. Requires API Base URL and API Key |
+| **Tavily** | AI-optimized content extraction. Set Extract Depth |
+
+<Note>
+  For pages heavy with JavaScript rendering, Playwright or Firecrawl is recommended.
+  The default loader only processes static HTML.
+</Note>
+
+---
+
+## YouTube Loader
+
+Use YouTube video subtitles as search sources.
+
+| Setting | Description |
+|---------|-------------|
+| **Languages** | Subtitle languages to fetch (comma-separated, e.g., `ko,en`) |
+| **Proxy URL** | Proxy URL to use when accessing YouTube (e.g., `https://user:password@host:port`) |

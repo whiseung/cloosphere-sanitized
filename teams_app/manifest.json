@@ -1,0 +1,65 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.17",
+  "version": "0.1.0",
+  "id": "{{BOT_APP_ID}}",
+  "developer": {
+    "name": "Cloocus",
+    "websiteUrl": "https://www.cloocus.com",
+    "privacyUrl": "https://www.cloocus.com/privacy",
+    "termsOfUseUrl": "https://www.cloocus.com/terms"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Cloosphere",
+    "full": "Cloosphere AI Agent"
+  },
+  "description": {
+    "short": "Chat with your Cloosphere agents inside Teams.",
+    "full": "Cloosphere AI agent integration for Microsoft Teams — ask your knowledge base, run queries, and get streamed answers directly in Teams."
+  },
+  "accentColor": "#171717",
+  "bots": [
+    {
+      "botId": "{{BOT_APP_ID}}",
+      "scopes": ["personal"],
+      "supportsFiles": false,
+      "isNotificationOnly": false,
+      "commandLists": [
+        {
+          "scopes": ["personal"],
+          "commands": [
+            {
+              "title": "agent",
+              "description": "사용할 Cloosphere 에이전트 선택"
+            },
+            {
+              "title": "current",
+              "description": "현재 선택된 에이전트 확인"
+            },
+            {
+              "title": "reset",
+              "description": "현재 대화 초기화 (히스토리 삭제)"
+            },
+            {
+              "title": "lang",
+              "description": "언어 변경 (예: /lang en, /lang ko)"
+            },
+            {
+              "title": "help",
+              "description": "사용 가능한 명령 보기"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": []
+}

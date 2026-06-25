@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>ClooSphere 사용자 가이드</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ClooSphere 엔터프라이즈 AI 플랫폼 사용자 가이드">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <style>
+    :root {
+      --theme-color: #3b82f6;
+    }
+    .sidebar-nav > ul > li > a {
+      font-weight: bold;
+    }
+    .app-name {
+      font-size: 1.5rem;
+    }
+    .app-name img {
+      height: 32px !important;
+    }
+    .markdown-section h1 {
+      border-bottom: 2px solid var(--theme-color);
+      padding-bottom: 10px;
+    }
+    /* 커버 페이지 버튼 스타일 */
+    .cover-main > p:last-child a:first-child {
+      background: #ffffff !important;
+      color: #3b82f6 !important;
+      border: 2px solid #ffffff !important;
+    }
+    .cover-main > p:last-child a:first-child:hover {
+      background: transparent !important;
+      color: #ffffff !important;
+    }
+    .cover-main > p:last-child a:last-child {
+      background: transparent !important;
+      color: #ffffff !important;
+      border: 2px solid #ffffff !important;
+    }
+    .cover-main > p:last-child a:last-child:hover {
+      background: #ffffff !important;
+      color: #3b82f6 !important;
+    }
+    /* 언어 전환 버튼 */
+    .lang-switch {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      margin: 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #475569;
+      transition: all 0.15s;
+    }
+    .lang-switch:hover {
+      background: #eef2ff;
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">로딩 중...</div>
+  <script>
+    (function() {
+      // 언어 감지: URL 파라미터 > localStorage > 기본값 ko
+      var params = new URLSearchParams(window.location.search);
+      var lang = params.get('lang');
+      if (lang && (lang === 'ko' || lang === 'en')) {
+        localStorage.setItem('guide-lang', lang);
+      } else {
+        lang = localStorage.getItem('guide-lang') || 'ko';
+      }
+
+      // HTML lang 속성 설정
+      document.documentElement.lang = lang === 'en' ? 'en' : 'ko';
+
+      var isEn = lang === 'en';
+      var langPath = '/guide/' + lang + '/';
+
+      window.$docsify = {
+        name: '<img src="/guide/images/logo.png" alt="logo"',
+        repo: '',
+        basePath: langPath,
+        loadSidebar: true,
+        alias: {
+          '/.*/_sidebar.md': '/_sidebar.md'
+        },
+        subMaxLevel: 3,
+        search: {
+          placeholder: isEn ? 'Search...' : '검색...',
+          noData: isEn ? 'No results' : '결과 없음',
+          paths: 'auto'
+        },
+        pagination: {
+          previousText: isEn ? 'Previous' : '이전',
+          nextText: isEn ? 'Next' : '다음',
+          crossChapter: true
+        },
+        auto2top: true,
+        coverpage: false,
+        themeColor: '#3b82f6',
+        plugins: [
+          function(hook) {
+            hook.ready(function() {
+              // 사이드바 상단에 언어 전환 버튼 추가
+              var sidebar = document.querySelector('.sidebar-nav');
+              if (sidebar) {
+                var switchBtn = document.createElement('div');
+                var targetLang = isEn ? 'ko' : 'en';
+                var label = isEn ? '🌐 한국어' : '🌐 English';
+                switchBtn.className = 'lang-switch';
+                switchBtn.textContent = label;
+                switchBtn.onclick = function() {
+                  localStorage.setItem('guide-lang', targetLang);
+                  var url = window.location.pathname + '?lang=' + targetLang + window.location.hash;
+                  window.location.href = url;
+                };
+                sidebar.insertBefore(switchBtn, sidebar.firstChild);
+              }
+            });
+          }
+        ]
+      };
+    })();
+  </script>
+  <!-- Docsify -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+  <!-- 플러그인 -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+  <!-- 코드 하이라이팅 -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
+  <!-- Mermaid -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: 'default' });
+    window.$docsify.markdown = {
+      renderer: {
+        code: function(code, lang) {
+          if (lang === 'mermaid') {
+            return '<div class="mermaid">' + code + '</div>';
+          }
+          return this.origin.code.apply(this, arguments);
+        }
+      }
+    };
+    (window.$docsify.plugins = window.$docsify.plugins || []).push(function(hook) {
+      hook.doneEach(function() {
+        mermaid.init(undefined, '.mermaid');
+      });
+    });
+  </script>
+</body>
+</html>

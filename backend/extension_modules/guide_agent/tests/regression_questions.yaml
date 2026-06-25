@@ -1,0 +1,116 @@
+# Guide Q&A 회귀 질문 셋 (80+).
+#
+# 각 항목:
+#   - question: 사용자가 입력할 자연어 질문
+#   - expected_categories: 정답 카테고리 ID 후보 (top-3 안에 들어와야 함)
+#   - role: 'user' | 'admin' (audience 필터 검증용; 기본 user)
+#   - lang: 'ko' | 'en' (langdetect 기대값)
+#   - tag: 'literal' | 'paraphrase' | 'cross-cut' | 'admin-blocked' (분류용)
+
+version: 1
+questions:
+  # === Literal: 카테고리 명·기능명을 직접 언급 ===
+  - { question: "첫 대화 시작하는 법", expected_categories: ["getting-started/first-chat"], lang: ko, tag: literal }
+  - { question: "How do I log in?", expected_categories: ["getting-started/login"], lang: en, tag: literal }
+  - { question: "UI 둘러보기", expected_categories: ["getting-started/ui-overview"], lang: ko, tag: literal }
+  - { question: "What is Cloosphere?", expected_categories: ["getting-started/overview", "index"], lang: en, tag: literal }
+  - { question: "채팅 모델 선택 방법", expected_categories: ["chat/models"], lang: ko, tag: literal }
+  - { question: "대화 기록 관리", expected_categories: ["chat/conversations"], lang: ko, tag: literal }
+  - { question: "How to share a chat", expected_categories: ["chat/sharing"], lang: en, tag: literal }
+  - { question: "Memory feature for AI", expected_categories: ["chat/memory"], lang: en, tag: literal }
+  - { question: "RAG 파일 첨부", expected_categories: ["chat/files-and-rag"], lang: ko, tag: literal }
+  - { question: "Web search and image generation", expected_categories: ["chat/capabilities"], lang: en, tag: literal }
+  - { question: "Playground 모드 사용법", expected_categories: ["chat/playground"], lang: ko, tag: literal }
+
+  # workspace
+  - { question: "워크스페이스란?", expected_categories: ["workspace/overview"], lang: ko, tag: literal }
+  - { question: "에이전트 만들기", expected_categories: ["workspace/agents"], lang: ko, tag: literal }
+  - { question: "Create an AI agent", expected_categories: ["workspace/agents"], lang: en, tag: literal }
+  - { question: "플로우 실행 워크플로우", expected_categories: ["workspace/flows"], lang: ko, tag: literal }
+  - { question: "Flow node types", expected_categories: ["workspace/flows-nodes", "workspace/flows"], lang: en, tag: literal }
+  - { question: "지식 베이스 업로드", expected_categories: ["workspace/knowledge"], lang: ko, tag: literal }
+  - { question: "Knowledge base RAG", expected_categories: ["workspace/knowledge"], lang: en, tag: literal }
+  - { question: "지식 필터 검색 한계", expected_categories: ["workspace/knowledge-filters"], lang: ko, tag: literal }
+  - { question: "지식 그래프 사용법", expected_categories: ["workspace/knowledge-graph"], lang: ko, tag: literal }
+  - { question: "DbSphere NL-to-SQL", expected_categories: ["workspace/database"], lang: en, tag: literal }
+  - { question: "용어집 등록", expected_categories: ["workspace/glossary"], lang: ko, tag: literal }
+  - { question: "Guardrail PII 차단", expected_categories: ["workspace/guardrails"], lang: ko, tag: literal }
+  - { question: "Prompt template variables", expected_categories: ["workspace/prompts"], lang: en, tag: literal }
+  - { question: "도구 연결 MCP", expected_categories: ["workspace/tools"], lang: ko, tag: literal }
+  - { question: "워크스페이스 태그 정리", expected_categories: ["workspace/tags"], lang: ko, tag: literal }
+
+  # collaboration
+  - { question: "채널에서 팀 메시지", expected_categories: ["collaboration/channels"], lang: ko, tag: literal }
+  - { question: "Project sharing collaboration", expected_categories: ["collaboration/projects"], lang: en, tag: literal }
+  - { question: "리소스 공유 권한 설정", expected_categories: ["collaboration/sharing-permissions"], lang: ko, tag: literal }
+  - { question: "Collaboration overview", expected_categories: ["collaboration/overview"], lang: en, tag: literal }
+
+  # automation
+  - { question: "예약 작업 등록", expected_categories: ["automation/schedules"], lang: ko, tag: literal }
+  - { question: "Cron schedule for agent", expected_categories: ["automation/schedules", "automation/overview"], lang: en, tag: literal }
+  - { question: "자동화 기능 소개", expected_categories: ["automation/overview"], lang: ko, tag: literal }
+
+  # troubleshooting / whats-new
+  - { question: "문제 해결 가이드", expected_categories: ["troubleshooting"], lang: ko, tag: literal }
+  - { question: "최근 업데이트", expected_categories: ["whats-new"], lang: ko, tag: literal }
+  - { question: "Release notes", expected_categories: ["whats-new"], lang: en, tag: literal }
+
+  # === Paraphrase: 다른 표현으로 같은 의미 ===
+  - { question: "AI랑 처음 어떻게 이야기 시작하지?", expected_categories: ["getting-started/first-chat", "chat/conversations"], lang: ko, tag: paraphrase }
+  - { question: "내 문서를 AI에게 학습시키고 싶어", expected_categories: ["workspace/knowledge", "chat/files-and-rag"], lang: ko, tag: paraphrase }
+  - { question: "Want my own custom AI assistant", expected_categories: ["workspace/agents"], lang: en, tag: paraphrase }
+  - { question: "여러 모델을 한 번에 비교하고 싶어", expected_categories: ["chat/playground", "chat/models"], lang: ko, tag: paraphrase }
+  - { question: "Block bad words from being sent to LLM", expected_categories: ["workspace/guardrails"], lang: en, tag: paraphrase }
+  - { question: "비밀 정보 마스킹", expected_categories: ["workspace/guardrails"], lang: ko, tag: paraphrase }
+  - { question: "데이터베이스에 자연어로 질문", expected_categories: ["workspace/database"], lang: ko, tag: paraphrase }
+  - { question: "Translate technical terms automatically", expected_categories: ["workspace/glossary"], lang: en, tag: paraphrase }
+  - { question: "회사 SQL 테이블이랑 문서를 같이 묶어 검색", expected_categories: ["workspace/knowledge-graph"], lang: ko, tag: paraphrase }
+  - { question: "매일 아침 9시에 리포트 자동 생성", expected_categories: ["automation/schedules"], lang: ko, tag: paraphrase }
+  - { question: "Browser plugin for Slack-like collaboration", expected_categories: ["collaboration/channels"], lang: en, tag: paraphrase }
+
+  # === Cross-cut: 여러 카테고리 걸침 ===
+  - { question: "에이전트에 지식 베이스 연결", expected_categories: ["workspace/agents", "workspace/knowledge"], lang: ko, tag: cross-cut }
+  - { question: "Use a knowledge graph in my agent", expected_categories: ["workspace/agents", "workspace/knowledge-graph"], lang: en, tag: cross-cut }
+  - { question: "에이전트에 가드레일 적용", expected_categories: ["workspace/agents", "workspace/guardrails"], lang: ko, tag: cross-cut }
+  - { question: "DB 결과를 차트로 보여주는 워크플로우", expected_categories: ["workspace/database", "workspace/flows"], lang: ko, tag: cross-cut }
+  - { question: "Schedule a flow to run weekly", expected_categories: ["automation/schedules", "workspace/flows"], lang: en, tag: cross-cut }
+  - { question: "지식 그래프와 용어집 차이점", expected_categories: ["workspace/knowledge-graph", "workspace/glossary"], lang: ko, tag: cross-cut }
+  - { question: "프로젝트 안에서 채널 생성", expected_categories: ["collaboration/projects", "collaboration/channels"], lang: ko, tag: cross-cut }
+  - { question: "RAG 답변에 출처가 표시되나?", expected_categories: ["chat/files-and-rag", "workspace/knowledge"], lang: ko, tag: cross-cut }
+  - { question: "Memory and conversations", expected_categories: ["chat/memory", "chat/conversations"], lang: en, tag: cross-cut }
+
+  # === Admin-only (admin role 만 접근) ===
+  - { question: "사용자 추가하는 방법", expected_categories: ["admin/users"], role: admin, lang: ko, tag: literal }
+  - { question: "조직 동기화 Entra ID", expected_categories: ["admin/organizations"], role: admin, lang: ko, tag: literal }
+  - { question: "Configure SMTP for email notifications", expected_categories: ["admin/notifications"], role: admin, lang: en, tag: literal }
+  - { question: "Code Gateway proxy setup", expected_categories: ["admin/code-gateway"], role: admin, lang: en, tag: literal }
+  - { question: "Teams Bot 설정", expected_categories: ["admin/teams-bot"], role: admin, lang: ko, tag: literal }
+  - { question: "프로덕션 배포 체크리스트", expected_categories: ["admin/deployment-checklist"], role: admin, lang: ko, tag: literal }
+  - { question: "관리자 패널 메뉴 구성", expected_categories: ["admin/overview"], role: admin, lang: ko, tag: literal }
+  - { question: "임베딩 모델 변경 RAG_EMBEDDING_MODEL", expected_categories: ["admin/settings/documents"], role: admin, lang: ko, tag: literal }
+  - { question: "Connection Ollama OpenAI", expected_categories: ["admin/settings/connections"], role: admin, lang: en, tag: literal }
+  - { question: "라이선스 등록", expected_categories: ["admin/settings/license"], role: admin, lang: ko, tag: literal }
+  - { question: "브랜딩 로고 변경", expected_categories: ["admin/settings/branding"], role: admin, lang: ko, tag: literal }
+  - { question: "Web search provider Brave", expected_categories: ["admin/settings/web-search"], role: admin, lang: en, tag: literal }
+  - { question: "Code execution sandbox", expected_categories: ["admin/settings/code-execution"], role: admin, lang: en, tag: literal }
+  - { question: "임베드 위젯 SSO 설정", expected_categories: ["admin/settings/embed-widgets"], role: admin, lang: ko, tag: literal }
+  - { question: "이미지 생성 프로바이더", expected_categories: ["admin/settings/images"], role: admin, lang: ko, tag: literal }
+  - { question: "오디오 STT TTS 설정", expected_categories: ["admin/settings/audio"], role: admin, lang: ko, tag: literal }
+  - { question: "Pipelines 파이프라인 등록", expected_categories: ["admin/settings/pipelines"], role: admin, lang: ko, tag: literal }
+  - { question: "검색 엔진 pgvector Azure Search", expected_categories: ["admin/settings/search-engine"], role: admin, lang: ko, tag: literal }
+  - { question: "Tools admin settings", expected_categories: ["admin/settings/tools"], role: admin, lang: en, tag: literal }
+  - { question: "관리자 모델 등록", expected_categories: ["admin/settings/models"], role: admin, lang: ko, tag: literal }
+
+  # monitoring (admin)
+  - { question: "감사 로그 조회", expected_categories: ["monitoring/audit-logs"], role: admin, lang: ko, tag: literal }
+  - { question: "사용량 대시보드", expected_categories: ["monitoring/usage", "monitoring/dashboard"], role: admin, lang: ko, tag: literal }
+  - { question: "Trace analysis tracing", expected_categories: ["monitoring/tracing"], role: admin, lang: en, tag: literal }
+  - { question: "가드레일 로그 모음", expected_categories: ["monitoring/guardrail-logs"], role: admin, lang: ko, tag: literal }
+  - { question: "파일 업로드 로그", expected_categories: ["monitoring/file-logs"], role: admin, lang: ko, tag: literal }
+  - { question: "Auto evaluation feedback", expected_categories: ["monitoring/evaluations"], role: admin, lang: en, tag: literal }
+  - { question: "모니터링 개요", expected_categories: ["monitoring/overview"], role: admin, lang: ko, tag: literal }
+
+  # === Admin-blocked: 일반 user 가 admin 질문 시 차단되어야 ===
+  - { question: "Code Gateway 설정", expected_categories: [], role: user, lang: ko, tag: admin-blocked, note: "admin/* 차단 — 검색 결과 없음 또는 사용자 카테고리만" }
+  - { question: "How to add users to my organization", expected_categories: [], role: user, lang: en, tag: admin-blocked }
+  - { question: "Audit log viewer", expected_categories: [], role: user, lang: en, tag: admin-blocked }

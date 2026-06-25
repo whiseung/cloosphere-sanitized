@@ -1,0 +1,88 @@
+---
+title: "웹 검색"
+description: "AI가 실시간 웹 정보를 검색할 수 있도록 검색 엔진과 웹 로더를 구성합니다."
+---
+
+**관리자 > 설정 > 웹 검색** 탭에서 AI의 웹 검색 기능을 구성합니다. 웹 검색이 활성화되면 에이전트가 실시간 인터넷 정보를 참조하여 답변을 생성할 수 있습니다.
+
+<Frame caption="웹 검색 설정 탭">
+  <img src="/images/admin/settings-web-search.png" alt="웹 검색 설정 탭" />
+</Frame>
+
+---
+
+## 웹 검색 활성화
+
+| 설정 항목 | 설명 | 기본값 |
+|-----------|------|--------|
+| **웹 검색 활성화** | 웹 검색 기능 ON/OFF | 비활성화 |
+
+---
+
+## 검색 엔진 선택
+
+지원되는 웹 검색 엔진 목록입니다. 사용할 엔진을 선택하고 해당 엔진의 API 키를 입력합니다.
+
+| 엔진 | API 키 필요 | 비고 |
+|------|------------|------|
+| **SearXNG** | 불필요 (Self-hosted) | 프라이버시 중심 메타 검색 엔진. Query URL 입력 필요 |
+| **Google PSE** | 필요 | Google Programmable Search Engine. API Key + Engine ID 입력 |
+| **Brave Search** | 필요 | Brave 검색 API |
+| **Kagi** | 필요 | 프리미엄 검색 엔진 |
+| **Mojeek** | 필요 | 독립 크롤러 기반 검색 엔진 |
+| **Bocha** | 필요 | AI 검색 API |
+| **Serpstack** | 필요 | Google 검색 결과 API |
+| **Serper** | 필요 | Google 검색 결과 API |
+| **Serply** | 필요 | 검색 결과 API |
+| **SearchAPI** | 필요 | 멀티 엔진 검색 API. Engine 선택 가능 |
+| **SerpAPI** | 필요 | Google 검색 결과 스크래핑. Engine 선택 가능 |
+| **DuckDuckGo** | 불필요 | 무료, 프라이버시 중심 |
+| **Tavily** | 필요 | AI 최적화 검색 API |
+| **Jina** | 필요 | AI 검색 API |
+| **Bing** | 필요 | Microsoft Bing Search V7. Endpoint + Subscription Key 입력 |
+| **Exa** | 필요 | 시맨틱 검색 API |
+| **Perplexity** | 필요 | AI 기반 검색 |
+| **Sougou** | 필요 | 중국 검색 엔진. API sID + SK 입력 |
+
+---
+
+## 검색 세부 설정
+
+<Note>
+  아래 검색 세부 설정 항목들은 **웹 검색 활성화**가 켜져 있을 때만 표시됩니다.
+</Note>
+
+| 설정 항목 | 설명 | 기본값 |
+|-----------|------|--------|
+| **검색 결과 수** | 가져올 검색 결과 개수 | `5` |
+| **동시 요청 수** | 병렬 검색 요청 수 | `1` |
+| **도메인 필터** | 허용/차단할 도메인 목록 (콤마 구분) | - |
+
+---
+
+## 웹 로더
+
+검색 결과 URL에서 웹 페이지 콘텐츠를 가져오는 엔진입니다.
+
+| 엔진 | 특징 |
+|------|------|
+| **기본 (Default)** | 단순 HTTP 요청으로 텍스트 추출. **Verify SSL Certificate** 토글로 SSL 인증서 검증 여부 설정 가능 |
+| **Playwright** | JavaScript 렌더링 지원, SPA 페이지 처리 가능. WebSocket URL 및 Timeout 설정 |
+| **Firecrawl** | 고급 웹 크롤링 및 콘텐츠 정제. API Base URL 및 API Key 입력 필요 |
+| **Tavily** | AI 최적화 콘텐츠 추출. Extract Depth 설정 가능 |
+
+<Note>
+  JavaScript로 렌더링되는 페이지가 많은 경우 Playwright 또는 Firecrawl을 권장합니다.
+  기본 로더는 정적 HTML만 처리합니다.
+</Note>
+
+---
+
+## YouTube 로더
+
+YouTube 영상의 자막을 검색 소스로 활용할 수 있습니다.
+
+| 설정 항목 | 설명 |
+|-----------|------|
+| **언어** | 자막 가져오기 언어 (콤마 구분, 예: `ko,en`) |
+| **Proxy URL** | YouTube 접근 시 사용할 프록시 URL (예: `https://user:password@host:port`) |

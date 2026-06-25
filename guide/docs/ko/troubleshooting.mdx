@@ -1,0 +1,265 @@
+---
+title: "트러블슈팅"
+description: "자주 보고된 증상과 원인·해결책 — AI 모델, 채팅, 파일 업로드, 권한, 가드레일, 이메일/웹훅 등 영역별 정리."
+---
+
+이 페이지는 운영 중 **자주 마주치는 증상과 해결책**을 모아둔 참고서입니다. Cloosphere의 최근 버그 fix들 중 사용자에게 영향이 컸던 사례 위주로 정리했습니다.
+
+<Tip>
+  증상이 카테고리에 정확히 맞지 않더라도 인접 항목을 함께 확인하세요. 동일 원인(예: 멀티워커 환경, 인코딩 문제)이 여러 영역에 걸쳐 나타나는 경우가 많습니다.
+</Tip>
+
+---
+
+## AI 모델 응답 이슈
+
+<AccordionGroup>
+  <Accordion title="Gemini / Vertex AI 응답이 중간에 잘립니다" icon="scissors">
+    **증상**: Gemini 모델로 긴 응답 생성 시 응답 일부만 출력되고 끊김. 또는 멀티파트 콘텐츠(텍스트+이미지)에서 일부 블록 누락.
+
+    **원인**: Gemini API의 응답 구조가 OpenAI/Claude와 달리 `parts` 배열 형태이며, 각 part의 텍스트를 순서대로 합쳐야 완전한 응답이 됨. 이전 버전에서는 첫 part만 처리하던 버그가 있었음.
+
+    **해결**: 최신 버전에서 자동 처리됨. 만약 여전히 잘림이 발생하면:
+    - 모델 파라미터의 `max_output_tokens`를 충분히 크게(예: 8192) 설정
+    - Chat Controls 패널에서 모델 파라미터를 확인
+  </Accordion>
+
+  <Accordion title="Ollama 모델을 선택했는데 Vertex AI 설정이 사용됩니다" icon="circle-question">
+    **증상**: Ollama 로컬 모델로 채팅했는데 응답이 Vertex AI 모델 결과처럼 보이거나, Ollama 설정이 무시됨.
+
+    **원인**: 모델 ID resolve 단계에서 동일 키가 여러 provider에 걸쳐 있을 때 잘못된 provider로 라우팅되던 버그.
+
+    **해결**: 최신 버전에서 fix됨. 미해결 시 모델 ID에 provider prefix(`ollama/llama3:8b`)를 명시하거나, **관리자 > 설정 > 모델**에서 모델 ID 충돌 여부 확인.
+  </Accordion>
+
+  <Accordion title="OSS 모델(Ollama 등)에서 도구 호출이 동작하지 않습니다" icon="wrench">
+    **증상**: OSS 모델이 도구를 호출해야 할 시점에 자연어로만 응답하고 실제 도구 실행 없이 끝남.
+
+    **원인**: OSS 모델은 OpenAI 호환 function-calling이 약하거나 없는 경우가 많아, 모델이 도구 호출을 텍스트로 묘사만 하는 경우 발생.
+
+    **해결**: 최신 버전에 **submit_result 강제 미들웨어**가 추가되어, 텍스트 응답 감지 시 자동으로 submit_result 도구를 강제 호출합니다. Ollama 에이전트도 UnifiedAgent 라우팅으로 처리됩니다 — 별도 설정 불필요.
+  </Accordion>
+
+  <Accordion title="`stream=false` API 요청이 일반 모델로 라우팅됩니다" icon="bolt">
+    **증상**: 외부 API에서 `stream=false`로 호출했는데 에이전트(KBSphere/DBSphere) 라우팅이 안 되고 단순 LLM 호출로만 처리됨.
+
+    **원인**: 이전 버전의 라우팅 조건이 stream=true에만 한정되어 있었음.
+
+    **해결**: 최신 버전에서 stream=false 요청도 UnifiedAgent로 라우팅됩니다.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 채팅·파일 업로드
+
+<AccordionGroup>
+  <Accordion title="여러 파일을 동시에 업로드하면 마지막 파일만 남습니다" icon="files">
+    **증상**: 지식기반에서 다중 파일 업로드 시 일부 파일이 사라지고 마지막 파일만 처리됨.
+
+    **원인**: 업로드 동시성 제어 버그.
+
+    **해결**: 최신 버전에서 fix. 업로드 진행 상태가 알림 센터(우측 상단 벨)에 통합되어 표시되니 진행률 확인 가능.
+  </Accordion>
+
+  <Accordion title="채팅에 파일 첨부 후 응답이 매우 느립니다" icon="hourglass">
+    **증상**: 파일을 채팅에 첨부하면 응답까지 시간이 오래 걸리거나 일부 파일이 처리되지 않은 상태로 응답이 시작됨.
+
+    **원인**: 이전 버전에서는 파일 업로드가 비동기로 처리되어, AI가 파일 처리 완료를 기다리지 않고 응답을 시작하던 케이스가 있었음.
+
+    **해결**: 최신 버전에서 채팅 파일 업로드는 **동기 처리**로 변경되어, 파일 인덱싱 완료 후 AI 응답이 시작됩니다. 큰 파일은 처리 시간이 길어질 수 있으므로 5MB 이상은 사전에 지식기반에 업로드 후 참조 권장.
+  </Accordion>
+
+  <Accordion title="이미지를 첨부했는데 AI가 인식하지 못합니다" icon="image">
+    **증상**: 이미지를 채팅에 첨부했지만 AI가 "이미지를 받지 못했다"고 응답.
+
+    **원인**: 이미지 업로드 시 context 파라미터 누락으로 LLM Vision 처리에 전달되지 않던 버그.
+
+    **해결**: 최신 버전에서 fix. 모델이 Vision을 지원하는지 확인 — 비전 미지원 모델 사용 시 이미지 인식 불가.
+  </Accordion>
+
+  <Accordion title="채팅 파일 업로드 시 에러 메시지가 모호합니다" icon="triangle-exclamation">
+    **증상**: 파일 업로드 실패 시 일관성 없는 에러 메시지가 표시됨.
+
+    **해결**: 최신 버전에서 ERROR_MESSAGES로 통일되었습니다. 다음 메시지가 표시되면 의미:
+    - "Unsupported file type" — 지원하지 않는 파일 형식 (지식기반 [지원 형식 목록](/ko/workspace/knowledge#지원-파일-형식) 확인)
+    - "File too large" — 관리자 설정의 최대 파일 크기 초과
+    - "Storage quota exceeded" — 사용자/조직 저장 한도 초과
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 한글·인코딩
+
+<AccordionGroup>
+  <Accordion title="입력창에 한글이 두 번 입력됩니다 (자음 중복)" icon="keyboard">
+    **증상**: 한글 IME(입력기)로 타이핑할 때 자음이 두 번 입력되거나 글자가 깨짐.
+
+    **원인**: Svelte의 입력 이벤트와 IME compositionend의 타이밍 충돌.
+
+    **해결**: 최신 버전에서 fix. 지속 발생 시:
+    - 브라우저 캐시 초기화
+    - 다른 브라우저(Chrome/Edge)에서 재현 여부 확인
+    - 운영 환경의 IME 변경(2-Set vs 3-Set, 한컴 vs MS) 점검
+  </Accordion>
+
+  <Accordion title="CSV로 사용자를 가져오면 한글이 깨집니다" icon="file-csv">
+    **증상**: 사용자 일괄 등록 CSV에서 한글 이름이 `?` 또는 mojibake로 들어감.
+
+    **원인**: CSV 파일 인코딩이 UTF-8이 아닌 CP949/EUC-KR.
+
+    **해결**:
+    - CSV는 반드시 **UTF-8 (BOM 포함)** 인코딩으로 저장
+    - Excel에서 저장 시 "CSV UTF-8 (.csv)" 형식 선택
+    - 메모장/VS Code에서 인코딩 변경 후 재저장 가능
+  </Accordion>
+
+  <Accordion title="용어집에서 제목 일부만 추출됩니다" icon="book">
+    **증상**: 용어집 DB 추출 시 제목 컬럼에서 첫 글자만 추출되거나 일부가 잘림.
+
+    **원인**: 제목 전용 추출 모드의 early-return 버그.
+
+    **해결**: 최신 버전에서 fix. 발생 시 추출 소스 설정에서 `제목` + `본문 앞 N자` 조합으로 설정해 전체 텍스트가 처리되는지 확인.
+  </Accordion>
+
+  <Accordion title="가드레일 PII 감지가 한글 데이터에서 동작하지 않습니다" icon="shield">
+    **증상**: 한글이 섞인 텍스트에서 이메일·주민번호 등 PII 패턴이 감지되지 않음.
+
+    **원인**: 정규식의 word boundary(`\b`)가 한글 환경에서 다르게 동작하던 문제.
+
+    **해결**: 최신 버전에서 한글 환경 기준으로 수정. 미감지 발생 시 가드레일 설정의 패턴을 직접 추가하거나 LLM 기반 탐지로 전환.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 권한·접근
+
+<AccordionGroup>
+  <Accordion title='권한을 "없음"으로 설정했는데 접근이 가능합니다' icon="lock-open">
+    **증상**: 그룹 권한을 `none`으로 설정했지만 사용자가 여전히 해당 기능에 접근 가능.
+
+    **원인**: 권한 레벨 `"none"`이 JavaScript에서 truthy로 평가되어 권한 체크를 우회하던 버그.
+
+    **해결**: 최신 버전에서 fix됨. 발생 시:
+    - 사용자 로그아웃 후 재로그인 (JWT 갱신)
+    - 그룹 멤버십 확인 — 다른 그룹에서 해당 권한이 부여되었을 가능성
+  </Accordion>
+
+  <Accordion title="가드레일을 조직 단위에 할당했는데 권한보기 모달에 보이지 않습니다" icon="users-gear">
+    **증상**: 조직 관리에서 특정 조직 단위(OU)에 가드레일을 할당했는데, 사용자의 "권한보기"에서 해당 가드레일 정보가 표시되지 않음.
+
+    **해결**: 최신 버전에서 권한보기 API에 가드레일 카테고리가 추가되어 표시됩니다. 미표시 시 OU 멤버십 동기화가 완료되었는지 확인 — IdP 동기화 직후 5분 정도 캐시 갱신 시간 필요.
+  </Accordion>
+
+  <Accordion title="에이전트 도구가 채팅 #으로 선택한 KB를 사용하지 않습니다" icon="hashtag">
+    **증상**: 채팅에서 `#`으로 지식기반을 명시적으로 선택했는데 에이전트가 다른 KB로 검색하거나 KB 정보를 무시.
+
+    **해결**: 최신 버전에서 fix. `#`로 선택한 KB는 해당 턴의 에이전트 도구 컨텍스트에 우선 전달됩니다. 미동작 시:
+    - 에이전트가 해당 KB에 접근 권한이 있는지 확인
+    - 에이전트의 도구 설명(Tool Description)이 비어있지 않은지 확인 (편집기에 경고 배너 표시됨)
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 임베딩·벡터 검색
+
+<AccordionGroup>
+  <Accordion title="임베딩 URL 설정 후 차원(dimension) 오류가 발생합니다" icon="vector-square">
+    **증상**: 임베딩 모델 변경 후 검색 시 "vector dimension mismatch" 오류.
+
+    **원인**: 새 임베딩 모델의 차원이 기존 인덱스와 다른데, 차원 정보가 자동 갱신되지 않음.
+
+    **해결**:
+    - 임베딩 URL은 trailing slash 없이 입력 (예: `http://embeddings.local:8080`)
+    - 차원은 모델별 정확히 입력 (text-embedding-3-small=1536, text-embedding-3-large=3072 등)
+    - 모델 변경 후 영향받는 지식기반에서 **재인덱싱** 실행
+  </Accordion>
+
+  <Accordion title="Azure Search Vector DB에서 간헐적 오류가 발생합니다" icon="cloud-arrow-up">
+    **증상**: Azure AI Search를 벡터 DB로 사용할 때 간헐적으로 인덱스 오류 또는 검색 실패.
+
+    **해결**: 최신 버전에서 에러 처리가 개선됨 (재시도, 명확한 에러 메시지). 지속 발생 시:
+    - Azure Search 서비스 등급 확인 (Free tier는 동시 요청 제한 있음)
+    - 인덱스 스키마와 임베딩 차원 일치 확인
+    - **모니터링 > 트레이싱**에서 실패한 요청의 정확한 응답 코드 확인
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 이메일·알림
+
+<AccordionGroup>
+  <Accordion title='SMTP 발송 시 "Invalid domain name" 오류' icon="envelope-circle-check">
+    **증상**: SMTP 채널로 메일 발송 시 "EHLO: Invalid domain name" 에러.
+
+    **원인**: SMTP 서버가 EHLO 명령에 사용할 도메인 이름을 검증하는데, 컨테이너의 hostname이 FQDN이 아닌 경우 발생.
+
+    **해결**: 최신 버전에서 EHLO hostname을 자동으로 유효한 값으로 설정. 미해결 시 SMTP 서버의 EHLO 검증을 완화하거나, 컨테이너 hostname을 FQDN으로 변경.
+  </Accordion>
+
+  <Accordion title="가드레일이 차단했는데 사용자에게 사유가 표시되지 않습니다" icon="ban">
+    **증상**: 가드레일이 차단했지만 사용자는 일반 에러만 보거나, 어떤 패턴이 문제인지 모름.
+
+    **해결**: 최신 버전에서 차단 시 **위반 유형(`guardrail_type`)** 과 **사유(`guardrail_reason`)** 가 응답 메타에 포함되며, 가드레일 설정의 Block Action으로 사용자 메시지를 커스터마이즈 가능합니다.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 운영·배포
+
+<AccordionGroup>
+  <Accordion title="멀티워커 환경에서 설정 변경이 일부 워커에만 적용됩니다" icon="server">
+    **증상**: 관리자가 설정을 변경했는데 일부 사용자에게만 반영되거나, 사용자가 받는 응답이 워커마다 다름.
+
+    **원인**: PersistentConfig가 워커별 메모리 캐시를 사용하는데, Redis 없이 운영 시 워커 간 동기화 부재.
+
+    **해결**:
+    - **운영 환경에서는 Redis 필수** — `REDIS_URL` 환경변수 설정
+    - 최신 버전에서 `partial-stale` invalidation 및 bulk import 처리 개선됨
+    - 자세한 내용은 [배포 체크리스트](/ko/admin/deployment-checklist) 참조
+  </Accordion>
+
+  <Accordion title="Alembic 마이그레이션이 잘못된 스키마에 테이블을 생성합니다" icon="database">
+    **증상**: `DATABASE_SCHEMA` 환경변수를 설정했는데도 테이블이 `public` 스키마에 생성됨.
+
+    **해결**: 최신 버전에서 fix. 발생 시:
+    - 잘못 생성된 public 스키마의 테이블을 수동으로 정리
+    - `DATABASE_SCHEMA=cloosphere` 같은 명시적 값 재설정 후 마이그레이션 재실행
+    - 멀티 프로세스 환경에서 마이그레이션 동시 실행 충돌도 함께 fix됨 — 최초 1개 워커만 실행
+  </Accordion>
+
+  <Accordion title="Knowledge Graph 동기화 중 PoolError가 발생합니다" icon="diagram-project">
+    **증상**: KG 동기화 또는 fan-out 추출 중 PostgreSQL connection pool 고갈로 작업 실패.
+
+    **해결**: AGE 그래프 DB 전용 풀 크기를 늘리세요 — `AGE_POOL_MAX` 환경변수.
+    - 소규모: `AGE_POOL_MAX=16`
+    - 중규모: `AGE_POOL_MAX=32` (기본값)
+    - 대규모(>100M 노드): `AGE_POOL_MAX=64`
+
+    [배포 체크리스트의 KG 성능 튜닝](/ko/admin/deployment-checklist#knowledge-graph-성능) 참조.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 더 도움이 필요한 경우
+
+<Columns>
+  <Card title="감사 로그" icon="clipboard-list" href="/ko/monitoring/audit-logs">
+    무엇이 언제 변경되었는지 시간순 확인
+  </Card>
+  <Card title="트레이싱" icon="route" href="/ko/monitoring/tracing">
+    개별 요청의 LLM 호출·에이전트 흐름·실패 원인 분석
+  </Card>
+  <Card title="배포 체크리스트" icon="list-check" href="/ko/admin/deployment-checklist">
+    운영 필수 환경변수 및 멀티워커 설정
+  </Card>
+  <Card title="문의 보내기" icon="envelope" href="/ko/admin/users#문의-관리">
+    관리자에게 문제 보고
+  </Card>
+</Columns>

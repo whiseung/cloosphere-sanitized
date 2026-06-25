@@ -1,0 +1,61 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend: Uvicorn (Debug, no reload)",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "cwd": "${workspaceFolder}/backend",
+      "args": [
+        "open_webui.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080",
+        "--forwarded-allow-ips",
+        "*"
+      ],
+      "env": {
+        "ENV": "dev",
+        "GLOBAL_LOG_LEVEL": "INFO",
+        "MAIN_LOG_LEVEL": "INFO",
+        "UVICORN_WORKERS": "1",
+        "CORS_ALLOW_ORIGIN": "http://localhost:5173;http://localhost:8080",
+        "PYTHONPATH": "${workspaceFolder}/backend",
+        "STATIC_DIR": "${workspaceFolder}/backend/open_webui/static"
+      },
+      "justMyCode": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Backend: Uvicorn (Reload, debug subprocs)",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "cwd": "${workspaceFolder}/backend",
+      "args": [
+        "open_webui.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080",
+        "--reload",
+        "--forwarded-allow-ips",
+        "*"
+      ],
+      "env": {
+        "ENV": "dev",
+        "GLOBAL_LOG_LEVEL": "INFO",
+        "MAIN_LOG_LEVEL": "INFO",
+        "UVICORN_WORKERS": "1",
+        "CORS_ALLOW_ORIGIN": "http://localhost:5173;http://localhost:8080",
+        "PYTHONPATH": "${workspaceFolder}/backend",
+        "STATIC_DIR": "${workspaceFolder}/backend/open_webui/static"
+      },
+      "subProcess": true,
+      "justMyCode": false,
+      "console": "integratedTerminal"
+    }
+  ]
+}

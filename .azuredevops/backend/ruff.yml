@@ -1,0 +1,74 @@
+# Ruff Lint & Format Pipeline for Azure DevOps
+# Backend Python 코드의 린트 및 포맷 검사를 수행합니다.
+
+trigger:
+  branches:
+    include:
+      - main
+      - dev
+  paths:
+    include:
+      - backend/**
+      - pyproject.toml
+
+pr:
+  branches:
+    include:
+      - main
+      - dev
+  paths:
+    include:
+      - backend/**
+      - pyproject.toml
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  PYTHON_VERSION: '3.11'
+  UV_CACHE_DIR: $(Pipeline.Workspace)/.uv_cache
+
+stages:
+  - stage: Lint
+    displayName: 'Ruff Lint & Format'
+    jobs:
+      - job: RuffCheck
+        displayName: 'Ruff Lint & Format Check'
+        steps:
+          - checkout: self
+
+          - task: UsePythonVersion@0
+            displayName: 'Use Python $(PYTHON_VERSION)'
+            inputs:
+              versionSpec: '$(PYTHON_VERSION)'
+              addToPath: true
+
+          - task: Cache@2
+            displayName: 'Cache uv dependencies'
+            inputs:
+              key: 'uv | "$(Agent.OS)" | pyproject.toml'
+              restoreKeys: |
+                uv | "$(Agent.OS)"
+              path: $(UV_CACHE_DIR)
+
+          - bash: |
+              curl -LsSf https://astral.sh/uv/install.sh | sh
+              echo "##vso[task.prependpath]$HOME/.local/bin"
+            displayName: 'Install uv'
+
+          - bash: |
+              uv sync --group lint
+            displayName: 'Install lint dependencies'
+            workingDirectory: $(Build.SourcesDirectory)
+
+          - bash: |
+              echo "Running Ruff Lint Check..."
+              uv run ruff check . --select F,I,E9 --ignore W,F841 --output-format=concise
+            displayName: 'Ruff Lint Check'
+            workingDirectory: $(Build.SourcesDirectory)
+
+          - bash: |
+              echo "Running Ruff Format Check..."
+              uv run ruff format . --check --diff
+            displayName: 'Ruff Format Check'
+            workingDirectory: $(Build.SourcesDirectory)

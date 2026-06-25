@@ -1,0 +1,219 @@
+---
+title: "Deployment Checklist"
+description: "Operator guide to required environment variables, multi-worker settings, external dependencies, and monitoring endpoints when deploying to production."
+---
+
+This page is a checklist of essential settings to verify when **deploying Cloosphere to production**.
+
+<Tip>
+  Admin panel settings (GUI) are saved as **PersistentConfig** in DB and auto-applied. This page covers items that **can't be changed via GUI** — environment variables and external dependencies.
+</Tip>
+
+---
+
+## Required Environment Variables
+
+In production, missing these disables some features or causes abnormal behavior.
+
+### Public URL
+
+| Variable | Required | Use | Example |
+|----------|:--------:|-----|---------|
+| **`CLOOSPHERE_PUBLIC_URL`** | ✅ | External access base URL. Used for SR (Service Request), embed widget callbacks, manifest validDomains auto-computation, etc. | `https://cloosphere.yourdomain.com` |
+
+<Warning>
+  When `CLOOSPHERE_PUBLIC_URL` is unset:
+  - **SR (Service Request) feature is disabled** — users can't report issues
+  - Embed widget callback URLs are wrongly exposed as internal IP/host
+  - Teams bot manifest validDomains computation errors
+
+  Always specify as **HTTPS public FQDN**. Behind a proxy (Nginx/Cloudflare), enter the externally visible URL.
+</Warning>
+
+### Database / Redis
+
+| Variable | Required | Use |
+|----------|:--------:|-----|
+| `DATABASE_URL` | ✅ | PostgreSQL connection string |
+| `DATABASE_SCHEMA` | ⚠️ | Schema separation in multi-tenant (default `public`) |
+| `REDIS_URL` | ⚠️ | Required for multi-worker, optional for single worker |
+| `REDIS_SENTINEL_HOSTS` | — | When using Redis Sentinel |
+| `REDIS_SENTINEL_PORT` | — | (default 26379) |
+
+<Warning>
+  **`REDIS_URL` is required in multi-worker environments.** Operating without Redis:
+  - PersistentConfig stored only in per-worker memory → **inter-worker setting inconsistency**
+  - Per-user agent selection state and other session data lost
+  - Teams bot / embed widget user context lost
+
+  When Redis connection fails, Cloosphere **fast-fails with 5-second timeout** and auto-switches to in-memory fallback (single-worker mode). In multi-worker, monitor Redis availability via health endpoints.
+</Warning>
+
+### Knowledge Graph (AGE)
+
+| Variable | Default | Recommended |
+|----------|:-------:|:-----------:|
+| `AGE_POOL_MIN` | 2 | Small 2 / Medium 4 / Large 8 |
+| `AGE_POOL_MAX` | 32 | Small 16 / Medium 32 / Large 64+ |
+
+KG fan-out extraction uses many concurrent connections, so pool exhaustion can fail sync.
+
+| Scale | Recommended |
+|-------|-------------|
+| **< 10M nodes** | `AGE_POOL_MIN=2 AGE_POOL_MAX=16` |
+| **10M ~ 100M nodes** | `AGE_POOL_MIN=4 AGE_POOL_MAX=32` (default) |
+| **> 100M nodes** | `AGE_POOL_MIN=8 AGE_POOL_MAX=64` |
+
+<Tip>
+  On pool exhaustion, Cloosphere auto-performs **5 retries with exponential backoff** (0.1s × 2^attempt). Seeing `[age_service] pool initialized` in logs indicates normal initialization. Repeated `PoolError` or `connection pool exhausted` means raise the pool size one tier.
+</Tip>
+
+---
+
+## SSO / OIDC Integration (optional)
+
+To activate OAuth/OIDC SSO, set the following environment variables (Keycloak, Entra ID, Google all use the same interface).
+
+```bash
+OPENID_PROVIDER_URL=https://auth.example.com/realms/cloosphere/.well-known/openid-configuration
+OAUTH_CLIENT_ID=cloosphere-app
+OAUTH_CLIENT_SECRET=<strong-secret>
+OAUTH_SCOPES="openid email profile"
+OAUTH_PROVIDER_NAME=Keycloak
+```
+
+| Variable | Use |
+|----------|-----|
+| `OPENID_PROVIDER_URL` | OIDC Discovery URL (`.well-known/openid-configuration`) |
+| `OAUTH_CLIENT_ID` | Client ID registered with the IdP |
+| `OAUTH_CLIENT_SECRET` | Client secret |
+| `OAUTH_SCOPES` | Requested scopes (`openid email profile` is default) |
+| `OAUTH_PROVIDER_NAME` | Provider name shown on the UI sign-in screen |
+
+<Note>
+  **Keycloak organization sync** (since `add35ab42`): operates via client_credentials grant flow. When the above env vars are all set, the Keycloak sync option activates in [Organization Management](/en/admin/organizations).
+</Note>
+
+See [General Settings — Authentication](/en/admin/settings/general#authentication-settings) for details.
+
+---
+
+## Teams Bot (optional)
+
+To operate a Microsoft Teams bot:
+
+```bash
+TEAMS_BOT_APP_ID=<Azure Bot Client ID>
+TEAMS_BOT_APP_PASSWORD=<Client Secret>
+TEAMS_BOT_TENANT_ID=common  # or single-tenant GUID
+TEAMS_BOT_ENABLED=true
+TEAMS_BOT_BACKEND_TIMEOUT=300
+TEAMS_BOT_DEFAULT_LOCALE=ko-KR
+```
+
+<Warning>
+  Teams bot **requires Redis in multi-worker environments**. Per-user agent selection state must be shared across workers.
+</Warning>
+
+See the [Teams Bot Guide](/en/admin/teams-bot) for detailed setup.
+
+---
+
+## Multi-Worker Operations Checklist
+
+| Item | Recommendation | Impact When Missed |
+|------|----------------|---------------------|
+| `REDIS_URL` set | Required | PersistentConfig sync failure, session loss |
+| Identical env vars across workers | Required | Inconsistent settings → different behavior per user |
+| Alembic migrations | Run once only | Concurrent multi-worker conflicts (lock-fixed in latest version) |
+| Shared file storage | Required | Workers access different local files → uploaded files missing on another worker |
+| Redis Sentinel/Cluster | Recommended | Single Redis failure causes full service downtime |
+| Same timezone (TZ) | Required | Schedule/audit log time inconsistency |
+
+<Tip>
+  Alembic migration conflicts are auto-resolved by lock in the latest version, but **serializing container start order** (e.g., wait for first worker's healthcheck to pass before starting others) is safer.
+</Tip>
+
+---
+
+## Health Endpoints (Monitoring Integration)
+
+Cloosphere provides health endpoints integrable with external monitoring (Prometheus, Datadog, Azure Monitor, etc.).
+
+| Endpoint | Use | Auth |
+|----------|-----|:----:|
+| `GET /health` | Basic liveness check | None |
+| `GET /health/db` | DB connection state (503 + error detail if down) | None |
+| `GET /health/redis` | Redis ping (503 if unavailable) | None |
+| `GET /health/full` | DB + Redis + TaskQueue overall state | Admin |
+
+Response example:
+
+```json
+GET /health/full
+
+{
+  "status": "ok",
+  "components": {
+    "database": { "status": "ok", "latency_ms": 12 },
+    "redis": { "status": "ok", "latency_ms": 1 },
+    "task_queue": { "status": "ok", "pending": 3 }
+  }
+}
+```
+
+<Tip>
+  The admin panel's **System Diagnostics panel** shows `/health/full` results in GUI. Recommend `/health/db` for CI/CD readiness probe and `/health` for liveness probe.
+</Tip>
+
+---
+
+## Operations Checklist (Summary)
+
+Pre-deploy verification:
+
+<Steps>
+  <Step title="Verify public URL">
+    Is `CLOOSPHERE_PUBLIC_URL` set to an external HTTPS FQDN?
+  </Step>
+  <Step title="DB / Redis">
+    `DATABASE_URL` connects normally; `REDIS_URL` required for multi-worker
+  </Step>
+  <Step title="OIDC (optional)">
+    For SSO, set `OPENID_PROVIDER_URL` + client credentials
+  </Step>
+  <Step title="Teams Bot (optional)">
+    For Teams integration, register Azure Bot Service + upload manifest
+  </Step>
+  <Step title="AGE pool size">
+    Adjust `AGE_POOL_MAX` per KG usage scale
+  </Step>
+  <Step title="Health monitoring">
+    Add `/health/db`, `/health/redis` polling to external monitoring
+  </Step>
+  <Step title="Audit log activation">
+    Verify the license includes the `audit_log` feature → [Audit Log](/en/monitoring/audit-logs)
+  </Step>
+  <Step title="Backup policy">
+    PostgreSQL + file storage periodic backups, AGE graph backup cadence configured
+  </Step>
+</Steps>
+
+---
+
+## Related Pages
+
+<Columns>
+  <Card title="General Settings" icon="sliders" href="/en/admin/settings/general">
+    GUI-managed authentication and feature toggles
+  </Card>
+  <Card title="Teams Bot" icon="microsoft" href="/en/admin/teams-bot">
+    Microsoft Teams integration
+  </Card>
+  <Card title="Notification Settings" icon="bell" href="/en/admin/notifications">
+    Email and webhook notification channels
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/en/troubleshooting">
+    Common issues and solutions in operations
+  </Card>
+</Columns>

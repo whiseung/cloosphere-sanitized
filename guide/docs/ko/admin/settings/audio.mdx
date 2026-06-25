@@ -1,0 +1,124 @@
+---
+title: "오디오"
+description: "TTS(음성 합성), STT(음성 인식), 아바타 엔진을 구성합니다."
+---
+
+**관리자 > 설정 > 오디오** 탭에서 음성 입출력 관련 엔진을 구성합니다.
+
+<Frame caption="오디오 설정 탭 전체 화면">
+  <img src="/images/admin/settings-audio-full.png" alt="오디오 설정 탭 전체 화면" />
+</Frame>
+
+---
+
+## TTS (Text-to-Speech)
+
+AI 응답을 음성으로 변환하는 엔진을 설정합니다.
+
+| 설정 항목 | 설명 | 기본값 |
+|-----------|------|--------|
+| **엔진** | TTS 서비스 선택 | `Web API` |
+| **모델** | 엔진별 TTS 모델 | - |
+| **음성** | 음성 유형 선택 | - |
+| **응답 분할** | TTS 응답 분할 단위 (문장/단락) | `Punctuation` |
+
+<Tabs>
+  <Tab title="시스템 (Web API)">
+    브라우저 내장 Web Speech API를 사용합니다. 별도 설정 없이 즉시 사용 가능합니다.
+  </Tab>
+  <Tab title="OpenAI">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **API Base URL** | OpenAI API Endpoint |
+    | **API Key** | API 인증 키 |
+    | **모델** | 예: `tts-1`, `tts-1-hd` |
+    | **음성** | `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer` |
+  </Tab>
+  <Tab title="Azure Speech">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **API Key** | Azure Speech Service 키 |
+    | **Region** | Azure 리전 (예: `koreacentral`) |
+    | **Output Format** | 오디오 출력 형식 |
+  </Tab>
+  <Tab title="ElevenLabs">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **API Key** | ElevenLabs API 키 |
+    | **Voice** | 음성 선택 |
+    | **모델** | ElevenLabs TTS 모델 |
+  </Tab>
+  <Tab title="Google Cloud TTS">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **Language Filter (Optional)** | 음성 언어 필터 (예: `ko-KR`) |
+    | **Service Account Key** | Global 키 또는 Custom JSON 키 |
+  </Tab>
+  <Tab title="Gemini TTS">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **Location** | 리전 (기본: `us-central1`) |
+    | **Service Account Key** | Global 키 또는 Custom JSON 키 |
+    | **TTS Voice** | Gemini TTS 음성 선택 |
+    | **모델** | Gemini TTS 모델 (기본: `gemini-2.5-flash-preview-tts`) |
+  </Tab>
+</Tabs>
+
+---
+
+## STT (Speech-to-Text)
+
+사용자 음성 입력을 텍스트로 변환하는 엔진을 설정합니다.
+
+| 설정 항목 | 설명 | 기본값 |
+|-----------|------|--------|
+| **엔진** | STT 서비스 선택 | `Whisper (로컬)` |
+| **모델** | 엔진별 STT 모델 | - |
+
+<Tabs>
+  <Tab title="시스템 (Web API)">
+    브라우저 내장 Web Speech API를 사용합니다.
+  </Tab>
+  <Tab title="OpenAI (Whisper)">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **API Base URL** | OpenAI API Endpoint |
+    | **API Key** | API 인증 키 |
+    | **모델** | Whisper 모델 선택 |
+  </Tab>
+  <Tab title="Azure Speech">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **API Key** | Azure Speech Service 키 |
+    | **Region** | Azure 리전 |
+    | **Locales** | 인식 언어 (콤마 구분, 예: `ko-KR,en-US`) |
+  </Tab>
+  <Tab title="Deepgram">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **API Key** | Deepgram API 키 |
+  </Tab>
+  <Tab title="Google Cloud STT">
+    | 설정 항목 | 설명 |
+    |-----------|------|
+    | **Project ID** | Google Cloud 프로젝트 ID |
+    | **Location** | 리전 (기본: `global`) |
+    | **Language Codes** | 인식 언어 (기본: `auto`) |
+    | **Service Account Key** | Global 키 또는 Custom JSON 키 |
+  </Tab>
+</Tabs>
+
+---
+
+## 아바타 (Avatar)
+
+AI 응답 시 표시되는 아바타를 설정합니다.
+
+| 설정 항목 | 설명 |
+|-----------|------|
+| **엔진** | 아바타 서비스 선택 |
+| **API Key** | 아바타 서비스 인증 키 |
+| **Region** | 서비스 리전 |
+| **Character** | 아바타 캐릭터 선택 |
+| **Style** | 아바타 스타일 |
+| **Greeting** | 아바타 인사말 |

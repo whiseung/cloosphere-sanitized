@@ -1,0 +1,152 @@
+---
+title: "Model Management"
+description: "Manage model list, set default model, control display order, import/export presets"
+---
+
+Manage the list of models pulled from connected LLM providers. From this tab, control individual model activation, customization, display order, and default model selection.
+
+Configure in **Admin > Settings > Models**.
+
+{/* SCREENSHOT: settings-models */}
+<Frame caption="Manage all connected models in one place — activate, customize, order">
+  <img src="/images/admin/settings-models-list.png" alt="Model management tab" />
+</Frame>
+
+---
+
+## Model List
+
+Shows Workspace models (admin-created/customized) combined with Base models (system models pulled from connected APIs).
+
+| Item | Description |
+|------|-------------|
+| **Model name** | Model name shown to users |
+| **ID** | Model identifier used in API calls |
+| **Enabled / Disabled** | Toggle (Switch) for whether the model is available |
+
+### Hide Model (Shift+Click)
+
+Hold **Shift** and click the icon in a model row to toggle hide/show. Hidden models are managed as `meta.hidden` and don't appear in the user's model picker.
+
+<Note>
+  Hidden and Disabled are separate features.
+  Hidden removes from the model picker; Disabled makes the model itself unavailable.
+</Note>
+
+---
+
+## Default Model and Order
+
+Click the settings (gear) icon at the top-right of the model list to open the model settings modal.
+
+| Setting | Description |
+|---------|-------------|
+| **Default model** | Model auto-selected when starting a new chat |
+| **Model order** | Display order in the model picker (drag or arrows) |
+
+---
+
+## Activate / Deactivate Models
+
+Use per-model **Enabled / Disabled** toggle (Switch) to expose only needed models to users.
+
+<Note>
+  Disabled models don't appear in the user's model picker dropdown.
+  Disabling a model that's set as an agent's base model doesn't affect agent execution.
+</Note>
+
+---
+
+## Model Customization
+
+Click the **edit (pencil) icon** on a model row to customize that model.
+
+| Setting | Description |
+|---------|-------------|
+| **Name/Description** | Change the user-facing model name and description |
+| **System prompt** | Set the default system prompt for this model |
+| **Response format prompt** | Set response format guidance |
+| **Parameters** | Temperature, Top P, Top K, Stop tokens, etc. |
+| **Resource connections** | Connect Knowledge Bases, DBs, tools, guardrails, glossaries |
+| **Capabilities** | Enable web search, image generation |
+| **Auto-evaluation** | Auto-monitor response quality |
+| **Access control** | Expose only to specific groups/users |
+
+<Note>
+  Customizing a model creates a **Workspace setting record** for that model. Unlike agents, this doesn't directly modify the base model — it adds an **override configuration**.
+</Note>
+
+---
+
+## Controlling Models Visible to Users
+
+| Mechanism | Effect | Where to Configure |
+|-----------|--------|-------------------|
+| **Activate/Deactivate** (toggle) | Disabled → excluded from model picker | Toggle on model row |
+| **Hide** (Shift+click) | Hidden → excluded from model picker | Shift+icon on model row or menu |
+| **Default model** | Auto-selected on new chat | Settings modal |
+| **Display order** | Order in model picker dropdown | Settings modal (drag) |
+| **Access control** | Only specific groups/users | Edit model > Access control |
+
+<Tip>
+  **Disable** and **Hide** have the same user effect (excluded from list) but are distinguished in the admin screen. Use Hide for temporary concealment; use Disable to fully block use.
+</Tip>
+
+---
+
+## Ollama Model Management
+
+Click the **download icon** at the top of the model list to open the Ollama model management modal.
+
+| Feature | Description |
+|---------|-------------|
+| **Pull** | Download a model from the Ollama model registry (up to 3 concurrent) |
+| **Update All** | Update all Ollama models to latest versions |
+| **Upload** | Upload a GGUF file or download from URL to create a model |
+| **Delete** | Delete an Ollama model |
+
+<Note>
+  When multiple Ollama instances are connected, you must first pick the instance to manage.
+</Note>
+
+---
+
+## Model Preset Import / Export
+
+Back up and restore model settings as JSON. This feature is **admin-only**.
+
+| Feature | Description |
+|---------|-------------|
+| **Import Presets** | Restore model presets from a JSON file |
+| **Export Presets** | Download current model presets as a JSON file |
+| **Single Export** | More menu (⋯) on a model row > Export |
+
+<Warning>
+  Import overwrites existing model settings. Always Export to back up first.
+</Warning>
+
+<AccordionGroup>
+  <Accordion title="Which models are imported?" icon="circle-question">
+    Only models with null `base_model_id` (Workspace custom settings) are imported. Agents (which reference another model via `base_model_id`) aren't imported in this tab — import them separately under Workspace > Agents.
+  </Accordion>
+
+  <Accordion title="How do I reset all model settings?" icon="circle-question">
+    Click **Reset All Models** at the bottom of the settings modal (gear) to delete all Workspace custom settings. Connected base model lists are preserved, but customizations like name/description/prompt are all reset.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Related Pages
+
+<Columns cols={3}>
+  <Card title="Connections" icon="plug" href="/en/admin/settings/connections">
+    Configure LLM provider API connections
+  </Card>
+  <Card title="Agents" icon="robot" href="/en/workspace/agents">
+    AI assistants combining Knowledge Bases, tools, and guardrails on top of a model
+  </Card>
+  <Card title="Usage" icon="chart-line" href="/en/monitoring/usage">
+    Per-model token usage and cost analysis
+  </Card>
+</Columns>

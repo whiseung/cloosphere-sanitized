@@ -1,0 +1,130 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "subscriptionId": {
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    "regionCode": {
+      "value": "krc"
+    },
+    "location": {
+      "value": "koreacentral"
+    },
+    "projectName": {
+      "value": "ai"
+    },
+    "environment": {
+      "value": "dev"
+    },
+    "companyPrefix": {
+      "value": "mycompany"
+    },
+    "postgresAdminPassword": {
+      "value": ""
+    },
+    "vnetAddressSpace": {
+      "value": "10.100.0.0/16"
+    },
+    "subnetCidrs": {
+      "value": {
+        "vm": "10.100.0.0/27",
+        "ap": "10.100.1.0/26",
+        "pe": "10.100.3.0/27",
+        "pgsql": "10.100.4.0/27",
+        "etc": "10.100.5.0/27"
+      }
+    },
+    "vmPrivateIps": {
+      "value": {
+        "vm01": "10.100.0.4",
+        "vm02": "10.100.0.5"
+      }
+    },
+    "allowedIps": {
+      "value": []
+    },
+    "postgresAdminLogin": {
+      "value": "pgsqldbadmin"
+    },
+    "vmAdminUsername": {
+      "value": "azureuser"
+    },
+    "vmSshPublicKey": {
+      "value": ""
+    },
+    "vmAdminPassword": {
+      "value": ""
+    },
+    "deployVMs": {
+      "value": true
+    },
+    "deployRedis": {
+      "value": true
+    },
+    "deploySearch": {
+      "value": true
+    },
+    "deployDocIntelligence": {
+      "value": true
+    },
+    "deployOpenAI": {
+      "value": true
+    },
+    "deployVnetPeering": {
+      "value": false
+    },
+    "openAIModels": {
+      "value": [
+        {
+          "name": "gpt-4o",
+          "modelName": "gpt-4o",
+          "version": "2024-11-20",
+          "skuName": "GlobalStandard",
+          "capacity": 150
+        },
+        {
+          "name": "gpt-4o-mini",
+          "modelName": "gpt-4o-mini",
+          "version": "2024-07-18",
+          "skuName": "GlobalStandard",
+          "capacity": 300
+        },
+        {
+          "name": "text-embedding-3-large",
+          "modelName": "text-embedding-3-large",
+          "version": "1",
+          "skuName": "Standard",
+          "capacity": 350
+        }
+      ]
+    },
+    "owuiAppServicePlanSku": {
+      "value": {
+        "name": "P0v3",
+        "tier": "Premium0V3",
+        "capacity": 1
+      }
+    },
+    "redisSku": {
+      "value": {
+        "name": "Standard",
+        "family": "C",
+        "capacity": 2
+      }
+    },
+    "postgresSku": {
+      "value": {
+        "name": "Standard_D2ds_v5",
+        "tier": "GeneralPurpose",
+        "storageSizeGB": 128
+      }
+    },
+    "searchSku": {
+      "value": "standard"
+    },
+    "acrSku": {
+      "value": "Premium"
+    }
+  }
+}

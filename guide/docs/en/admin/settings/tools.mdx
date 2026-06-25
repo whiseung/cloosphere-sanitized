@@ -1,0 +1,82 @@
+---
+title: "Tool Servers"
+description: "Manage external tool server connections."
+---
+
+Connect tool servers so agents can call external services (CRM, ticket systems, weather APIs, etc.). Supports two protocols: **OpenAPI** and **MCP (Model Context Protocol)**.
+
+Configure in **Admin > Settings > Tools**.
+
+---
+
+## OpenAPI vs MCP
+
+| | OpenAPI | MCP |
+|---|---|---|
+| **Protocol** | REST API (HTTP) | Model Context Protocol (JSON-RPC) |
+| **Spec file** | `openapi.json` / `openapi.yaml` | Auto-discovery |
+| **Auth** | Bearer Token / Session | Bearer Token / API Key / None |
+| **Best for** | Integrating existing REST APIs | AI-dedicated tool servers |
+| **Path examples** | `openapi.json`, `spec/tools.yaml` | `/sse` (SSE), `/` (Streamable HTTP) |
+
+---
+
+## Adding a Tool Server
+
+<Steps>
+  <Step title="Add server">
+    Click the **+** button to add a new tool server.
+  </Step>
+  <Step title="Enter connection info">
+    | Setting | Default | Description |
+    |---------|:-------:|-------------|
+    | **URL** | — | Tool server address (e.g., `https://my-tool-server.com`) |
+    | **Path** | `openapi.json` | OpenAPI spec file path or MCP endpoint. Final request URL = `{URL}/{Path}` |
+    | **Auth Type** | Bearer | `Bearer`: fixed API Key, `Session`: auto-forward current user's session token |
+    | **API Key** | — | Bearer Token value (when using Bearer auth) |
+    | **Access control** | Public | Restrict tool server exposure to specific groups/users |
+  </Step>
+  <Step title="Verify connection">
+    Click **Verify Connection** to validate that the spec file can be fetched correctly.
+  </Step>
+</Steps>
+
+<Tip>
+  Using **Session auth** automatically applies per-user permissions. Suitable for internal APIs where each user accesses different data.
+</Tip>
+
+---
+
+## Admin Global vs Personal User
+
+| Scope | Configuration | Applies To | Protocol |
+|-------|---------------|-----------|----------|
+| **Global (admin)** | Admin > Settings > Tools | System-wide (can be restricted by access control) | OpenAPI + MCP |
+| **Personal (user)** | Personal Settings > Tools | That user only | OpenAPI only |
+
+<Note>
+  Personal tool servers can be disabled by admin. To use personal tool servers, the API server must have correctly configured **CORS**.
+</Note>
+
+---
+
+## Using Tools in Agents
+
+Globally registered tool servers can be selected in the "Tool Connections" section of the **Workspace > Agents** edit screen. When tools are connected to an agent, the AI **auto-picks and calls** the appropriate tool based on the question.
+
+<Warning>
+  Tool servers let agents call external APIs. **Only register trusted servers**.
+</Warning>
+
+---
+
+## Related Pages
+
+<Columns cols={2}>
+  <Card title="Agent Tool Connections" icon="robot" href="/en/workspace/tools">
+    Create OpenAPI/MCP tools in the workspace and connect to agents
+  </Card>
+  <Card title="Pipelines" icon="diagram-project" href="/en/admin/settings/pipelines">
+    Plugin system for injecting custom logic into LLM requests/responses
+  </Card>
+</Columns>

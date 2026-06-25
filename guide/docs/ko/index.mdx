@@ -1,0 +1,136 @@
+---
+title: Cloosphere User Guide
+description: Cloosphere 사용자 가이드 - 엔터프라이즈 AI 채팅 플랫폼
+mode: custom
+---
+
+<div className="landing-hero">
+  <h1>Cloosphere User Guide</h1>
+  <p>엔터프라이즈 AI 채팅 플랫폼 — 에이전트, 지식기반, 워크플로우를 하나의 플랫폼에서 통합 관리하세요.</p>
+</div>
+
+<div className="landing-cta">
+  <Columns cols={3}>
+    <Card title="빠른 시작 가이드" icon="rocket" href="/ko/getting-started/overview">
+      로그인부터 첫 대화까지 빠르게 시작
+    </Card>
+    <Card title="워크스페이스 구성" icon="briefcase" href="/ko/workspace/overview">
+      에이전트, 지식기반, 데이터베이스 설정
+    </Card>
+    <Card title="관리자 설정" icon="gear" href="/ko/admin/overview">
+      사용자, 모델 연결, 시스템 설정
+    </Card>
+  </Columns>
+</div>
+
+<div className="landing-divider"><hr /></div>
+
+<div className="landing-section">
+  <h2>주요 기능</h2>
+  <p>Cloosphere의 핵심 기능을 영역별로 살펴보세요. 각 탭을 클릭하면 해당 영역의 상세 기능을 확인할 수 있습니다.</p>
+
+  <Tabs>
+    <Tab title="채팅">
+      AI 모델과 대화하고, 파일을 첨부하고, 웹검색 결과를 활용하세요.
+
+      <Columns cols={3}>
+        <Card title="대화" icon="comment" href="/ko/chat/conversations">
+          새 대화 시작, 히스토리 검색, 폴더 관리
+        </Card>
+        <Card title="모델 선택" icon="microchip" href="/ko/chat/models">
+          Azure OpenAI, Ollama 등 멀티 모델 연동
+        </Card>
+        <Card title="고급 기능" icon="wand-magic-sparkles" href="/ko/chat/capabilities">
+          웹검색, 이미지 생성, 코드 인터프리터
+        </Card>
+        <Card title="파일 & RAG" icon="file-lines" href="/ko/chat/files-and-rag">
+          파일 첨부 및 문서 기반 답변
+        </Card>
+        <Card title="대화 공유" icon="share-nodes" href="/ko/chat/sharing">
+          팀원과 대화 내용 공유 및 협업
+        </Card>
+        <Card title="Playground" icon="flask" href="/ko/chat/playground">
+          LLM 테스트, 모델 비교 실험
+        </Card>
+      </Columns>
+    </Tab>
+
+    <Tab title="워크스페이스">
+      에이전트, 지식기반, 데이터베이스 등 AI 업무 환경을 구성하세요.
+
+      <Columns cols={4}>
+        <Card title="에이전트" icon="robot" href="/ko/workspace/agents">
+          지식기반 + 도구 + 가드레일 결합한 맞춤형 AI
+        </Card>
+        <Card title="지식기반" icon="book" href="/ko/workspace/knowledge">
+          문서 업로드, 벡터 검색, 근거 기반 답변
+        </Card>
+        <Card title="데이터베이스" icon="database" href="/ko/workspace/database">
+          자연어로 데이터베이스 질의 (NL-to-SQL)
+        </Card>
+        <Card title="에이전트 플로우" icon="diagram-project" href="/ko/workspace/flows">
+          멀티 에이전트 워크플로우 시각적 빌더
+        </Card>
+        <Card title="가드레일" icon="shield-halved" href="/ko/workspace/guardrails">
+          PII 감지, 콘텐츠 필터링, 입출력 검증
+        </Card>
+        <Card title="도구" icon="wrench" href="/ko/workspace/tools">
+          OpenAPI / MCP 서버 연결
+        </Card>
+        <Card title="프롬프트" icon="message" href="/ko/workspace/prompts">
+          `/` 명령어로 빠르게 호출하는 템플릿
+        </Card>
+        <Card title="용어집" icon="spell-check" href="/ko/workspace/glossary">
+          도메인 전문 용어 관리로 답변 정확도 향상
+        </Card>
+      </Columns>
+    </Tab>
+
+    <Tab title="협업 & 자동화">
+      팀과 함께 AI를 활용하고, 반복 작업을 자동화하세요.
+
+      <Columns cols={4}>
+        <Card title="프로젝트" icon="folder-open" href="/ko/collaboration/projects">
+          팀 단위로 채팅과 리소스를 묶어 관리
+        </Card>
+        <Card title="채널" icon="hashtag" href="/ko/collaboration/channels">
+          팀 메시징, 스레드, AI 멘션
+        </Card>
+        <Card title="공유 및 권한" icon="lock" href="/ko/collaboration/sharing-permissions">
+          그룹/조직 기반 접근 제어
+        </Card>
+        <Card title="스케줄" icon="clock" href="/ko/automation/schedules">
+          CRON 기반 에이전트 자동 실행
+        </Card>
+      </Columns>
+    </Tab>
+  </Tabs>
+</div>
+
+<div className="landing-divider"><hr /></div>
+
+<div className="landing-section">
+  <h2>관리 & 모니터링</h2>
+  <p>시스템 설정, 사용자 관리, AI 운영 현황을 한눈에 파악하세요.</p>
+
+  <Columns cols={3}>
+    <Card title="사용자 관리" icon="users" href="/ko/admin/users">
+      사용자 등록, 역할 할당, 권한 관리
+    </Card>
+    <Card title="시스템 설정" icon="sliders" href="/ko/admin/settings/general">
+      모델 연결, 문서 처리, 인터페이스 등 14개 설정
+    </Card>
+    <Card title="브랜딩" icon="palette" href="/ko/admin/settings/branding">
+      로고, 색상, 환영 메시지 커스터마이징
+    </Card>
+    <Card title="사용량" icon="chart-pie" href="/ko/monitoring/usage">
+      토큰 소비, 비용, 사용자별 현황
+    </Card>
+    <Card title="감사 로그" icon="clipboard-list" href="/ko/monitoring/audit-logs">
+      시스템 활동 기록 및 감사 추적
+    </Card>
+    <Card title="트레이싱" icon="route" href="/ko/monitoring/tracing">
+      LLM 호출 체인 추적 및 성능 분석
+    </Card>
+  </Columns>
+</div>

@@ -1,0 +1,283 @@
+---
+title: "BI Dashboard"
+description: "AI-based panel dashboard — auto-generate SQL charts from natural language, share, and export"
+---
+
+Tired of writing SQL, drawing charts in Excel, and pasting into slides every time you make a data analysis report?
+
+The BI Dashboard auto-generates SQL charts from **a single natural language line**. Add and edit panels by chatting with the AI assistant, then share the completed dashboard with your team or export to HTML.
+
+| Method | Process | Time |
+|--------|---------|:----:|
+| Manual | Write SQL → execute → Excel chart → slide | 30 min ~ hours |
+| BI Dashboard | Natural language input → AI auto-generates chart | **30 sec** |
+
+{/* SCREENSHOT: BI dashboard main screen
+<Frame caption="BI Dashboard">
+  <img src="/images/monitoring/dashboard-main.png" alt="BI dashboard main screen" />
+</Frame>
+*/}
+
+## Access Path
+
+Access via **Admin > Monitoring > Dashboard**.
+
+| Permission | Dashboard List | Create/Edit/Delete | Shared Dashboards |
+|------------|:--:|:--:|:--:|
+| Admin (monitoring write) | All | ✓ | ✓ |
+| Admin (monitoring read) | All | ✗ | ✓ |
+| Regular user | Owned + public/shared only | ✗ | ✓ |
+
+---
+
+## Creating Dashboards
+
+<Steps>
+  <Step title="Create dashboard">
+    Click **Create Dashboard** in the dashboard list.
+
+    | Field | Required | Description |
+    |-------|:--------:|-------------|
+    | **Name** | ✓ | Dashboard name (must be unique system-wide) |
+    | **Description** | ✗ | Dashboard purpose |
+
+    <Tip>
+      DB connection isn't configured at this stage. Different DBs can be used per panel, so DB is selected when adding panels.
+    </Tip>
+  </Step>
+  <Step title="Add panels">
+    From the created dashboard, add panels via **Add Panel** or **AI Assistant**. See [Panel Composition](#panel-composition) and [AI Assistant](#ai-assistant) below.
+  </Step>
+  <Step title="Adjust layout">
+    In **Edit** mode, drag panels to move them and use the bottom-right handle to resize. Layout is on a 12-column grid.
+  </Step>
+</Steps>
+
+---
+
+## Panel Composition
+
+A dashboard consists of individual **panels**. Each panel has its own DB connection and SQL.
+
+### Panel Types
+
+<Tabs>
+  <Tab title="Chart">
+    Visualize SQL execution results as various charts. Enter a **natural language question** in the panel editor and AI auto-generates SQL.
+
+    **Supported chart types:**
+
+    | Chart | Description | Use Case |
+    |-------|-------------|----------|
+    | **Table** | Display data in table form | Detailed data viewing |
+    | **Bar** | Per-item comparison | Per-model usage count |
+    | **Grouped Bar** | Compare multiple grouped series | Per-model · per-period cost comparison |
+    | **Line** | Trend over time | Daily token usage trend |
+    | **Area** | Trend + area emphasis | Cumulative usage change |
+    | **Pie** | Ratio distribution | Per-agent usage share |
+    | **Scatter** | Correlation between two variables | Response time vs. token count |
+    | **Histogram** | Numeric distribution | Response time distribution |
+    | **Heatmap** | 2D matrix value distribution | Per-time-of-day · per-day-of-week usage |
+
+    Click the chart-type icon at the top of the panel in edit mode for instant switching.
+  </Tab>
+  <Tab title="Card">
+    A summary card showing key KPI values at a glance.
+
+    | Source | Description |
+    |--------|-------------|
+    | **DB Query** | Real-time value lookup via natural language → SQL |
+    | **Manual Input** | Direct fixed value entry (e.g., "1,234" or "Active") |
+
+    Specify a background color for visual distinction.
+  </Tab>
+</Tabs>
+
+### Panel Editor
+
+Click **Add Panel** or the edit icon on an existing panel to open the panel edit modal.
+
+| Field | Description |
+|-------|-------------|
+| **Panel name** | Panel title (required) |
+| **Database** | Pick the DbSphere to connect |
+| **Model** | AI model used for SQL generation |
+| **Natural language query** | Describe the data you want in natural language |
+| **Generate SQL** | AI auto-generates SQL + shows explanation |
+| **SQL editing** | Edit the generated SQL directly |
+| **Execute** | Run SQL and show chart preview |
+| **Period filter** | Specify date column to integrate with the dashboard period filter |
+
+<Info>
+  The generated SQL can be edited freely. When the AI-generated SQL isn't accurate, edit directly and click Execute.
+</Info>
+
+---
+
+## AI Assistant
+
+Click the **purple AI Assistant button at the bottom-right** of the dashboard to open the chat panel.
+
+### Conversational Dashboard Builder
+
+Add, edit, and delete panels by chatting in natural language.
+
+<Steps>
+  <Step title="Open AI Assistant">
+    Click the bottom-right purple button. Pick **DB** and **model** at the top.
+  </Step>
+  <Step title="Request in natural language">
+    Examples:
+    - "Make a chart of this month's per-model token usage"
+    - "Add a per-user cost card too"
+    - "Change the period to 30 days"
+    - "Change the pie chart to a bar chart"
+  </Step>
+  <Step title="Review AI results">
+    The AI generates SQL and auto-places panels. Positions are auto-adjusted to avoid overlap.
+  </Step>
+  <Step title="Iterate">
+    Continue panel edits/deletes/relayouts via additional conversation. Conversation history is saved on the dashboard.
+  </Step>
+</Steps>
+
+<Tip>
+  The AI sometimes presents button-form choices. Click for quick responses.
+</Tip>
+
+### One-shot Generation
+
+Starting fresh with an empty dashboard, describe the dashboard's **purpose** to the AI to generate a suitable panel set at once. DB connection is auto-tested first, generating only when valid.
+
+---
+
+## Filtering
+
+The dashboard top has **period filter** and **custom filters**.
+
+### Period Filter (TimeRangePicker)
+
+| Preset | Description |
+|--------|-------------|
+| Today / Yesterday | Today / Yesterday |
+| This Week / Last Week | This week / Last week |
+| This Month / Last Month | This month / Last month |
+| 7d / 30d | Last 7 / 30 days |
+| All | Entire period |
+| Custom | Specify start/end dates directly |
+
+Default is **Yesterday**. Changing the period auto-re-executes SQL on all panels with `period filter` enabled.
+
+### Custom Filters (FilterBar)
+
+In edit mode, use the **Add Filter** button to add filters that apply to the entire dashboard.
+
+| Filter Type | Description |
+|-------------|-------------|
+| **Text** | Free text input (e.g., username) |
+| **Date Range** | Start ~ end date range |
+| **Select** | Selection options |
+
+When adding a filter, specify the **display label** and **DB column name**. Active filters appear as blue badges at the top of each panel.
+
+---
+
+## Sharing
+
+Share completed dashboards with team members.
+
+<Steps>
+  <Step title="Click Share button">
+    Click the **Share** button at the top of the dashboard.
+  </Step>
+  <Step title="Set access scope">
+    | Access Scope | Description |
+    |--------------|-------------|
+    | **Public** | All signed-in users can access |
+    | **Restricted** | Only specified groups or organizational units can access |
+    | **Private** | Only owner and Admin can access |
+  </Step>
+  <Step title="Generate and copy link">
+    Click **Create & Copy Link** to generate a share link copied to the clipboard.
+
+    Share URL format: `https://{domain}/dashboard/{share_id}`
+  </Step>
+</Steps>
+
+Shared dashboards operate as **view-only** — period filter and custom filters can query data, but panel edit/add/delete and AI Assistant are disabled.
+
+<Warning>
+  Sign-in is **required** to access share links. Non-signed-in users go to the sign-in page and auto-return to the dashboard.
+</Warning>
+
+---
+
+## HTML Export
+
+Export dashboards as **standalone HTML files**.
+
+Click the **Export** button at the top of the dashboard to execute SQL with the currently applied period and filter conditions, downloading the HTML file with the latest data.
+
+**Exported file characteristics:**
+
+| Item | Description |
+|------|-------------|
+| **Format** | Single HTML file (no external dependencies) |
+| **Chart interaction** | Hover, zoom, and other Plotly default features supported |
+| **Theme** | Light/dark mode auto-supported (follows system setting) |
+| **Layout** | Same 12-column grid as the dashboard |
+| **Responsive** | Charts auto-adjust on window resize |
+
+<Tip>
+  Exported HTML files can be email-attached, uploaded to internal share drives, or integrated with scheduled tasks for **regular reports**. See [Schedules](/en/automation/schedules) for details.
+</Tip>
+
+---
+
+## Security
+
+| Item | Policy |
+|------|--------|
+| **SQL execution** | Only `SELECT` queries allowed. INSERT/UPDATE/DELETE/DROP and other modification queries are blocked |
+| **Filter input** | Special character escaping to prevent SQL Injection |
+| **Share access** | Access control (Public/Restricted/Private)-based verification |
+| **DB connection** | Only read-only connections registered in DbSphere |
+
+---
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Executive KPI Monitoring">
+    1. AI auto-generation via "Make a key KPI dashboard for this month"
+    2. Card panels show key values (total revenue, active user count, etc.)
+    3. Line charts show daily trends
+    4. Share as Public for team-wide access
+  </Accordion>
+  <Accordion title="Periodic Report Automation">
+    1. Compose monthly report panels in the dashboard
+    2. Integrate HTML export with scheduled tasks
+    3. Auto-generate HTML reports and email every Monday morning
+  </Accordion>
+  <Accordion title="Model Usage Analysis">
+    1. Generate charts via "Compare per-model token usage and cost"
+    2. Grouped Bar for per-model · per-period comparison
+    3. Analyze across last 7 days/30 days/all via period filter
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Related Pages
+
+<Columns>
+  <Card title="Database (DbSphere)" icon="database" href="/en/workspace/database">
+    Configure databases that BI Dashboard connects to
+  </Card>
+  <Card title="Schedules" icon="clock" href="/en/automation/schedules">
+    Scheduler for automating dashboard exports
+  </Card>
+  <Card title="Usage" icon="chart-line" href="/en/monitoring/usage">
+    Token usage and cost statistics dashboard
+  </Card>
+</Columns>

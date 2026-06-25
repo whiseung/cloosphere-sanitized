@@ -1,0 +1,331 @@
+import { APP_NAME } from '$lib/constants';
+import { type Writable, writable } from 'svelte/store';
+import type { ModelConfig } from '$lib/apis';
+import type { Banner } from '$lib/types';
+import type { Socket } from 'socket.io-client';
+
+import emojiShortCodes from '$lib/emoji-shortcodes.json';
+
+// Backend
+export const WEBUI_NAME = writable(APP_NAME);
+export const config: Writable<Config | undefined> = writable(undefined);
+export const user: Writable<SessionUser | undefined> = writable(undefined);
+export const userPermissions: Writable<UserPermissions | null> = writable(null);
+
+// User permissions type
+export type PermissionLevel = 'none' | 'access' | 'read' | 'write';
+
+export type AdminPermissions = {
+	users: PermissionLevel;
+	evaluations: PermissionLevel;
+	settings: PermissionLevel;
+	monitoring: PermissionLevel;
+};
+
+export type UserPermissions = {
+	admin?: AdminPermissions;
+	workspace?: {
+		agents: PermissionLevel;
+		knowledge: PermissionLevel;
+		prompts: PermissionLevel;
+		tools: PermissionLevel;
+		databases: PermissionLevel;
+		glossaries: PermissionLevel;
+		knowledge_graphs: PermissionLevel;
+		guardrails: PermissionLevel;
+		agent_flows: PermissionLevel;
+		marketplace?: PermissionLevel;
+	};
+	sharing?: {
+		public_agents: boolean;
+		public_knowledge: boolean;
+		public_prompts: boolean;
+		public_tools: boolean;
+		public_databases: boolean;
+		public_glossaries: boolean;
+		public_guardrails?: boolean;
+	};
+	chat?: {
+		controls: boolean;
+		file_upload: boolean;
+		delete: boolean;
+		edit: boolean;
+		stt: boolean;
+		tts: boolean;
+		call: boolean;
+		multiple_models: boolean;
+		temporary: boolean;
+		temporary_enforced: boolean;
+	};
+	features?: {
+		direct_tool_servers: boolean;
+		web_search: boolean;
+		image_generation: boolean;
+		code_interpreter: boolean;
+		scheduled_tasks: boolean;
+	};
+};
+
+// Electron App
+export const isApp = writable(false);
+export const appInfo = writable(null);
+export const appData = writable(null);
+
+// Frontend
+export const MODEL_DOWNLOAD_POOL = writable({});
+
+export const mobile = writable(false);
+
+export const socket: Writable<null | Socket> = writable(null);
+export const activeUserIds: Writable<null | string[]> = writable(null);
+export const USAGE_POOL: Writable<null | string[]> = writable(null);
+
+
+export const theme = writable('system');
+
+export const shortCodesToEmojis = writable(
+	Object.entries(emojiShortCodes).reduce((acc, [key, value]) => {
+		if (typeof value === 'string') {
+			acc[value] = key;
+		} else {
+			for (const v of value) {
+				acc[v] = key;
+			}
+		}
+
+		return acc;
+	}, {})
+);
+
+export const TTSWorker = writable(null);
+
+export const chatId = writable('');
+export const chatTitle = writable('');
+
+export const channels = writable([]);
+export const chats = writable(null);
+export const pinnedChats = writable([]);
+export const tags = writable([]);
+
+export const models: Writable<Model[]> = writable([]);
+
+export const prompts: Writable<null | Prompt[]> = writable(null);
+export const knowledge: Writable<null | Document[]> = writable(null);
+export const guardrails: Writable<null | any[]> = writable(null);
+export const tools = writable(null);
+export const functions = writable(null);
+
+export const workspaceTags: Writable<any[]> = writable([]);
+export const activeWorkspaceFilter: Writable<string> = writable('mine'); // 'all' | 'mine' | 'tag:xxx'
+export const failedFileIds: Writable<string[]> = writable([]);
+
+// 참고: KB 배치 업로드의 개별 토스트 억제는 더 이상 클라이언트 측 suppress set 으로
+// 처리하지 않는다. 백엔드 file-processing 알림에 echo 되는 batch_id 로 모든 세션이
+// 결정론적으로 토스트를 억제하고, 진행상황은 알림센터(벨) 엔트리에서만 노출한다.
+
+export const toolServers = writable([]);
+
+export const banners: Writable<Banner[]> = writable([]);
+
+export const projectsLastUpdated = writable(0);
+
+export const settings: Writable<Settings> = writable({});
+
+export const showSidebar = writable(false);
+export const showSettings = writable(false);
+export const showArchivedChats = writable(false);
+export const showChangelog = writable(false);
+
+export const showControls = writable(false);
+export const showOverview = writable(false);
+export const showArtifacts = writable(false);
+export const showCallOverlay = writable(false);
+
+export const temporaryChatEnabled = writable(false);
+export const scrollPaginationEnabled = writable(false);
+export const currentChatPage = writable(1);
+
+export const isLastActiveTab = writable(true);
+export const playingNotificationSound = writable(false);
+
+export type Model = OpenAIModel | OllamaModel | FlowModel;
+
+type BaseModel = {
+	id: string;
+	name: string;
+	info?: ModelConfig;
+	owned_by: 'ollama' | 'openai' | 'arena' | 'flow' | 'agent_flow';
+};
+
+export interface OpenAIModel extends BaseModel {
+	owned_by: 'openai';
+	external: boolean;
+	source?: string;
+}
+
+export interface OllamaModel extends BaseModel {
+	owned_by: 'ollama';
+	details: OllamaModelDetails;
+	size: number;
+	description: string;
+	model: string;
+	modified_at: string;
+	digest: string;
+	ollama?: {
+		name?: string;
+		model?: string;
+		modified_at: string;
+		size?: number;
+		digest?: string;
+		details?: {
+			parent_model?: string;
+			format?: string;
+			family?: string;
+			families?: string[];
+			parameter_size?: string;
+			quantization_level?: string;
+		};
+		urls?: number[];
+	};
+}
+
+export interface FlowModel extends BaseModel {
+	owned_by: 'flow' | 'agent_flow';
+	flow_id: string;
+	flow_data?: any;
+}
+
+type OllamaModelDetails = {
+	parent_model: string;
+	format: string;
+	family: string;
+	families: string[] | null;
+	parameter_size: string;
+	quantization_level: string;
+};
+
+type Settings = {
+	models?: string[];
+	conversationMode?: boolean;
+	speechAutoSend?: boolean;
+	responseAutoPlayback?: boolean;
+	audio?: AudioSettings;
+	showUsername?: boolean;
+	notificationEnabled?: boolean;
+	title?: TitleSettings;
+	splitLargeDeltas?: boolean;
+	chatDirection: 'LTR' | 'RTL' | 'auto';
+	ctrlEnterToSend?: boolean;
+
+	system?: string;
+	requestFormat?: string;
+	keepAlive?: string;
+	seed?: number;
+	temperature?: string;
+	repeat_penalty?: string;
+	top_k?: string;
+	top_p?: string;
+	num_ctx?: string;
+	num_batch?: string;
+	num_keep?: string;
+	options?: ModelOptions;
+};
+
+type ModelOptions = {
+	stop?: boolean;
+};
+
+type AudioSettings = {
+	STTEngine?: string;
+	TTSEngine?: string;
+	speaker?: string;
+	model?: string;
+	nonLocalVoices?: boolean;
+};
+
+type TitleSettings = {
+	auto?: boolean;
+	model?: string;
+	modelExternal?: string;
+	prompt?: string;
+};
+
+type Prompt = {
+	command: string;
+	user_id: string;
+	title: string;
+	content: string;
+	timestamp: number;
+};
+
+type Document = {
+	collection_name: string;
+	filename: string;
+	name: string;
+	title: string;
+};
+
+type Config = {
+	status: boolean;
+	name: string;
+	version: string;
+	default_locale: string;
+	default_models: string;
+	default_prompt_suggestions: PromptSuggestion[];
+	features: {
+		auth: boolean;
+		auth_trusted_header: boolean;
+		enable_api_key: boolean;
+		enable_signup: boolean;
+		enable_login_form: boolean;
+		enable_web_search?: boolean;
+		enable_google_drive_integration: boolean;
+		enable_onedrive_integration: boolean;
+		enable_sharepoint_integration: boolean;
+		enable_image_generation: boolean;
+		enable_gmail?: boolean;
+		enable_calendar?: boolean;
+		enable_drive?: boolean;
+		enable_admin_export: boolean;
+		enable_admin_chat_access: boolean;
+		enable_community_sharing: boolean;
+		enable_autocomplete_generation: boolean;
+		enable_follow_up_generation?: boolean;
+		developer_mode?: boolean;
+	};
+	branding?: {
+		favicon_url: string;
+		favicon_dark_url: string;
+		logo_url: string;
+		splash_url: string;
+		splash_dark_url: string;
+	};
+	oauth: {
+		providers: {
+			[key: string]: string;
+		};
+	};
+	storage?: {
+		image_upload_mode: string;
+		provider: string;
+	};
+	license?: {
+		has_license: boolean;
+		tier: string | null;
+		permissions: Record<string, boolean>;
+		enforcement_enabled: boolean;
+	};
+};
+
+type PromptSuggestion = {
+	content: string;
+	title: [string, string];
+};
+
+type SessionUser = {
+	id: string;
+	email: string;
+	name: string;
+	role: string;
+	profile_image_url: string;
+};

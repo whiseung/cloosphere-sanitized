@@ -1,0 +1,81 @@
+---
+title: "Code Execution"
+description: "Configure code execution environment and code interpreter in chat."
+---
+
+In **Admin > Settings > Code Execution**, configure the runtime for AI-generated code. You can configure two features separately: Code Execution and Code Interpreter.
+
+{/* SCREENSHOT: settings-code-execution */}
+<Frame caption="Configure Code Execution (user-manual) and Code Interpreter (AI-auto) separately">
+  <img src="/images/admin/settings-code-execution.png" alt="Code Execution settings tab" />
+</Frame>
+
+### Code Execution vs Code Interpreter
+
+| | Code Execution | Code Interpreter |
+|---|---|---|
+| **Behavior** | User **manually runs** AI-generated code blocks | AI **auto-generates and runs** code |
+| **Trigger** | Click the "Run" button on a code block | When the AI decides data analysis is needed |
+| **Activation** | This setting alone | This setting + agent capability + user chat toggle — **all 3 required** |
+
+---
+
+## Code Execution
+
+A feature that lets users directly run AI-generated code blocks in chat.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Code Execution enabled** | Code execution feature ON/OFF | Enabled |
+| **Execution engine** | Code execution environment | `pyodide` |
+
+### Execution Engines
+
+<Tabs>
+  <Tab title="Pyodide">
+    Run Python inside the browser. WebAssembly-based — doesn't affect the server.
+
+    | Pro | Con |
+    |-----|-----|
+    | No separate server needed | Some native packages unsupported |
+    | No security risk | Large-data processing limits |
+    | Ready to use immediately | No filesystem access |
+  </Tab>
+  <Tab title="Jupyter">
+    Run code on a Jupyter server. All packages in the server environment are available.
+
+    | Setting | Description |
+    |---------|-------------|
+    | **Server URL** | Jupyter server address |
+    | **Auth method** | None, Token, or Password |
+    | **Auth token/password** | Authentication info |
+    | **Timeout** | Execution time limit (seconds) |
+
+    <Warning>
+      Jupyter execution runs arbitrary code on the server, posing serious security risks. Use only in trusted environments.
+    </Warning>
+  </Tab>
+</Tabs>
+
+---
+
+## Code Interpreter
+
+A feature where the agent auto-generates and runs code for data analysis, chart generation, etc.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Code Interpreter enabled** | Code Interpreter feature ON/OFF | Enabled |
+| **Execution engine** | Code Interpreter runtime | `pyodide` |
+| **Prompt template** | System prompt used when generating code (optional) | - |
+
+The Code Interpreter also supports Pyodide and Jupyter engines, with Jupyter server settings independent from Code Execution.
+
+<Warning>
+  For Code Interpreter to work, **all 3 conditions** must be met:
+  1. Code Interpreter **enabled** in this tab
+  2. Code Interpreter capability set to **Default On** or **Default Off** in agent settings
+  3. User **manually toggles** Code Interpreter in chat (when Default Off)
+
+  Missing any one disables Code Interpreter.
+</Warning>

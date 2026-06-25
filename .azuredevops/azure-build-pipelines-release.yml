@@ -1,0 +1,54 @@
+# Docker - Release Pipeline
+# v* 태그 push 시 트리거: 버전 태그 + stable 태그로 ACR에 배포
+# 고객사는 'stable' 태그를 pull하여 항상 최신 릴리즈를 사용
+
+trigger:
+  branches:
+    exclude:
+    - '*'      # 브랜치 push는 무시
+  tags:
+    include:
+    - 'v*'     # v0.1.1 형태 태그에만 트리거
+
+resources:
+- repo: self
+
+variables:
+  dockerRegistryServiceConnection: '6bd42f51-f166-47cf-b137-99640333263c'
+  imageRepository: 'cloosphere'
+  containerRegistry: 'acrcloosphere.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  # refs/tags/v0.1.1 → 0.1.1
+  APP_VERSION: $[replace(variables['Build.SourceBranch'], 'refs/tags/v', '')]
+
+  vmImageName: 'ubuntu-latest'
+  DOCKER_BUILDKIT: 1
+
+stages:
+- stage: Build
+  displayName: Build and push release image
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - checkout: self
+      fetchDepth: 0
+
+    - script: |
+        echo "Release version: $(APP_VERSION)"
+        npm version "$(APP_VERSION)" --no-git-tag-version --allow-same-version
+      displayName: 'Set package.json version'
+
+    - task: Docker@2
+      displayName: Build and push release image
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(APP_VERSION)
+          stable
+        arguments: '--cache-from=$(containerRegistry)/$(imageRepository):latest --build-arg BUILDKIT_INLINE_CACHE=1'

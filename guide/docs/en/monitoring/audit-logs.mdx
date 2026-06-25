@@ -1,0 +1,172 @@
+---
+title: "Audit Log"
+description: "Security audit and compliance through user activity records — track authentication, resource changes, permission changes"
+---
+
+The Audit Log **chronologically records all major activities** in the system.
+Transparently track who, when, what, and how — meeting security audit and compliance requirements.
+
+Access via **Admin > Monitoring > Audit Logs**.
+
+<Frame caption="Audit Log main screen — filter area, log table">
+  <img src="/images/monitoring/audit-logs-main.png" alt="Audit Log main screen" />
+</Frame>
+
+<Note>
+  Audit Log is a licensed feature. Requires a license with `audit_log` feature enabled.
+</Note>
+
+---
+
+## Recorded Activities
+
+### Action Types
+
+| Action | Description |
+|--------|-------------|
+| **CREATE** | Resource creation |
+| **UPDATE** | Resource modification |
+| **DELETE** | Resource deletion |
+| **ACCESS_CONTROL_CHANGE** | Resource access permission change |
+| **PERMISSION_CHANGE** | Group feature permission change |
+| **MEMBER_ADD** | Group/organization member addition |
+| **MEMBER_REMOVE** | Group/organization member removal |
+| **ROLE_CHANGE** | User role change |
+| **SETTINGS_CHANGE** | System setting change |
+| **LOGIN** | Sign in |
+| **LOGOUT** | Sign out |
+| **LOGIN_FAILED** | Sign-in failure |
+| **API_KEY_CREATED** | API key issuance |
+| **API_KEY_DELETED** | API key revocation |
+| **GUEST_SESSION** | Embed widget guest session start |
+
+### Resource Types
+
+| Resource | Auto-tracked | Description |
+|----------|:------------:|-------------|
+| **model** | ✅ | AI model |
+| **knowledge** | ✅ | Knowledge Base |
+| **dbsphere** | ✅ | Database connection |
+| **glossary** | ✅ | Glossary |
+| **prompt** | ✅ | Prompt |
+| **tool** | ✅ | Tool |
+| **user** | ✅ | User |
+| **organization** | ✅ | Organization |
+| **organizational_unit** | ✅ | Organizational unit |
+| **group** | ✅ | Group |
+| **agent** | ⚠️ | Agent — only explicit logging calls are recorded (no auto-tracking) |
+| **chat** | ⚠️ | Chat — only explicit logging calls are recorded (no auto-tracking) |
+| **admin_settings** | ⚠️ | Admin settings change — explicit logging with `SETTINGS_CHANGE` action |
+| **auth** | ⚠️ | Auth events — LOGIN/LOGOUT/LOGIN_FAILED auto, others explicit |
+| **memory** | ⚠️ | Memory — only explicit logging calls are recorded |
+| **embed_widget** | ⚠️ | Embed widget guest session — auto with `GUEST_SESSION` action |
+
+<Note>
+  ✅ marked resources are **auto-recorded** in the audit log on DB changes.
+  ⚠️ marked resources are recorded **only at points where the backend explicitly calls logging** — some events are auto (LOGIN/LOGOUT/LOGIN_FAILED for auth, GUEST_SESSION for guest, SETTINGS_CHANGE for settings), but general CRUD on agent/chat/memory isn't auto-tracked.
+
+  READ is not logged separately (for performance).
+</Note>
+
+---
+
+## Log Entry Structure
+
+Each audit log entry includes:
+
+| Field | Description |
+|-------|-------------|
+| **Timestamp** | Event occurrence time |
+| **User** | Activity actor (name, email) |
+| **Action** | Performed action (CREATE, UPDATE, etc.) |
+| **Resource type** | Target resource type |
+| **Resource ID** | Target resource identifier |
+| **Resource name** | Target resource name |
+| **Before state** | Pre-change values (JSON) |
+| **After state** | Post-change values (JSON) |
+| **Changed fields** | List of changed fields |
+| **Permission change details** | Access permission change details (when applicable) |
+
+---
+
+## Viewing Logs
+
+### Filter Options
+
+| Filter | Description |
+|--------|-------------|
+| **Time range** | Start/end date range (Unix timestamp) |
+| **Resource type** | model, knowledge, user, etc. |
+| **Action** | CREATE, UPDATE, DELETE, LOGIN, etc. |
+| **User** | Specific user ID |
+| **Organization** | Specific organization ID |
+| **Resource ID** | Track changes to a specific resource |
+
+## Log Detail View
+
+Click a log entry to see details in a modal.
+
+<Frame caption="Audit Log detail modal — before/after diff, metadata">
+  <img src="/images/monitoring/audit-logs-detail.png" alt="Audit Log detail modal" />
+</Frame>
+
+**Information shown:**
+- Full request metadata
+- Before/after state comparison (JSON diff)
+- Highlighted changed fields
+- Detailed access control changes for permission changes
+
+---
+
+## Statistics
+
+Audit log statistics help understand overall activity patterns.
+
+<Frame caption="Audit log statistics — distribution by action and resource type">
+  <img src="/images/monitoring/audit-logs-scroll.png" alt="Audit log statistics" />
+</Frame>
+
+| Statistic | Description |
+|-----------|-------------|
+| **Action distribution** | Count by action (CREATE, UPDATE, DELETE, etc.) |
+| **Resource type distribution** | Count by resource (model, user, chat, etc.) |
+| **Total count** | Total audit log entries in the period |
+
+---
+
+## Use Cases
+
+<Accordion title="Security Incident Investigation">
+  1. In the **Audit Log** tab, set the time range around the incident
+  2. Filter by relevant user or resource type
+  3. Review activity history chronologically
+  4. Verify changes via detail view
+  5. Preserve detailed logs as evidence
+</Accordion>
+
+<Accordion title="Compliance Audit">
+  1. Periodically (monthly/quarterly) review audit log statistics
+  2. Review permission change logs to detect unauthorized access
+  3. Track setting change history to verify policy compliance
+  4. Compose audit reports based on audit logs
+</Accordion>
+
+<Accordion title="Anomaly Detection">
+  - Mass resource deletion outside business hours
+  - Repeated permission changes in short periods
+  - Abnormal sign-in failure patterns
+  - Admin permission escalation
+</Accordion>
+
+---
+
+## Best Practices
+
+<Warning>
+  The system auto-records audit logs. There's no feature to delete or modify audit logs themselves — this preserves the integrity of the records.
+</Warning>
+
+- **Periodic review**: Review audit logs at least monthly to detect anomaly patterns
+- **Long-term retention**: Per compliance requirements, retain for at least 1 year
+- **Backup**: Regularly back up audit log data to external storage
+- **Notification integration**: Configure alerts for important events (permission changes, mass deletions)

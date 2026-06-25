@@ -1,0 +1,52 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- main
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: '6bd42f51-f166-47cf-b137-99640333263c'
+  imageRepository: 'cloosphere'
+  containerRegistry: 'acrcloosphere.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+  DOCKER_BUILDKIT: 1
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - checkout: self
+      fetchDepth: 0  # 전체 이력 + 태그 가져오기
+
+    - script: |
+        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+        echo "Latest git tag: $LATEST_TAG"
+        npm version "$LATEST_TAG" --no-git-tag-version --allow-same-version
+        echo "##vso[task.setvariable variable=APP_VERSION]$LATEST_TAG"
+      displayName: 'Set package.json version from latest git tag'
+
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          latest
+        arguments: '--cache-from=$(containerRegistry)/$(imageRepository):latest --build-arg BUILDKIT_INLINE_CACHE=1'

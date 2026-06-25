@@ -1,0 +1,124 @@
+---
+title: "Audio"
+description: "Configure TTS (text-to-speech), STT (speech-to-text), and avatar engines."
+---
+
+In **Admin > Settings > Audio**, configure voice input/output engines.
+
+<Frame caption="Audio settings tab full screen">
+  <img src="/images/admin/settings-audio-full.png" alt="Audio settings tab full screen" />
+</Frame>
+
+---
+
+## TTS (Text-to-Speech)
+
+Configure the engine that converts AI responses to speech.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Engine** | TTS service selection | `Web API` |
+| **Model** | Per-engine TTS model | - |
+| **Voice** | Voice type | - |
+| **Response splitting** | TTS response split unit (sentence/paragraph) | `Punctuation` |
+
+<Tabs>
+  <Tab title="System (Web API)">
+    Uses the browser's built-in Web Speech API. Ready to use without separate configuration.
+  </Tab>
+  <Tab title="OpenAI">
+    | Setting | Description |
+    |---------|-------------|
+    | **API Base URL** | OpenAI API Endpoint |
+    | **API Key** | API authentication key |
+    | **Model** | e.g., `tts-1`, `tts-1-hd` |
+    | **Voice** | `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer` |
+  </Tab>
+  <Tab title="Azure Speech">
+    | Setting | Description |
+    |---------|-------------|
+    | **API Key** | Azure Speech Service key |
+    | **Region** | Azure region (e.g., `koreacentral`) |
+    | **Output Format** | Audio output format |
+  </Tab>
+  <Tab title="ElevenLabs">
+    | Setting | Description |
+    |---------|-------------|
+    | **API Key** | ElevenLabs API key |
+    | **Voice** | Voice selection |
+    | **Model** | ElevenLabs TTS model |
+  </Tab>
+  <Tab title="Google Cloud TTS">
+    | Setting | Description |
+    |---------|-------------|
+    | **Language Filter (Optional)** | Voice language filter (e.g., `ko-KR`) |
+    | **Service Account Key** | Global key or Custom JSON key |
+  </Tab>
+  <Tab title="Gemini TTS">
+    | Setting | Description |
+    |---------|-------------|
+    | **Location** | Region (default: `us-central1`) |
+    | **Service Account Key** | Global key or Custom JSON key |
+    | **TTS Voice** | Gemini TTS voice selection |
+    | **Model** | Gemini TTS model (default: `gemini-2.5-flash-preview-tts`) |
+  </Tab>
+</Tabs>
+
+---
+
+## STT (Speech-to-Text)
+
+Configure the engine that converts user voice input to text.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Engine** | STT service selection | `Whisper (local)` |
+| **Model** | Per-engine STT model | - |
+
+<Tabs>
+  <Tab title="System (Web API)">
+    Uses the browser's built-in Web Speech API.
+  </Tab>
+  <Tab title="OpenAI (Whisper)">
+    | Setting | Description |
+    |---------|-------------|
+    | **API Base URL** | OpenAI API Endpoint |
+    | **API Key** | API authentication key |
+    | **Model** | Whisper model selection |
+  </Tab>
+  <Tab title="Azure Speech">
+    | Setting | Description |
+    |---------|-------------|
+    | **API Key** | Azure Speech Service key |
+    | **Region** | Azure region |
+    | **Locales** | Recognition languages (comma-separated, e.g., `ko-KR,en-US`) |
+  </Tab>
+  <Tab title="Deepgram">
+    | Setting | Description |
+    |---------|-------------|
+    | **API Key** | Deepgram API key |
+  </Tab>
+  <Tab title="Google Cloud STT">
+    | Setting | Description |
+    |---------|-------------|
+    | **Project ID** | Google Cloud project ID |
+    | **Location** | Region (default: `global`) |
+    | **Language Codes** | Recognition languages (default: `auto`) |
+    | **Service Account Key** | Global key or Custom JSON key |
+  </Tab>
+</Tabs>
+
+---
+
+## Avatar
+
+Configure avatars displayed during AI responses.
+
+| Setting | Description |
+|---------|-------------|
+| **Engine** | Avatar service selection |
+| **API Key** | Avatar service authentication key |
+| **Region** | Service region |
+| **Character** | Avatar character selection |
+| **Style** | Avatar style |
+| **Greeting** | Avatar greeting |

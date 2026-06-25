@@ -1,0 +1,116 @@
+---
+title: "최신 업데이트"
+description: "Cloosphere에 추가된 신규 기능과 주요 변경 사항을 시간순으로 정리합니다"
+---
+
+새로 추가된 기능, 개선 사항, 운영 환경 변경을 한곳에서 확인하세요. 각 항목 끝의 링크로 상세 가이드로 바로 이동할 수 있습니다.
+
+<Update label="2026-04 · 1.0.1 릴리즈" tags={["릴리즈", "Teams 봇", "지식 그래프"]}>
+
+### Microsoft Teams 봇 통합
+사용자가 Teams 1:1·그룹챗에서 봇과 대화하고 에이전트를 선택할 수 있는 양방향 통합. AAD Object ID ↔ `User.oauth_oid` 매칭, RSC 권한, Redis 기반 멀티워커 세션 공유까지 포함.
+[자세히 →](/ko/admin/teams-bot)
+
+### 지식 그래프 — `Doc Attr` 노드
+KB 필터 값을 **LLM 호출 없이** 그래프 노드로 승격하는 경량 경로. 용어집 `Term` 노드와 자동 재사용되어 그래프 파편화 방지. 비용 부담스러운 청크 엔티티 추출(`Doc Entity`)을 켜기 전에 먼저 도입할 수 있습니다.
+[자세히 →](/ko/workspace/knowledge-graph#kb-필터를-kg-노드로-승격)
+
+### 임베드 위젯 확장
+- **side-bottom** 패널 모드 추가 (popup / side-right / side-left와 함께 4종)
+- 사용자가 패널 너비를 직접 리사이즈, 호스트 레이아웃이 자동으로 shift
+- **게스트 모드**: 비로그인 사용자도 임베드 위젯 사용 가능
+- **SSO 토큰 교환**으로 호스트 사이트 로그인 세션 그대로 통과
+[자세히 →](/ko/admin/settings/embed-widgets)
+
+### 그룹 ↔ 조직 단위 매핑
+그룹 편집 모달의 **Organizations** 탭에서 그룹에 OU를 매핑하면, IdP 동기화로 새 직원이 OU에 추가되는 즉시 그룹 권한이 자동 적용됩니다. OU는 한 그룹에만 할당 가능 (1:1 배타).
+[자세히 →](/ko/admin/users#그룹-↔-조직-단위-매핑)
+
+### 멀티워커 환경 안정화
+- `PersistentConfig` 변경이 모든 워커에 즉시 동기화 (Redis pub/sub)
+- OAuth 콜백 상태 워커 간 공유
+- Teams 봇 사용자별 에이전트 선택 상태 Redis 영속
+[자세히 →](/ko/admin/deployment-checklist#멀티워커-체크리스트)
+
+### 그 외
+- 사용자 역할 변경 **감사 로그** (`ROLE_CHANGE`) 추가 [→](/ko/monitoring/audit-logs)
+- Google Workspace Admin Directory API 조직/그룹 동기화
+- 후속 질문 추천 (Follow-Up Generation) — 기본 OFF, 비용 고려해 활성화 [→](/ko/admin/settings/interface)
+- alembic 마이그레이션이 `DATABASE_SCHEMA`를 무시하던 버그 수정 [→](/ko/troubleshooting)
+
+</Update>
+
+<Update label="2026-04 초 · 지식 그래프 정식 출시" tags={["지식 그래프", "용어집", "임베드 위젯"]}>
+
+### Knowledge Graph (KG) 정식 추가
+용어집·DbSphere·지식기반을 하나의 그래프로 통합하는 신규 워크스페이스 리소스. Apache AGE 기반.
+- 지식 연결(KB·DB·용어집을 KG에 어태치)
+- Graph-RAG: vector+graph 하이브리드 검색
+- 엣지 카탈로그 + LLM 기반 엣지 타입 추천
+- 그래프 전체화면 뷰, 노드/엣지 상세 패널
+- KG export/import (백업/이전)
+- KG 도구 테스터 (관리자용)
+- 백그라운드 워커 기반 sync + 진행률 indicator
+[자세히 →](/ko/workspace/knowledge-graph)
+
+### 용어집 강화
+- 카테고리 태그형 입력 UI
+- DB 값 기반 자동 생성
+- DB 추출 시 항목별 커스텀 지시사항
+- 추출 소스 설정 (제목/본문/앞 N자/뒤 N자)
+- DB 추출 백그라운드화 + 인라인 검토 UX
+- 페이지네이션 + 단건 CRUD + 인덱스 재생성
+[자세히 →](/ko/workspace/glossary)
+
+### 지식기반 (KB) 운영성
+- 대용량 업로드 + 디렉토리 업로드 + 실패 우선 정렬
+- 파일 목록 서버 페이지네이션
+- KB별 문서 요약/질의 예시 활성화 설정
+- 새 필터 타입: **Glossary** (용어집과 정합되는 메타데이터 필터)
+[자세히 →](/ko/workspace/knowledge)
+
+### 데이터베이스 (DbSphere)
+- BigQuery 커넥터 추가
+[자세히 →](/ko/workspace/database)
+
+### 임베드 위젯 SSO·게스트 (선행)
+정식 1.0.1 이전에 게스트 모드와 SSO 토큰 교환의 베타 도입. 이후 1.0.1에서 디자인 옵션과 함께 정식화.
+
+### 워크스페이스 공통 UX
+- 가드레일·도구·프롬프트·지식사전·DB 목록에 **공유 태그 및 필터 탭** 통일 적용
+
+</Update>
+
+<Update label="2026-03 · 관리 기능·OAuth·온보딩 보강" tags={["관리자", "OAuth"]}>
+
+### Google OAuth SSO + 조직/그룹 동기화
+Google Workspace Admin Directory API로 OU·그룹을 자동 동기화. Entra OIDC와 동일한 권한 모델로 통합.
+[자세히 →](/ko/admin/organizations)
+
+### 관리자 온보딩 토글
+관리자 설정에서 **온보딩 가이드** 노출 여부를 토글. 신규 워크스페이스 첫 설정 시 단계별 안내 활성화.
+[자세히 →](/ko/admin/settings/general)
+
+### 조직 단위 권한보기
+조직 단위 행에서 가드레일·권한 셋을 빠르게 확인. OAuth 동기화 시 **손자 OU까지 화면에 전체 표시**.
+
+</Update>
+
+<Update label="이전 업데이트" tags={["AI Foundry", "임베드 위젯", "권한 제어"]}>
+
+이전 버전에 도입된 주요 기능 요약 (2026-02 ~ 2026-03 초):
+- **AI Foundry** 모델 연결 — Azure 기반 모델 카탈로그 활용
+- **SQL 결과 시각화** — DbSphere 쿼리 결과를 채팅에서 자연스럽게 렌더
+- **임베드 위젯 디자인 옵션 확장** — 컬러·로고·CTA 메시지 커스터마이즈
+- **세밀한 권한 제어** — 4단계 레벨 (없음 / 접근 / 읽기 / 쓰기) 도입
+- **에이전트 가드레일** — 인풋·아웃풋 PII 마스킹·차단·LLM Judge
+
+</Update>
+
+---
+
+## 가이드 통합 안내
+
+이 페이지는 사용자에게 **무엇이 새로 생겼는지** 빠르게 보여주는 changelog입니다. 각 기능의 세부 사용법은 사이드바의 해당 카테고리(워크스페이스 / 관리자 / 모니터링)에서 확인하세요.
+
+운영자가 알아두면 좋은 운영 환경 변경(env 변수, 마이그레이션, Redis 의존)은 [배포 체크리스트](/ko/admin/deployment-checklist)에 모아두었습니다.

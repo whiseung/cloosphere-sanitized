@@ -1,0 +1,92 @@
+# Presenton — AI 프레젠테이션(편집 가능 PPTX/PDF) 생성 서비스
+# Cloosphere 와 "완전 별개" 로 배포되는 독립 서비스. Cloosphere 는 이 컨테이너의
+# 내장 MCP 서버(/mcp)에 기존 Tool Connections 로만 연결한다 (Cloosphere 코드 변경 0).
+#
+# 모든 설정은 같은 폴더의 .env 로 주입 (.env.example 복사해서 채울 것).
+# 자세한 사용/연결법: ./README.md
+services:
+  presenton:
+    image: ghcr.io/presenton/presenton:${PRESENTON_TAG:-latest}
+    container_name: presenton
+    restart: unless-stopped
+    ports:
+      # 호스트:컨테이너(nginx :80). 웹 UI / REST(/api/v1) / MCP(/mcp) 모두 이 포트로 노출.
+      - "${PRESENTON_PORT:-5001}:80"
+    volumes:
+      # 생성물·DB·업로드 영속화. 생성된 pptx 는 /app_data/exports 아래 저장됨.
+      - ./app_data:/app_data
+      # 패치: Presenton 내장 MCP 서버가 자기 내부 API를 부를 때의 httpx 타임아웃을
+      # 60s → 600s 로 상향. PPT 생성이 60s+ 걸려 기본 60s 로는 MCP 호출이 ReadTimeout 으로
+      # 끊긴다(파일은 생성되는데 호출자는 실패로 봄). 이미지 업그레이드 시 원본과 동기화 필요.
+      - ./mcp_server.py:/app/servers/fastapi/mcp_server.py:ro
+      # 패치: 레이아웃 생성 프롬프트에 "고정높이 금지(min-h)+긴 CJK 텍스트 대응" 및
+      # "인라인 마크다운 볼드 렌더(** → <strong>)" 규칙 추가 → 기존 PPT→커스텀 템플릿
+      # 추출 시 텍스트 세로눌림/`**` 노출 결함이 처음부터 안 생김. 업그레이드 시 동기화 필요.
+      - ./prompts.py:/app/servers/fastapi/templates/prompts.py:ro
+    environment:
+      # ── 핵심: 인증 비활성화 ────────────────────────────────────────────────
+      # true → MCP/REST 무인증 + /app_data/exports 공개 다운로드(생성 링크 클릭 즉시 받기).
+      # ⚠️ 무인증이므로 이 서비스를 공개 인터넷에 직접 노출하지 말 것(내부망/리버스프록시 뒤).
+      - DISABLE_AUTH=${DISABLE_AUTH:-true}
+
+      # ── 내부 렌더링 URL (중요) ───────────────────────────────────────────────
+      # export 시 컨테이너 "내부" 헤드리스 브라우저가 이 URL 로 슬라이드 페이지를 연다.
+      # 반드시 컨테이너 내부에서 도달 가능해야 함 → nginx 가 듣는 :80 = http://localhost.
+      # ⚠️ 여기에 호스트 published 포트(예: http://localhost:5001)를 넣으면 컨테이너
+      #    내부에서 그 포트가 안 열려 있어 export 가 500 으로 실패한다(검증됨).
+      #    사용자 다운로드 링크는 generate 가 돌려주는 상대경로(/app_data/exports/..)에
+      #    "http://<호스트>:${PRESENTON_PORT}" 를 붙여 만든다 (NEXT_PUBLIC_URL 과 별개).
+      - NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL:-http://localhost}
+
+      # ── LLM 공급자 (Presenton 자체 키) ──────────────────────────────────────
+      # LLM 값: openai | azure | anthropic | google | vertex | bedrock | ollama
+      #        | custom | openrouter | fireworks | together | cerebras | lmstudio
+      - LLM=${LLM:-openai}
+      # OpenAI
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
+      # Azure OpenAI
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY:-}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT:-}
+      - AZURE_OPENAI_BASE_URL=${AZURE_OPENAI_BASE_URL:-}
+      - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION:-}
+      - AZURE_OPENAI_DEPLOYMENT=${AZURE_OPENAI_DEPLOYMENT:-}
+      - AZURE_OPENAI_MODEL=${AZURE_OPENAI_MODEL:-}
+      # Anthropic
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-}
+      # OpenAI 호환(custom) — 사내 게이트웨이 등
+      - CUSTOM_LLM_URL=${CUSTOM_LLM_URL:-}
+      - CUSTOM_LLM_API_KEY=${CUSTOM_LLM_API_KEY:-}
+      - CUSTOM_MODEL=${CUSTOM_MODEL:-}
+
+      # ── 이미지 생성 ─────────────────────────────────────────────────────────
+      # 처음엔 끄고 시작(true) 권장. 켜려면 false + IMAGE_PROVIDER + 키.
+      # IMAGE_PROVIDER: pexels | pixabay | dall-e-3 | gemini_flash | comfyui | open_webui
+      - DISABLE_IMAGE_GENERATION=${DISABLE_IMAGE_GENERATION:-true}
+      - IMAGE_PROVIDER=${IMAGE_PROVIDER:-}
+      - PEXELS_API_KEY=${PEXELS_API_KEY:-}
+      - PIXABAY_API_KEY=${PIXABAY_API_KEY:-}
+      - DALL_E_3_QUALITY=${DALL_E_3_QUALITY:-}
+      # IMAGE_PROVIDER=open_webui 시: Cloosphere 이미지 생성 API 재사용.
+      # URL 은 Cloosphere 의 /api/v1 (컨테이너에선 host.docker.internal 로 호스트 접근).
+      - OPEN_WEBUI_IMAGE_URL=${OPEN_WEBUI_IMAGE_URL:-}
+      - OPEN_WEBUI_IMAGE_API_KEY=${OPEN_WEBUI_IMAGE_API_KEY:-}
+
+      # ── 운영 ───────────────────────────────────────────────────────────────
+      - CAN_CHANGE_KEYS=${CAN_CHANGE_KEYS:-false}        # UI에서 키 변경 잠금(env 고정)
+      - MIGRATE_DATABASE_ON_STARTUP=true
+      - DISABLE_ANONYMOUS_TRACKING=${DISABLE_ANONYMOUS_TRACKING:-true}
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+      # PostgreSQL 쓰려면 .env 에 설정(미설정 시 컨테이너 내 SQLite 사용).
+      - DATABASE_URL=${DATABASE_URL:-}
+    extra_hosts:
+      # CUSTOM_LLM_URL / OLLAMA 등이 호스트의 다른 서비스를 가리킬 때 사용.
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      # 이미지에 curl 포함. nginx(:80) 가 응답하면 기동 완료로 간주.
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s   # 첫 부팅(마이그레이션/프로세스 기동)이 느려 넉넉히.

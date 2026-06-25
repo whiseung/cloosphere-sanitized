@@ -1,0 +1,95 @@
+---
+title: "License"
+description: "Register license keys, review per-tier features, and manage feature keys."
+---
+
+In **Admin > Settings > License**, register and delete Cloosphere license keys and feature keys, and review module activation status.
+
+<Frame caption="License settings tab">
+  <img src="/images/admin/settings-license.png" alt="License settings tab" />
+</Frame>
+
+---
+
+## Tier Composition
+
+| Tier | Included Features |
+|------|-------------------|
+| **Basic** | Basic chat, user management (no license modules) |
+| **Standard** | Basic + audit logs, glossary, guardrails, image generation, KbSphere, tools |
+| **Professional** | Standard + agent flows, branding, DbSphere, auto-evaluation, tracing |
+| **Enterprise** | All Professional features + Code Gateway, File Guardrail (all modules) |
+
+---
+
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| **License key** | Specifies the tier, includes max user count and expiration |
+| **Feature key** | Activates specific modules individually, independent of tier |
+
+**Modules activatable via feature keys:**
+
+| Module | Description |
+|--------|-------------|
+| `audit_log` | Audit log |
+| `glossary` | Glossary |
+| `guardrail` | Guardrail |
+| `image_generation` | Image generation |
+| `kbsphere` | Knowledge Base (KbSphere) |
+| `tools` | Tools |
+| `agent_flow` | Agent Flow |
+| `branding` | Branding |
+| `dbsphere` | DbSphere |
+| `evaluation` | Auto-evaluation |
+| `trace` | Tracing |
+| `code_gateway` | Code Gateway (Enterprise only) |
+| `file_guardrail` | File Guardrail (Enterprise only) |
+
+---
+
+## Registering a License
+
+<Steps>
+  <Step title="Get a key">
+    Get a license key from your Cloocus contact.
+  </Step>
+  <Step title="Enter the key">
+    Enter the key in the **Admin > Settings > License** tab.
+  </Step>
+  <Step title="Register">
+    Click **Register Key**. License keys and feature keys use the same input.
+  </Step>
+  <Step title="Check status">
+    After registration, check the current license status.
+
+    | Item | Description |
+    |------|-------------|
+    | **Tier** | Currently active tier |
+    | **Company name** | License issuer target |
+    | **Max users** | Maximum allowed user count |
+    | **Expiration** | License expiration date/time |
+    | **Feature Status** | Per-module Available / Not Licensed and enforcement setting |
+  </Step>
+</Steps>
+
+---
+
+## License Management
+
+Registered license keys and feature keys appear in the list and can be individually deleted.
+
+<Frame caption="License key list and feature status">
+  <img src="/images/admin/settings-license-detail.png" alt="License key list and feature status" />
+</Frame>
+
+<Note>
+  When the `ENABLE_LICENSE_ENFORCEMENT` environment variable is `false` (default), all features are available without a license.
+  Set to `true` in enterprise environments where feature control is required.
+</Note>
+
+<Warning>
+  Deleting a license key immediately disables that tier's features.
+  Verify that currently used features won't be affected before deleting.
+</Warning>

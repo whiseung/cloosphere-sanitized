@@ -1,0 +1,82 @@
+---
+title: "도구 서버"
+description: "외부 도구 서버(Tool Server) 연결을 관리합니다."
+---
+
+에이전트가 외부 서비스(CRM, 티켓 시스템, 날씨 API 등)를 호출할 수 있도록 도구 서버를 연결합니다. **OpenAPI**와 **MCP(Model Context Protocol)** 두 가지 프로토콜을 지원합니다.
+
+**관리자 > 설정 > 도구** 탭에서 설정합니다.
+
+---
+
+## OpenAPI vs MCP
+
+| | OpenAPI | MCP |
+|---|---|---|
+| **프로토콜** | REST API (HTTP) | Model Context Protocol (JSON-RPC) |
+| **스펙 파일** | `openapi.json` / `openapi.yaml` | 자동 discovery |
+| **인증** | Bearer Token / Session | Bearer Token / API Key / None |
+| **적합한 경우** | 기존 REST API 연동 | AI 도구 전용 서버 |
+| **Path 예시** | `openapi.json`, `spec/tools.yaml` | `/sse` (SSE), `/` (Streamable HTTP) |
+
+---
+
+## 도구 서버 추가
+
+<Steps>
+  <Step title="서버 추가">
+    **"+" 버튼**을 클릭하여 새 도구 서버를 추가합니다.
+  </Step>
+  <Step title="연결 정보 입력">
+    | 설정 | 기본값 | 설명 |
+    |------|:------:|------|
+    | **URL** | — | 도구 서버 주소 (예: `https://my-tool-server.com`) |
+    | **Path** | `openapi.json` | OpenAPI 스펙 파일 경로 또는 MCP 엔드포인트. 최종 요청 URL = `{URL}/{Path}` |
+    | **Auth Type** | Bearer | `Bearer`: 고정 API Key, `Session`: 현재 사용자 세션 토큰 자동 전달 |
+    | **API Key** | — | Bearer Token 값 (Bearer 인증 시) |
+    | **접근 제어** | 전체 공개 | 특정 그룹/사용자에게만 도구 서버 노출 |
+  </Step>
+  <Step title="연결 확인">
+    **"Verify Connection"** 버튼을 클릭하여 스펙 파일을 정상적으로 가져올 수 있는지 검증합니다.
+  </Step>
+</Steps>
+
+<Tip>
+  **Session 인증**을 사용하면 사용자별 권한이 자동으로 적용됩니다. 사용자마다 다른 데이터에 접근해야 하는 내부 API에 적합합니다.
+</Tip>
+
+---
+
+## 관리자 전역 vs 사용자 개인
+
+| 범위 | 설정 위치 | 적용 대상 | 프로토콜 |
+|------|----------|----------|---------|
+| **전역 (관리자)** | 관리자 > 설정 > 도구 | 시스템 전체 (접근 제어로 제한 가능) | OpenAPI + MCP |
+| **개인 (사용자)** | 개인 설정 > 도구 | 해당 사용자만 | OpenAPI만 |
+
+<Note>
+  사용자 개인 도구 서버 기능은 관리자가 비활성화할 수 있습니다. 개인 도구 서버를 사용하려면 API 서버에서 **CORS 설정**이 올바르게 구성되어 있어야 합니다.
+</Note>
+
+---
+
+## 에이전트에서 도구 사용
+
+관리자가 등록한 전역 도구 서버는 **워크스페이스 > 에이전트** 편집 화면의 "도구 연결" 섹션에서 선택할 수 있습니다. 에이전트에 도구를 연결하면 AI가 질문에 따라 **자동으로 적절한 도구를 선택하여 호출**합니다.
+
+<Warning>
+  도구 서버는 에이전트가 외부 API를 호출할 수 있게 합니다. **신뢰할 수 있는 서버만** 등록하세요.
+</Warning>
+
+---
+
+## 관련 페이지
+
+<Columns cols={2}>
+  <Card title="에이전트 도구 연결" icon="robot" href="/ko/workspace/tools">
+    워크스페이스에서 OpenAPI/MCP 도구를 생성하고 에이전트에 연결
+  </Card>
+  <Card title="파이프라인" icon="diagram-project" href="/ko/admin/settings/pipelines">
+    LLM 요청/응답에 커스텀 로직을 삽입하는 플러그인 시스템
+  </Card>
+</Columns>

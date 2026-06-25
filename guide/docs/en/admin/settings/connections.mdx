@@ -1,0 +1,204 @@
+---
+title: "Connections"
+description: "Configure AI model providers (OpenAI, Azure OpenAI, Ollama) and cloud storage."
+---
+
+To use AI models, first configure connections to LLM providers. Connect multiple providers simultaneously so users can pick from various models.
+
+Configure in **Admin > Settings > Connections**.
+
+{/* SCREENSHOT: settings-connections */}
+<Frame caption="Configure LLM providers, cloud accounts, and storage in Admin > Settings > Connections">
+  <img src="/images/admin/settings-connections-full.png" alt="Connections settings tab" />
+</Frame>
+
+---
+
+## OpenAI API Connection
+
+Connect with OpenAI or OpenAI-compatible APIs (Azure OpenAI, AI Foundry, etc.). Configure multiple connections to balance load.
+
+<Steps>
+  <Step title="Add connection">
+    Click the **+** button in the OpenAI API section.
+  </Step>
+  <Step title="Enter connection info">
+    In the connection modal, enter API Base URL and API Key.
+  </Step>
+  <Step title="Verify connection">
+    After saving, verify the model list auto-refreshes.
+  </Step>
+</Steps>
+
+<Tabs>
+  <Tab title="OpenAI">
+    | Setting | Description |
+    |---------|-------------|
+    | **API Base URL** | `https://api.openai.com/v1` |
+    | **API Key** | Key from OpenAI (`sk-...`) |
+    | **Prefix ID** | Model ID prefix (optional — prevents collision in multi-connection) |
+    | **Model IDs** | Manual specification (auto-fetched if blank) |
+  </Tab>
+  <Tab title="Azure OpenAI">
+    | Setting | Description |
+    |---------|-------------|
+    | **API Base URL** | `https://{resource}.openai.azure.com/` |
+    | **API Key** | Key from Azure Portal |
+    | **API Version** | API version (required, e.g., `2024-02-15-preview`) |
+    | **Prefix ID** | Model ID prefix (optional) |
+    | **Model IDs** | Manual specification of deployed model names |
+  </Tab>
+  <Tab title="AI Foundry">
+    | Setting | Description |
+    |---------|-------------|
+    | **API Base URL** | `https://{project}.{region}.models.ai.azure.com/` |
+    | **API Key** | Key from AI Foundry |
+    | **API Version** | API version (default: `2024-05-01-preview`) |
+    | **Prefix ID** | Model ID prefix (optional) |
+    | **Model IDs** | Manual (auto-fetched on Verify Connection if blank) |
+
+    <Accordion title="Azure OpenAI vs AI Foundry">
+      | | Azure OpenAI | AI Foundry |
+      |---|---|---|
+      | **Endpoint format** | `{url}/openai/deployments/{model}/...` | `{url}/openai/v1/...` |
+      | **Model identifier** | Deployment name | Model ID |
+      | **Auth** | API Key or Bearer Token | Bearer Token only |
+      | **Use** | OpenAI-only models on Azure | Diverse models on Azure AI (OpenAI + OSS) |
+
+      Azure OpenAI manages models **per deployment**; AI Foundry accesses them directly from the **model catalog**. If you already use Azure OpenAI, **AI Foundry isn't separately required** — add it when you need OSS or AI Foundry-only models.
+    </Accordion>
+  </Tab>
+  <Tab title="Vertex AI">
+    | Setting | Description |
+    |---------|-------------|
+    | **Project ID** | Google Cloud project ID (required) |
+    | **Location** | Region (default: `us-central1`) |
+    | **Auth** | Global GCP Key or Custom Service Account JSON |
+
+    Available models are auto-displayed on Verify Connection.
+  </Tab>
+</Tabs>
+
+### Common Connection Settings
+
+Each connection has these common features:
+
+| Feature | Description |
+|---------|-------------|
+| **Verify Connection** | Test API access via the verify button in the settings modal |
+| **Prefix ID** | Distinguish models with `{prefix}.{model}` form when names collide across connections |
+| **Activate/Deactivate** | Per-connection toggle to pause without deleting |
+| **Model IDs** | When manually specified, only those models are exposed. Auto-fetched if blank |
+
+<Tip>
+  Adding **multiple connections** to the same provider auto-merges model lists. For example, adding 2 Azure OpenAI connections (US/Korea regions) shows models from both regions. Use **Prefix ID** to distinguish.
+</Tip>
+
+---
+
+## Ollama API Connection
+
+Connect to a local or internal server Ollama instance.
+
+| Setting | Description | Example |
+|---------|-------------|---------|
+| **Base URL** | Ollama server address | `http://localhost:11434` |
+
+Add multiple servers to load-balance. Ollama provides complete data privacy without external network.
+
+---
+
+## Direct Connections
+
+Beyond admin-configured connections, allow **users to connect directly to LLMs with personal API keys**.
+
+| Setting | Description | Default |
+|---------|-------------|:-------:|
+| **Allow direct connections** | Allow per-user personal API connections | Enabled |
+
+When enabled, users can add OpenAI-compatible APIs in **Personal Settings > Connections**.
+
+<Note>
+  Direct connections support **OpenAI-compatible APIs only** (Ollama unsupported). The user's API server must have CORS correctly configured.
+</Note>
+
+---
+
+## Cloud Accounts
+
+Configure global cloud service accounts. Service Account Keys set here serve as fallback when individual features (TTS, STT, images) lack separate keys.
+
+| Provider | Settings |
+|----------|----------|
+| **Google Cloud** | Service Account Key (JSON) |
+
+<Note>
+  Leaving Service Account Key empty uses Application Default Credentials (ADC).
+</Note>
+
+---
+
+## Image Attachment Mode
+
+Configure how images attached to chats are processed and stored.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Image Upload Mode** | Base64 Inline or Cloud Storage | `Base64 Inline` |
+| **Storage Provider** | Local, AWS S3, Azure Blob, Google Cloud Storage | `Local` |
+
+<Tabs>
+  <Tab title="AWS S3">
+    | Setting | Description |
+    |---------|-------------|
+    | **Bucket Name** | S3 bucket name |
+    | **Region** | AWS region |
+    | **Endpoint URL** | Custom Endpoint (optional) |
+    | **Access Key ID** | Auth key ID |
+    | **Secret Access Key** | Secret key |
+    | **Key Prefix** | File path prefix (optional) |
+  </Tab>
+  <Tab title="Azure Blob">
+    | Setting | Description |
+    |---------|-------------|
+    | **Storage Endpoint** | Azure Blob Storage Endpoint |
+    | **Container Name** | Container name |
+    | **Storage Key** | Auth key |
+  </Tab>
+  <Tab title="Google Cloud Storage">
+    | Setting | Description |
+    |---------|-------------|
+    | **Bucket Name** | GCS bucket name |
+    | **Authentication** | Global Google Cloud Key or Custom Key |
+  </Tab>
+</Tabs>
+
+---
+
+## Shared Storage (file uploads)
+
+Configure storage location for uploaded files like documents and PDFs. Same storage provider options as Image Attachment Mode.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **File Storage Provider** | Local, AWS S3, Azure Blob, Google Cloud Storage | `Local` |
+
+<Note>
+  After changing storage settings, always verify connection state with the **Test** button.
+</Note>
+
+---
+
+## Related Pages
+
+<Columns cols={3}>
+  <Card title="Model Management" icon="robot" href="/en/admin/settings/models">
+    Activate/deactivate connected models and configure Workspace models
+  </Card>
+  <Card title="Documents" icon="file-lines" href="/en/admin/settings/documents">
+    Embedding engine and RAG pipeline settings
+  </Card>
+  <Card title="Code Gateway" icon="code" href="/en/admin/code-gateway">
+    LLM proxy settings for coding tools
+  </Card>
+</Columns>

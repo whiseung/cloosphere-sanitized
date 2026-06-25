@@ -1,0 +1,196 @@
+---
+title: "로그인"
+description: "SSO(Microsoft Entra ID) 및 이메일/비밀번호 로그인 방법과 문제 해결 가이드"
+---
+
+Cloosphere는 SSO(Single Sign-On)와 이메일/비밀번호 로그인을 모두 지원합니다. 기업 환경에서는 Microsoft Entra ID(Azure AD) 기반 SSO를 권장합니다.
+
+---
+
+## 인증 방식
+
+| 인증 방식 | 설명 | 상태 |
+|----------|------|------|
+| **Microsoft Entra ID** | Azure AD 기반 기업 SSO 로그인 | 지원 |
+| **이메일/비밀번호** | 기본 로그인 폼 | 지원 |
+| **LDAP** | LDAP 디렉터리 서비스 연동 | 지원 |
+| **Google Workspace** | Google 기업 계정 | 관리자 설정 시 사용 가능 |
+| **GitHub** | GitHub 계정 연동 | 관리자 설정 시 사용 가능 |
+| **OIDC/OAuth 2.0** | 기타 IdP 연동 | 관리자 설정 시 사용 가능 |
+
+<Note>
+  사용 가능한 로그인 방식은 관리자 설정에 따라 다를 수 있습니다. 로그인 화면에 표시되지 않는 인증 방식은 IT 관리자에게 문의하세요.
+</Note>
+
+<Note>
+  OAuth 로그인 옵션(Microsoft, Google, GitHub 등)은 관리자가 환경 변수로 해당 Provider를 구성한 경우에만 로그인 화면에 표시됩니다.
+</Note>
+
+---
+
+## 로그인 방법
+
+<Tabs>
+  <Tab title="SSO 로그인 (Microsoft)">
+    Microsoft Entra ID(Azure AD)를 사용하는 기업 환경에서 권장되는 로그인 방식입니다. 별도 계정 생성 없이 회사 계정으로 바로 로그인할 수 있습니다.
+
+    <Steps>
+      <Step title="Cloosphere 접속">
+        관리자가 제공한 Cloosphere URL을 브라우저 주소창에 입력합니다.
+      </Step>
+      <Step title="SSO 로그인 버튼 클릭">
+        로그인 화면 하단의 **"Continue with Microsoft"** 버튼을 클릭합니다.
+      </Step>
+      <Step title="Microsoft 계정 인증">
+        Microsoft 로그인 페이지로 이동합니다. 회사 이메일과 비밀번호를 입력하거나, 이미 브라우저에 로그인된 계정을 선택합니다.
+
+        <Tip>
+          이미 Microsoft 365에 로그인한 상태라면 계정 선택만으로 자동 인증됩니다.
+        </Tip>
+      </Step>
+      <Step title="메인 화면 진입">
+        인증이 완료되면 자동으로 Cloosphere 메인 채팅 화면으로 이동합니다.
+
+        ![로그인 성공 후 메인 화면](/images/getting-started/login-success.png)
+      </Step>
+    </Steps>
+
+    **SSO 로그인의 장점:**
+    - 별도 계정 생성이 필요 없습니다
+    - 회사 비밀번호 정책이 자동으로 적용됩니다
+    - MFA(다중 인증) 등 회사 보안 정책이 그대로 적용됩니다
+    - 조직 정보가 자동으로 연동됩니다
+  </Tab>
+
+  <Tab title="이메일/비밀번호 로그인">
+    SSO를 사용하지 않는 환경에서 이메일과 비밀번호로 로그인하는 방식입니다.
+
+    <Steps>
+      <Step title="Cloosphere 접속">
+        관리자가 제공한 Cloosphere URL을 브라우저 주소창에 입력합니다.
+      </Step>
+      <Step title="이메일 입력">
+        **Email** 입력란에 등록된 이메일 주소를 입력합니다.
+      </Step>
+      <Step title="비밀번호 입력">
+        **Password** 입력란에 비밀번호를 입력합니다.
+      </Step>
+      <Step title="로그인 버튼 클릭">
+        **"Sign in"** 버튼을 클릭하거나 `Enter` 키를 누릅니다.
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="LDAP 로그인">
+    LDAP 디렉터리 서비스가 설정된 환경에서 사용하는 방식입니다.
+
+    <Steps>
+      <Step title="Cloosphere 접속">
+        관리자가 제공한 Cloosphere URL을 브라우저 주소창에 입력합니다.
+      </Step>
+      <Step title="LDAP 모드 확인">
+        로그인 화면이 LDAP 모드로 표시됩니다. **Username** 입력란이 보입니다.
+
+        이메일 로그인 폼이 보이는 경우, 하단의 **"Continue with LDAP"** 링크를 클릭하여 LDAP 모드로 전환합니다. 반대로 LDAP 모드에서 이메일 로그인으로 돌아가려면 **"Continue with Email"** 링크를 클릭합니다.
+      </Step>
+      <Step title="인증 정보 입력">
+        LDAP Username과 비밀번호를 입력한 후 **"Authenticate"** 버튼을 클릭합니다.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+---
+
+## 신규 계정 생성
+
+<Note>
+  관리자가 신규 가입(Sign up)을 허용한 경우에만 계정을 직접 생성할 수 있습니다. 비활성화된 경우 IT 관리자에게 계정 생성을 요청하세요.
+</Note>
+
+신규 가입이 허용된 환경에서는 로그인 화면 하단의 **"Sign up"** 링크를 클릭하여 계정을 생성할 수 있습니다.
+
+<Steps>
+  <Step title="Sign up 페이지 이동">
+    로그인 화면 하단의 **"Don't have an account? Sign up"** 링크를 클릭합니다.
+  </Step>
+  <Step title="정보 입력">
+    다음 정보를 입력합니다:
+    - **Name**: 표시할 이름 (실명 권장)
+    - **Email**: 로그인에 사용할 이메일 주소
+    - **Password**: 비밀번호
+
+    ![Sign up 폼](/images/getting-started/login-signup-form.png)
+  </Step>
+  <Step title="비밀번호 요구사항 확인">
+    비밀번호는 다음 조건을 **모두** 충족해야 합니다:
+    - 최소 8자 이상
+    - 대문자 1개 이상 포함
+    - 소문자 1개 이상 포함
+    - 숫자 1개 이상 포함
+
+    입력 시 비밀번호 강도 표시기가 실시간으로 충족 여부를 알려줍니다.
+  </Step>
+  <Step title="계정 생성 완료">
+    모든 조건을 충족하면 **"Create Account"** 버튼이 활성화됩니다. 클릭하여 계정을 생성합니다.
+
+    <Warning>
+      관리자 설정에 따라 계정 생성 후 승인 대기 상태(`pending`)가 될 수 있습니다. 이 경우 관리자가 승인해야 로그인할 수 있습니다.
+    </Warning>
+  </Step>
+</Steps>
+
+---
+
+## 로그아웃
+
+<Steps>
+  <Step title="사용자 메뉴 열기">
+    화면 좌측 하단의 **프로필 이미지**를 클릭합니다.
+  </Step>
+  <Step title="Sign Out 클릭">
+    드롭다운 메뉴에서 **"Sign Out"**을 클릭합니다. 로그인 화면(`/auth`)으로 이동됩니다.
+
+    ![사용자 메뉴 드롭다운](/images/getting-started/ui-profile-dropdown.png)
+  </Step>
+</Steps>
+
+---
+
+## 문제 해결
+
+<Accordion title="SSO 로그인 버튼이 보이지 않아요">
+  SSO는 관리자가 OAuth Provider를 설정해야 로그인 화면에 표시됩니다. 로그인 화면에 "Continue with Microsoft" 버튼이 없다면 IT 관리자에게 OAuth 설정을 요청하세요 (환경 변수로 구성됨).
+</Accordion>
+
+<Accordion title="'Invalid credentials' 오류가 발생해요">
+  이메일 또는 비밀번호가 잘못되었습니다. 다음을 확인하세요:
+  - 이메일 주소 오타 확인 (대소문자 구분 없음)
+  - Caps Lock 키 상태 확인
+  - 비밀번호를 잊은 경우 관리자에게 비밀번호 초기화를 요청하세요
+</Accordion>
+
+<Accordion title="'You do not have permission to access this resource' 메시지가 나타나요">
+  관리자가 신규 가입 후 승인 절차를 설정한 경우, 계정이 `pending` 상태에서 이 오류가 발생합니다. 관리자의 승인이 필요하므로 IT 관리자에게 계정 활성화를 요청하세요.
+</Accordion>
+
+<Accordion title="Microsoft 로그인 후 '권한 없음' 오류가 나타나요">
+  Microsoft Entra ID에서 Cloosphere 앱에 대한 접근 권한이 부여되지 않은 경우 발생합니다. IT 관리자에게 다음을 확인 요청하세요:
+  - Azure AD에서 Cloosphere 앱 등록 여부
+  - 사용자 또는 그룹에 앱 접근 권한 할당 여부
+  - 필요한 API 권한(User.Read 등) 승인 여부
+</Accordion>
+
+<Accordion title="로그인 후 빈 화면이 표시돼요">
+  브라우저 캐시 문제일 수 있습니다:
+  1. 브라우저 캐시를 삭제합니다 (`Ctrl + Shift + Delete`)
+  2. 하드 리프레시를 시도합니다 (`Ctrl + Shift + R`)
+  3. 시크릿/인코그니토 모드에서 접속을 시도합니다
+  4. 문제가 지속되면 IT 관리자에게 문의하세요
+</Accordion>
+
+---
+
+## 다음 단계
+
+로그인에 성공했다면, [화면 구성](/ko/getting-started/ui-overview)을 살펴보고 [첫 번째 AI 대화](/ko/getting-started/first-chat)를 시작해 보세요.

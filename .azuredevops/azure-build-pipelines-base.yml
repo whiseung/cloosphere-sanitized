@@ -1,0 +1,50 @@
+# Base Image Pipeline
+# 시스템 의존성(LibreOffice, ODBC, Playwright 등) + Python 패키지를 포함한 베이스 이미지
+# 트리거: Dockerfile.base 또는 requirements.txt 변경 시
+# 수동 실행도 가능 (Run pipeline)
+
+trigger:
+  branches:
+    include:
+    - dev
+    - main
+  paths:
+    include:
+    - Dockerfile.base
+    - backend/requirements.txt
+
+resources:
+- repo: self
+
+variables:
+  dockerRegistryServiceConnection: '6bd42f51-f166-47cf-b137-99640333263c'
+  imageRepository: 'cloosphere-base'
+  containerRegistry: 'acrcloosphere.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile.base'
+
+  vmImageName: 'ubuntu-latest'
+  DOCKER_BUILDKIT: 1
+
+stages:
+- stage: Build
+  displayName: Build and push base image
+  jobs:
+  - job: Build
+    displayName: Build Base Image
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - checkout: self
+      fetchDepth: 1
+
+    - task: Docker@2
+      displayName: Build and push base image to ACR
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(Build.BuildId)
+          latest
+        arguments: '--cache-from=$(containerRegistry)/$(imageRepository):latest --build-arg BUILDKIT_INLINE_CACHE=1'

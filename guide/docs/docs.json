@@ -1,0 +1,445 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Cloosphere Guide",
+  "colors": {
+    "primary": "#5f22d0",
+    "light": "#7c3aed",
+    "dark": "#4c1d95"
+  },
+  "logo": {
+    "light": "/images/logo.png",
+    "dark": "/images/logo.png",
+    "href": "/ko/index"
+  },
+  "favicon": "/images/favicon.png",
+  "appearance": {
+    "default": "system",
+    "strict": false
+  },
+  "navigation": {
+    "languages": [
+      {
+        "language": "ko",
+        "default": true,
+        "tabs": [
+          {
+            "tab": "시작하기",
+            "icon": "rocket",
+            "groups": [
+              {
+                "group": "시작하기",
+                "pages": [
+                  "ko/index",
+                  "ko/getting-started/overview",
+                  "ko/getting-started/login",
+                  "ko/getting-started/first-chat",
+                  "ko/getting-started/ui-overview"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "채팅",
+            "icon": "comments",
+            "groups": [
+              {
+                "group": "채팅",
+                "pages": [
+                  "ko/chat/overview",
+                  "ko/chat/conversations",
+                  "ko/chat/models"
+                ]
+              },
+              {
+                "group": "기능",
+                "pages": [
+                  "ko/chat/capabilities",
+                  "ko/chat/files-and-rag",
+                  "ko/chat/sharing",
+                  "ko/chat/memory",
+                  "ko/chat/playground"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "워크스페이스",
+            "icon": "briefcase",
+            "groups": [
+              {
+                "group": "워크스페이스",
+                "pages": [
+                  "ko/workspace/overview"
+                ]
+              },
+              {
+                "group": "AI 에이전트",
+                "pages": [
+                  "ko/workspace/agents",
+                  "ko/workspace/flows",
+                  "ko/workspace/flows-nodes"
+                ]
+              },
+              {
+                "group": "지식 & 데이터",
+                "pages": [
+                  "ko/workspace/knowledge",
+                  "ko/workspace/knowledge-filters",
+                  "ko/workspace/knowledge-graph",
+                  "ko/workspace/database",
+                  "ko/workspace/glossary"
+                ]
+              },
+              {
+                "group": "안전",
+                "pages": [
+                  "ko/workspace/guardrails"
+                ]
+              },
+              {
+                "group": "커스터마이징",
+                "pages": [
+                  "ko/workspace/prompts",
+                  "ko/workspace/tools",
+                  "ko/workspace/tags"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "협업",
+            "icon": "users",
+            "groups": [
+              {
+                "group": "협업",
+                "pages": [
+                  "ko/collaboration/overview",
+                  "ko/collaboration/projects",
+                  "ko/collaboration/channels",
+                  "ko/collaboration/sharing-permissions"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "자동화",
+            "icon": "clock",
+            "groups": [
+              {
+                "group": "자동화",
+                "pages": [
+                  "ko/automation/overview",
+                  "ko/automation/schedules"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "관리자",
+            "icon": "gear",
+            "groups": [
+              {
+                "group": "관리자",
+                "pages": [
+                  "ko/admin/overview",
+                  "ko/admin/users",
+                  "ko/admin/organizations"
+                ]
+              },
+              {
+                "group": "시스템 설정",
+                "pages": [
+                  "ko/admin/settings/general",
+                  "ko/admin/settings/connections",
+                  "ko/admin/settings/models",
+                  "ko/admin/settings/documents",
+                  "ko/admin/settings/search-engine",
+                  "ko/admin/settings/web-search",
+                  "ko/admin/settings/code-execution",
+                  "ko/admin/settings/interface",
+                  "ko/admin/settings/audio",
+                  "ko/admin/settings/images",
+                  "ko/admin/settings/pipelines",
+                  "ko/admin/settings/tools",
+                  "ko/admin/settings/branding",
+                  "ko/admin/settings/license"
+                ]
+              },
+              {
+                "group": "기타",
+                "pages": [
+                  "ko/admin/notifications",
+                  "ko/admin/teams-bot",
+                  "ko/admin/code-gateway",
+                  "ko/admin/settings/embed-widgets",
+                  "ko/admin/deployment-checklist"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "모니터링",
+            "icon": "chart-line",
+            "groups": [
+              {
+                "group": "모니터링",
+                "pages": [
+                  "ko/monitoring/overview"
+                ]
+              },
+              {
+                "group": "대시보드",
+                "pages": [
+                  "ko/monitoring/dashboard",
+                  "ko/monitoring/usage"
+                ]
+              },
+              {
+                "group": "로그",
+                "pages": [
+                  "ko/monitoring/audit-logs",
+                  "ko/monitoring/guardrail-logs",
+                  "ko/monitoring/file-logs"
+                ]
+              },
+              {
+                "group": "분석",
+                "pages": [
+                  "ko/monitoring/tracing",
+                  "ko/monitoring/evaluations"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "트러블슈팅",
+            "icon": "wrench",
+            "groups": [
+              {
+                "group": "트러블슈팅",
+                "pages": [
+                  "ko/troubleshooting"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "language": "en",
+        "tabs": [
+          {
+            "tab": "Getting Started",
+            "icon": "rocket",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "en/index",
+                  "en/getting-started/overview",
+                  "en/getting-started/login",
+                  "en/getting-started/first-chat",
+                  "en/getting-started/ui-overview"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Chat",
+            "icon": "comments",
+            "groups": [
+              {
+                "group": "Chat",
+                "pages": [
+                  "en/chat/overview",
+                  "en/chat/conversations",
+                  "en/chat/models"
+                ]
+              },
+              {
+                "group": "Features",
+                "pages": [
+                  "en/chat/capabilities",
+                  "en/chat/files-and-rag",
+                  "en/chat/sharing",
+                  "en/chat/memory",
+                  "en/chat/playground"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Workspace",
+            "icon": "briefcase",
+            "groups": [
+              {
+                "group": "Workspace",
+                "pages": [
+                  "en/workspace/overview"
+                ]
+              },
+              {
+                "group": "AI Agents",
+                "pages": [
+                  "en/workspace/agents",
+                  "en/workspace/flows",
+                  "en/workspace/flows-nodes"
+                ]
+              },
+              {
+                "group": "Knowledge & Data",
+                "pages": [
+                  "en/workspace/knowledge",
+                  "en/workspace/knowledge-filters",
+                  "en/workspace/knowledge-graph",
+                  "en/workspace/database",
+                  "en/workspace/glossary"
+                ]
+              },
+              {
+                "group": "Safety",
+                "pages": [
+                  "en/workspace/guardrails"
+                ]
+              },
+              {
+                "group": "Customization",
+                "pages": [
+                  "en/workspace/prompts",
+                  "en/workspace/tools",
+                  "en/workspace/tags"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Collaboration",
+            "icon": "users",
+            "groups": [
+              {
+                "group": "Collaboration",
+                "pages": [
+                  "en/collaboration/overview",
+                  "en/collaboration/projects",
+                  "en/collaboration/channels",
+                  "en/collaboration/sharing-permissions"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Automation",
+            "icon": "clock",
+            "groups": [
+              {
+                "group": "Automation",
+                "pages": [
+                  "en/automation/overview",
+                  "en/automation/schedules"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Admin",
+            "icon": "gear",
+            "groups": [
+              {
+                "group": "Admin",
+                "pages": [
+                  "en/admin/overview",
+                  "en/admin/users",
+                  "en/admin/organizations"
+                ]
+              },
+              {
+                "group": "System Settings",
+                "pages": [
+                  "en/admin/settings/general",
+                  "en/admin/settings/connections",
+                  "en/admin/settings/models",
+                  "en/admin/settings/documents",
+                  "en/admin/settings/search-engine",
+                  "en/admin/settings/web-search",
+                  "en/admin/settings/code-execution",
+                  "en/admin/settings/interface",
+                  "en/admin/settings/audio",
+                  "en/admin/settings/images",
+                  "en/admin/settings/pipelines",
+                  "en/admin/settings/tools",
+                  "en/admin/settings/branding",
+                  "en/admin/settings/license"
+                ]
+              },
+              {
+                "group": "Others",
+                "pages": [
+                  "en/admin/notifications",
+                  "en/admin/teams-bot",
+                  "en/admin/code-gateway",
+                  "en/admin/settings/embed-widgets",
+                  "en/admin/deployment-checklist"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Monitoring",
+            "icon": "chart-line",
+            "groups": [
+              {
+                "group": "Monitoring",
+                "pages": [
+                  "en/monitoring/overview"
+                ]
+              },
+              {
+                "group": "Dashboards",
+                "pages": [
+                  "en/monitoring/dashboard",
+                  "en/monitoring/usage"
+                ]
+              },
+              {
+                "group": "Logs",
+                "pages": [
+                  "en/monitoring/audit-logs",
+                  "en/monitoring/guardrail-logs",
+                  "en/monitoring/file-logs"
+                ]
+              },
+              {
+                "group": "Analytics",
+                "pages": [
+                  "en/monitoring/tracing",
+                  "en/monitoring/evaluations"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Troubleshooting",
+            "icon": "wrench",
+            "groups": [
+              {
+                "group": "Troubleshooting",
+                "pages": [
+                  "en/troubleshooting"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "interaction": {
+    "drilldown": true
+  },
+  "head": [
+    "<link rel=\"stylesheet\" href=\"/styles.css\">",
+    "<script src=\"/toc.js\"></script>",
+    "<script src=\"/lang-toggle.js\"></script>"
+  ]
+}

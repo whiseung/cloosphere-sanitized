@@ -1,0 +1,219 @@
+---
+title: "배포 체크리스트"
+description: "운영 환경 배포 시 반드시 점검해야 할 환경변수, 멀티워커 설정, 외부 의존성, 모니터링 endpoint 가이드."
+---
+
+이 페이지는 Cloosphere를 **운영 환경에 배포할 때** 운영자가 점검해야 할 필수 설정을 모아둔 체크리스트입니다.
+
+<Tip>
+  관리자 패널의 설정값(GUI)은 **PersistentConfig**로 DB에 저장되어 자동 반영됩니다. 이 페이지에서 다루는 항목은 GUI로 변경 불가능한 **환경변수 / 외부 의존성** 입니다.
+</Tip>
+
+---
+
+## 필수 환경변수
+
+운영 환경에서 미설정 시 일부 기능이 비활성화되거나 비정상 동작합니다.
+
+### 공개 URL
+
+| 변수 | 필수 | 용도 | 예시 |
+|------|:---:|------|------|
+| **`CLOOSPHERE_PUBLIC_URL`** | ✅ | 외부 접근 base URL. SR(서비스 요청), 임베드 위젯 callback, 매니페스트 validDomains 자동 계산 등에 사용 | `https://cloosphere.yourdomain.com` |
+
+<Warning>
+  `CLOOSPHERE_PUBLIC_URL` 미설정 시:
+  - **SR(Service Request) 기능 비활성화** — 사용자가 문제 신고 불가
+  - 임베드 위젯 callback URL이 내부 IP/host로 잘못 노출
+  - Teams 봇 매니페스트의 validDomains 계산 오류
+
+  반드시 **HTTPS 공개 FQDN**으로 지정. 프록시(Nginx/Cloudflare) 뒤에 있으면 외부에서 보이는 URL을 입력.
+</Warning>
+
+### 데이터베이스 / Redis
+
+| 변수 | 필수 | 용도 |
+|------|:---:|------|
+| `DATABASE_URL` | ✅ | PostgreSQL 연결 문자열 |
+| `DATABASE_SCHEMA` | ⚠️ | 멀티 테넌트 시 스키마 분리 (기본 `public`) |
+| `REDIS_URL` | ⚠️ | 멀티워커 환경 필수, 단일 워커는 선택 |
+| `REDIS_SENTINEL_HOSTS` | — | Redis Sentinel 사용 시 |
+| `REDIS_SENTINEL_PORT` | — | (기본 26379) |
+
+<Warning>
+  **멀티워커 환경에서는 `REDIS_URL` 필수.** Redis 없이 운영하면:
+  - PersistentConfig가 워커별 메모리에만 저장되어 **워커 간 설정 불일치**
+  - 사용자별 에이전트 선택 상태 등 세션 데이터 손실
+  - Teams 봇 / 임베드 위젯의 사용자 컨텍스트 분실
+
+  Cloosphere는 Redis 연결 실패 시 **5초 timeout으로 fast-fail**하고 in-memory fallback으로 자동 전환됩니다 (단일 워커 모드용). 멀티워커에서는 health endpoint로 Redis 가용성을 모니터링하세요.
+</Warning>
+
+### Knowledge Graph (AGE)
+
+| 변수 | 기본값 | 권장값 |
+|------|:------:|:------:|
+| `AGE_POOL_MIN` | 2 | 소규모 2 / 중 4 / 대 8 |
+| `AGE_POOL_MAX` | 32 | 소규모 16 / 중 32 / 대 64+ |
+
+KG fan-out 추출은 동시 연결을 많이 사용하므로 풀 고갈로 sync가 실패할 수 있습니다.
+
+| 규모 | 권장 |
+|------|------|
+| **< 10M 노드** | `AGE_POOL_MIN=2 AGE_POOL_MAX=16` |
+| **10M ~ 100M 노드** | `AGE_POOL_MIN=4 AGE_POOL_MAX=32` (기본값) |
+| **> 100M 노드** | `AGE_POOL_MIN=8 AGE_POOL_MAX=64` |
+
+<Tip>
+  풀 고갈 시 Cloosphere는 **5회 지수 백오프 재시도** (0.1s × 2^attempt)를 자동 수행합니다. 로그에 `[age_service] pool initialized`가 보이면 정상 초기화. `PoolError` 또는 `connection pool exhausted`가 반복되면 풀 크기를 한 단계 올리세요.
+</Tip>
+
+---
+
+## SSO / OIDC 연동 (선택)
+
+OAuth/OIDC SSO를 활성화하려면 다음 환경변수를 설정합니다 (Keycloak, Entra ID, Google 모두 동일 인터페이스).
+
+```bash
+OPENID_PROVIDER_URL=https://auth.example.com/realms/cloosphere/.well-known/openid-configuration
+OAUTH_CLIENT_ID=cloosphere-app
+OAUTH_CLIENT_SECRET=<strong-secret>
+OAUTH_SCOPES="openid email profile"
+OAUTH_PROVIDER_NAME=Keycloak
+```
+
+| 변수 | 용도 |
+|------|------|
+| `OPENID_PROVIDER_URL` | OIDC Discovery URL (`.well-known/openid-configuration`) |
+| `OAUTH_CLIENT_ID` | IdP에 등록한 클라이언트 ID |
+| `OAUTH_CLIENT_SECRET` | 클라이언트 시크릿 |
+| `OAUTH_SCOPES` | 요청 스코프 (`openid email profile`이 기본) |
+| `OAUTH_PROVIDER_NAME` | UI 로그인 화면에 표시될 Provider 이름 |
+
+<Note>
+  **Keycloak 조직 동기화**(`add35ab42` 이후): client_credentials grant flow로 동작. 위 환경변수가 모두 설정되어 있으면 [조직 관리](/ko/admin/organizations) 화면에서 Keycloak 동기화 옵션이 활성화됩니다.
+</Note>
+
+자세한 내용은 [일반 설정 — 인증](/ko/admin/settings/general#인증-설정) 참조.
+
+---
+
+## Teams 봇 (선택)
+
+Microsoft Teams 봇을 운영하려면:
+
+```bash
+TEAMS_BOT_APP_ID=<Azure Bot Client ID>
+TEAMS_BOT_APP_PASSWORD=<Client Secret>
+TEAMS_BOT_TENANT_ID=common  # 또는 단일 테넌트 GUID
+TEAMS_BOT_ENABLED=true
+TEAMS_BOT_BACKEND_TIMEOUT=300
+TEAMS_BOT_DEFAULT_LOCALE=ko-KR
+```
+
+<Warning>
+  Teams 봇은 **멀티워커 환경에서 Redis 필수**. 사용자별 에이전트 선택 상태가 워커 간 공유되어야 합니다.
+</Warning>
+
+상세 설정은 [Teams 봇 가이드](/ko/admin/teams-bot) 참조.
+
+---
+
+## 멀티워커 운영 체크리스트
+
+| 항목 | 권장 | 미준수 시 영향 |
+|------|------|-----------------|
+| `REDIS_URL` 설정 | 필수 | PersistentConfig 동기화 실패, 세션 손실 |
+| 워커 간 동일한 환경변수 | 필수 | 설정 불일치로 사용자별 다른 동작 |
+| Alembic 마이그레이션 | 1회만 | 다중 워커 동시 실행 시 충돌 (최신 버전에서 lock으로 fix) |
+| 파일 스토리지 공유 | 필수 | 워커마다 다른 로컬 파일에 접근 → 업로드 후 다른 워커에서 미존재 |
+| Redis Sentinel/Cluster | 권장 | Redis 단일 장애 시 전체 서비스 중단 |
+| 동일한 시간대 (TZ) | 필수 | 스케줄·감사 로그 시간 불일치 |
+
+<Tip>
+  Alembic 마이그레이션 충돌은 최신 버전에서 자동 lock으로 해결되었지만, **컨테이너 시작 순서를 직렬화**(예: 첫 워커 시작 후 헬스체크 통과를 기다려 나머지 워커 기동)하면 더 안전합니다.
+</Tip>
+
+---
+
+## Health Endpoints (모니터링 통합)
+
+Cloosphere는 외부 모니터링(Prometheus, Datadog, Azure Monitor 등)과 연동할 수 있는 health endpoint를 제공합니다.
+
+| Endpoint | 용도 | 인증 |
+|----------|------|:----:|
+| `GET /health` | 기본 liveness 체크 | 없음 |
+| `GET /health/db` | DB 연결 상태 (503 + error detail if down) | 없음 |
+| `GET /health/redis` | Redis ping (503 if unavailable) | 없음 |
+| `GET /health/full` | DB + Redis + TaskQueue 종합 상태 | Admin |
+
+응답 예시:
+
+```json
+GET /health/full
+
+{
+  "status": "ok",
+  "components": {
+    "database": { "status": "ok", "latency_ms": 12 },
+    "redis": { "status": "ok", "latency_ms": 1 },
+    "task_queue": { "status": "ok", "pending": 3 }
+  }
+}
+```
+
+<Tip>
+  관리자 패널의 **System Diagnostics 패널**에서 `/health/full` 결과를 GUI로 확인할 수 있습니다. CI/CD readiness probe는 `/health/db`를, liveness probe는 `/health`를 사용하길 권장합니다.
+</Tip>
+
+---
+
+## 운영 체크리스트 (요약)
+
+배포 직전 점검:
+
+<Steps>
+  <Step title="공개 URL 확인">
+    `CLOOSPHERE_PUBLIC_URL`이 외부 HTTPS FQDN으로 설정되었는가?
+  </Step>
+  <Step title="DB / Redis">
+    `DATABASE_URL` 정상 연결, 멀티워커면 `REDIS_URL` 필수
+  </Step>
+  <Step title="OIDC (선택)">
+    SSO 사용 시 `OPENID_PROVIDER_URL` + client credentials 설정
+  </Step>
+  <Step title="Teams 봇 (선택)">
+    Teams 통합 사용 시 Azure Bot Service 등록 + 매니페스트 업로드
+  </Step>
+  <Step title="AGE 풀 크기">
+    KG 사용 규모에 맞춰 `AGE_POOL_MAX` 조정
+  </Step>
+  <Step title="Health 모니터링">
+    외부 모니터링에 `/health/db`, `/health/redis` polling 추가
+  </Step>
+  <Step title="감사 로그 활성화">
+    라이선스에 `audit_log` 피처 포함되어 있는지 확인 → [감사 로그](/ko/monitoring/audit-logs)
+  </Step>
+  <Step title="백업 정책">
+    PostgreSQL + 파일 스토리지 정기 백업, AGE 그래프 별도 백업 주기 설정
+  </Step>
+</Steps>
+
+---
+
+## 관련 페이지
+
+<Columns>
+  <Card title="일반 설정" icon="sliders" href="/ko/admin/settings/general">
+    GUI로 관리되는 인증·기능 토글
+  </Card>
+  <Card title="Teams 봇" icon="microsoft" href="/ko/admin/teams-bot">
+    Microsoft Teams 통합
+  </Card>
+  <Card title="알림 설정" icon="bell" href="/ko/admin/notifications">
+    이메일·웹훅 알림 채널
+  </Card>
+  <Card title="트러블슈팅" icon="wrench" href="/ko/troubleshooting">
+    운영 중 자주 보고된 이슈와 해결책
+  </Card>
+</Columns>

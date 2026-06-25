@@ -1,0 +1,95 @@
+---
+title: "라이선스"
+description: "라이선스 키 등록, 티어별 기능 확인, 기능 키 관리를 수행합니다."
+---
+
+**관리자 > 설정 > 라이선스** 탭에서 Cloosphere 라이선스 키와 기능 키를 등록·삭제하고, 모듈별 활성 상태를 확인합니다.
+
+<Frame caption="라이선스 설정 탭">
+  <img src="/images/admin/settings-license.png" alt="라이선스 설정 탭" />
+</Frame>
+
+---
+
+## 티어 구성
+
+| 티어 | 포함 기능 |
+|------|----------|
+| **Basic** | 기본 채팅, 사용자 관리 (라이선스 모듈 미포함) |
+| **Standard** | Basic + 감사 로그, 용어 사전, 가드레일, 이미지 생성, KbSphere, 도구 |
+| **Professional** | Standard + 에이전트 플로우, 브랜딩, DbSphere, 자동 평가, 트레이싱 |
+| **Enterprise** | Professional의 모든 기능 + Code Gateway, File Guardrail (전체 모듈 포함) |
+
+---
+
+## 키 유형
+
+| 유형 | 설명 |
+|------|------|
+| **라이선스 키** | 티어를 지정하며, 최대 사용자 수와 만료일을 포함합니다 |
+| **기능 키** | 특정 모듈을 티어와 무관하게 개별 활성화합니다 |
+
+**기능 키로 활성화 가능한 모듈:**
+
+| 모듈 | 설명 |
+|------|------|
+| `audit_log` | 감사 로그 |
+| `glossary` | 용어 사전 |
+| `guardrail` | 가드레일 |
+| `image_generation` | 이미지 생성 |
+| `kbsphere` | 지식기반 (KbSphere) |
+| `tools` | 도구 |
+| `agent_flow` | 에이전트 플로우 |
+| `branding` | 브랜딩 |
+| `dbsphere` | DbSphere |
+| `evaluation` | 자동 평가 |
+| `trace` | 트레이싱 |
+| `code_gateway` | Code Gateway (Enterprise 전용) |
+| `file_guardrail` | File Guardrail (Enterprise 전용) |
+
+---
+
+## 라이선스 등록
+
+<Steps>
+  <Step title="키 발급">
+    Cloocus 담당자에게 라이선스 키를 발급받습니다.
+  </Step>
+  <Step title="키 입력">
+    **관리자 > 설정 > 라이선스** 탭에서 키를 입력합니다.
+  </Step>
+  <Step title="키 등록">
+    **"키 등록"** (Register Key) 버튼을 클릭합니다. 라이선스 키와 기능 키 모두 동일한 입력란을 사용합니다.
+  </Step>
+  <Step title="상태 확인">
+    등록 후 현재 라이선스 상태를 확인합니다.
+
+    | 확인 항목 | 설명 |
+    |-----------|------|
+    | **티어** | 현재 활성 티어 |
+    | **회사명** | 라이선스 발급 대상 |
+    | **최대 사용자 수** | 허용되는 최대 사용자 수 |
+    | **만료일** | 라이선스 만료 일시 |
+    | **기능 현황** (Feature Status) | 모듈별 Available / Not Licensed 상태 및 enforcement 설정 상태 |
+  </Step>
+</Steps>
+
+---
+
+## 라이선스 관리
+
+등록된 라이선스 키와 기능 키는 목록에서 확인할 수 있으며, 개별 삭제가 가능합니다.
+
+<Frame caption="라이선스 키 목록 및 기능 현황">
+  <img src="/images/admin/settings-license-detail.png" alt="라이선스 키 목록 및 기능 현황" />
+</Frame>
+
+<Note>
+  `ENABLE_LICENSE_ENFORCEMENT` 환경 변수가 `false`(기본값)이면 라이선스 없이 모든 기능을 사용할 수 있습니다.
+  기업 환경에서 기능 제어가 필요한 경우 `true`로 설정하세요.
+</Note>
+
+<Warning>
+  라이선스 키를 삭제하면 해당 티어의 기능이 즉시 비활성화됩니다.
+  삭제 전 현재 사용 중인 기능에 영향이 없는지 확인하세요.
+</Warning>
